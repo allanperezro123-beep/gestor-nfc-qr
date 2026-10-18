@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "links": {
+      ".read": true,
+      ".write": true,
+      "$slug": {
+        ".validate": "newData.hasChildren(['slug', 'name', 'targetUrl'])"
+      }
+    },
+    "config": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
+

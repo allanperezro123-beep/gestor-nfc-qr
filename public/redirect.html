@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlueCode — Conectando...</title>
+  <link rel="icon" type="image/svg+xml" href="/logo_BC.svg" />
+  <link rel="preconnect" href="https://gestor-nfc-qr-2026-default-rtdb.firebaseio.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08090d;
+      --surface: #10121a;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #0865F5;
+      --cyan: #08D0E6;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --font: 'Plus Jakarta Sans', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg);
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 20px 20px;
+      font-family: var(--font);
+      color: var(--text);
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 26px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+    .brand-logo-wrap {
+      width: 44px;
+      height: 26px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 2.5px solid rgba(8, 101, 245, 0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h1 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.01em; }
+    p { font-size: 0.88rem; color: var(--muted); line-height: 1.5; }
+    .slug-badge {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: #93c5fd;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+    .wifi-box, .vcard-box {
+      margin-top: 18px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: left;
+      font-size: 0.84rem;
+    }
+    .wifi-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .wifi-row span { color: var(--muted); }
+    .wifi-row strong { color: #fff; font-family: var(--mono); }
+    .footer-brand {
+      margin-top: 24px;
+      font-size: 0.75rem;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="card" id="statusCard">
+    <div class="brand-logo-wrap">
+      <img src="/logo_BC.svg" alt="BlueCode Logo" />
+    </div>
+    <div class="spinner" id="spinner"></div>
+    <h1 id="title">Conectando...</h1>
+    <p id="message">Redirigiendo al destino configurado en BlueCode.</p>
+    <div id="extra"></div>
+  </div>
+
+  <div class="footer-brand">
+    <span>Powered by</span>
+    <strong style="color: #64748b;">BlueCode</strong>
+  </div>
+
+  <script>
+    (function () {
+      const DB_URL = "https://gestor-nfc-qr-2026-default-rtdb.firebaseio.com";
+
+      function extractSlug() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("id")) return params.get("id").trim();
+        const parts = window.location.pathname.split("/").filter(Boolean);
+        const rIndex = parts.indexOf("r");
+        if (rIndex !== -1 && parts[rIndex + 1]) {
+          return decodeURIComponent(parts[rIndex + 1]).trim();
+        }
+        return parts[parts.length - 1] || "";
+      }
+
+      function showState(titleText, msgText, slugText, actionHtml) {
+        document.getElementById("spinner").classList.add("hidden");
+        document.getElementById("title").textContent = titleText;
+        document.getElementById("message").textContent = msgText;
+        const extra = document.getElementById("extra");
+        extra.innerHTML = "";
+        if (slugText) {
+          const badge = document.createElement("div");
+          badge.className = "slug-badge";
+          badge.textContent = "ID: " + slugText;
+          extra.appendChild(badge);
+        }
+        if (actionHtml) {
+          const div = document.createElement("div");
+          div.innerHTML = actionHtml;
+          extra.appendChild(div);
+        }
+      }
+
+      const slug = extractSlug().toLowerCase().replace(/[^a-z0-9-_]/g, "");
+      if (!slug) {
+        showState("Enlace no válido", "No se especificó un identificador en este enlace.");
+        return;
+      }
+
+      fetch(DB_URL + "/links/" + encodeURIComponent(slug) + ".json", {
+        method: "GET",
+        cache: "no-store"
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          if (!data || !data.targetUrl) {
+            showState(
+              "Tag sin configurar",
+              "Este tag o QR está registrado pero aún no tiene un destino asignado en el gestor.",
+              slug,
+              '<br><a class="btn" href="/equipo-4x9k">Abrir Gestor BlueCode</a>'
+            );
+            return;
+          }
+
+          if (data.active === false) {
+            showState(
+              "Enlace en pausa",
+              "Este enlace dinámico fue pausado temporalmente desde el panel.",
+              data.name || slug
+            );
+            return;
+          }
+
+          // Non-blocking scan counter increment
+          const nextScans = (typeof data.scans === "number" ? data.scans : 0) + 1;
+          try {
+            fetch(DB_URL + "/links/" + encodeURIComponent(slug) + ".json", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ scans: nextScans, lastScannedAt: Date.now() }),
+              keepalive: true
+            }).catch(function () {});
+          } catch (e) {}
+
+          const target = data.targetUrl.trim();
+
+          // 1. Manejo especial de Wi-Fi (WIFI:S:Red;T:WPA;P:Pass;;)
+          if (target.startsWith("WIFI:")) {
+            const ssidMatch = target.match(/S:([^;]+);/);
+            const passMatch = target.match(/P:([^;]+);/);
+            const ssid = ssidMatch ? ssidMatch[1] : "Red Wi-Fi";
+            const pass = passMatch ? passMatch[1] : "";
+
+            showState(
+              "Conexión Wi-Fi",
+              "Conéctate a la red escaneada:",
+              data.name,
+              '<div class="wifi-box">' +
+                '<div class="wifi-row"><span>Red (SSID):</span><strong>' + ssid + '</strong></div>' +
+                '<div class="wifi-row"><span>Contraseña:</span><strong>' + (pass || '(Abierta)') + '</strong></div>' +
+              '</div>' +
+              (pass ? '<button class="btn" onclick="navigator.clipboard.writeText(\'' + pass + '\');alert(\'Contraseña copiada al portapapeles\')">Copiar Contraseña</button>' : '')
+            );
+            return;
+          }
+
+          // 2. Manejo especial de vCard digital (data:text/vcard...)
+          if (target.startsWith("data:text/vcard") || target.startsWith("BEGIN:VCARD")) {
+            const vcfData = target.startsWith("data:") ? decodeURIComponent(target.split(",")[1] || "") : target;
+            const blob = new Blob([vcfData], { type: "text/vcard;charset=utf-8" });
+            const vcfUrl = URL.createObjectURL(blob);
+            showState(
+              "Tarjeta de Contacto",
+              "Descarga la ficha de contacto para guardarla en tu teléfono:",
+              data.name,
+              '<br><a class="btn" href="' + vcfUrl + '" download="' + (data.name || 'contacto') + '.vcf">Guardar en Contactos</a>'
+            );
+            // Trigger auto-download on mobile
+            const tempA = document.createElement("a");
+            tempA.href = vcfUrl;
+            tempA.download = (data.name || "contacto") + ".vcf";
+            tempA.click();
+            return;
+          }
+
+          // 3. Destinos estándar (Web, WhatsApp, Tel, Mail, Maps)
+          let finalUrl = target;
+          if (!/^(https?:\/\/|mailto:|tel:|whatsapp:\/\/|sms:|geo:)/i.test(finalUrl)) {
+            finalUrl = "https://" + finalUrl;
+          }
+
+          window.location.replace(finalUrl);
+        })
+        .catch(function () {
+          showState(
+            "Error de conexión",
+            "No se pudo consultar el destino. Intenta escanear nuevamente.",
+            slug
+          );
+        });
+    })();
+  </script>
+</body>
+</html>

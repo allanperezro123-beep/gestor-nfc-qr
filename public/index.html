@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlueCode — Gestor NFC & QR</title>
+  <link rel="icon" type="image/svg+xml" href="/logo_BC.svg" />
+  <link rel="preconnect" href="https://gestor-nfc-qr-2026-default-rtdb.firebaseio.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Librerías cliente ultra-ligeras -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #08090d;
+      --surface: #0f1118;
+      --surface-elevated: #151822;
+      --surface-hover: #191c28;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-focus: #0865F5;
+      --text: #f1f5f9;
+      --text-muted: #8e9bb0;
+      --text-dim: #556277;
+      --bc-blue: #0865F5;
+      --bc-cyan: #08D0E6;
+      --bc-gradient: linear-gradient(135deg, #0865F5 0%, #087CF5 28%, #079AF0 53%, #04B9EA 76%, #08D0E6 100%);
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --danger: #ef4444;
+      --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 96px;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Header Minimalista BlueCode */
+    header {
+      background: rgba(8, 9, 13, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding: 14px 0;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .brand-logo-img {
+      height: 24px;
+      width: auto;
+      display: block;
+    }
+    .brand-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-pill {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(8, 208, 230, 0.1);
+      color: var(--bc-cyan);
+      border: 1px solid rgba(8, 208, 230, 0.25);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Botones Minimalistas */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-family: var(--font);
+      font-size: 0.83rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-bc {
+      background: var(--bc-gradient);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(8, 101, 245, 0.25);
+    }
+    .btn-bc:hover { opacity: 0.95; }
+    .btn-subtle {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .btn-subtle:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+    }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+    .btn-sm { padding: 5px 10px; font-size: 0.77rem; }
+
+    /* Barra Superior de Herramientas & Masivo */
+    .top-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 22px 0 16px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 340px;
+      min-width: 220px;
+    }
+    .search-box svg {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 8px 12px 8px 34px;
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.84rem;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--border-focus); }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Tabla / Lista de Tags */
+    .table-header {
+      display: grid;
+      grid-template-columns: 36px 1.2fr 1.3fr 1.6fr 100px;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 820px) {
+      .table-header { display: none; }
+    }
+
+    .tags-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    /* Fila / Tarjeta Minimalista */
+    .tag-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: 36px 1.2fr 1.3fr 1.6fr 100px;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    .tag-row:hover {
+      background: var(--surface-hover);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+    .tag-row.selected {
+      border-color: rgba(8, 101, 245, 0.45);
+      background: rgba(8, 101, 245, 0.04);
+    }
+    .tag-row.is-paused {
+      opacity: 0.55;
+    }
+
+    @media (max-width: 820px) {
+      .tag-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+
+    /* Checkbox personalizado */
+    .custom-check {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .custom-check input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--bc-blue);
+      cursor: pointer;
+    }
+
+    /* Celda Info: Nombre y Escaneos */
+    .cell-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .tag-name-text {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .tag-meta-sub {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge-dest-type {
+      font-size: 0.65rem;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      text-transform: uppercase;
+    }
+
+    /* Celda Link Fijo */
+    .cell-fixed {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      padding: 5px 8px;
+      border-radius: 5px;
+      min-width: 0;
+    }
+    .fixed-link-display {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: #93c5fd;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .fixed-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .btn-icon {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 3px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+    }
+    .btn-icon:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+    /* Celda Destino Actual Editable */
+    .cell-dest {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .dest-inline-input {
+      flex: 1;
+      background: #090c12;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 0.82rem;
+      padding: 6px 10px;
+      border-radius: 5px;
+      outline: none;
+      min-width: 0;
+      transition: border-color 0.15s ease;
+    }
+    .dest-inline-input:focus {
+      border-color: var(--bc-blue);
+    }
+    .btn-save-inline {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 9px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .btn-save-inline:hover {
+      background: var(--bc-blue);
+      border-color: var(--bc-blue);
+      color: #fff;
+    }
+
+    /* Celda Opciones */
+    .cell-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+
+    /* Barra Flotante de Acciones Masivas */
+    .bulk-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: #11141e;
+      border: 1px solid rgba(8, 101, 245, 0.35);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      padding: 10px 18px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 50;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-wrap: wrap;
+    }
+    .bulk-bar.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+    .bulk-count-badge {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--bc-cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Modales */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 8, 0.82);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 520px;
+      padding: 24px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .modal-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px; }
+
+    .form-row { margin-bottom: 14px; }
+    .form-row label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .form-control {
+      width: 100%;
+      background: #090b10;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.86rem;
+      font-family: var(--font);
+      padding: 8px 12px;
+      border-radius: 6px;
+      outline: none;
+    }
+    .form-control:focus { border-color: var(--bc-blue); }
+    .hint-text { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; }
+
+    /* Selector de Tipo de Destino con Tabs */
+    .dest-type-tabs {
+      display: flex;
+      gap: 4px;
+      background: #090b10;
+      padding: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      overflow-x: auto;
+    }
+    .type-tab {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 5px 9px;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .type-tab.active {
+      background: rgba(8, 101, 245, 0.2);
+      color: #93c5fd;
+    }
+
+    /* Modal QR Studio */
+    .qr-export-preview {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      display: inline-block;
+      margin: 16px auto;
+    }
+    .qr-export-label {
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-align: center;
+      margin-top: 8px;
+    }
+    .export-options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #11141e;
+      border: 1px solid rgba(8, 101, 245, 0.4);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.25s ease;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* Private Gate */
+    #gateScreen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #gateScreen.active { display: flex; }
+  </style>
+</head>
+<body>
+
+  <!-- Gate Privado (4 Integrantes) -->
+  <div id="gateScreen">
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 32px 26px; max-width: 360px; width: 100%; text-align: center;">
+      <img src="/logo_BC.svg" alt="BlueCode" style="height: 30px; margin: 0 auto 16px; display: block;" />
+      <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 6px;">Acceso Privado BlueCode</h2>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">Ingresa la clave compartida del equipo para continuar.</p>
+      <form id="gateForm">
+        <input type="password" id="gateKeyInput" class="form-control" placeholder="Clave (ej: equipo4)" style="text-align: center; margin-bottom: 10px;" required />
+        <button type="submit" class="btn btn-bc" style="width: 100%;">Entrar al Gestor</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container header-inner">
+      <a href="/equipo-4x9k" class="brand-link">
+        <img src="/logo_BC.svg" alt="BlueCode Logo" class="brand-logo-img" />
+        <div class="brand-title">
+          <span>BlueCode</span>
+          <span style="font-weight: 400; color: var(--text-muted);">NFC & QR</span>
+          <span class="brand-pill">Privado</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <button type="button" class="btn btn-subtle btn-sm" id="btnShareLink" title="Copiar enlace de acceso directo para el equipo">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+          Link del Equipo
+        </button>
+        <button type="button" class="btn btn-subtle btn-sm" id="btnOpenBulkModal" title="Crear varios tags en serie o por lista">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Lote Masivo
+        </button>
+        <button type="button" class="btn btn-bc btn-sm" id="btnOpenNewModal">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Nuevo Tag / QR
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Barra de Búsqueda y Exportación Masiva -->
+    <section class="top-toolbar">
+      <div class="search-box">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, código o destino..." />
+      </div>
+
+      <div class="toolbar-actions">
+        <button type="button" class="btn btn-subtle btn-sm" id="btnExportCsv" title="Descargar inventario en archivo CSV">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Exportar CSV
+        </button>
+        <button type="button" class="btn btn-subtle btn-sm" id="btnExportAllZip" title="Descargar todos los códigos QR en un archivo .ZIP">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+          Exportar Todos QR (ZIP)
+        </button>
+        <button type="button" class="btn btn-subtle btn-sm" id="btnPrintSheet" title="Hoja de impresión de stickers para mandar a imprimir">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          Hoja de Impresión
+        </button>
+      </div>
+    </section>
+
+    <!-- Cabecera de Columnas -->
+    <div class="table-header">
+      <div>
+        <label class="custom-check" title="Seleccionar todo">
+          <input type="checkbox" id="selectAllCheckbox" />
+        </label>
+      </div>
+      <div>Identificador / Tag</div>
+      <div>Link Fijo (NFC / QR)</div>
+      <div>Destino Actual (Editable)</div>
+      <div style="text-align: right;">Acciones</div>
+    </div>
+
+    <!-- Contenedor de Tags -->
+    <div class="tags-container" id="tagsContainer">
+      <!-- Cargado dinámicamente -->
+    </div>
+
+  </main>
+
+  <!-- Barra Flotante de Acciones Masivas -->
+  <div class="bulk-bar" id="bulkBar">
+    <div class="bulk-count-badge">
+      <span id="bulkCount">0</span> seleccionados
+    </div>
+    <button type="button" class="btn btn-subtle btn-sm" id="btnBulkEditDest">
+      Cambiar Destino
+    </button>
+    <button type="button" class="btn btn-subtle btn-sm" id="btnBulkExportZip">
+      Descargar QRs (ZIP)
+    </button>
+    <button type="button" class="btn btn-subtle btn-sm" id="btnBulkPrint">
+      Imprimir Seleccionados
+    </button>
+    <button type="button" class="btn btn-subtle btn-sm" id="btnBulkToggleActive">
+      Pausar / Activar
+    </button>
+    <button type="button" class="btn btn-danger btn-sm" id="btnBulkDelete">
+      Eliminar
+    </button>
+  </div>
+
+  <!-- Modal: Crear Nuevo Tag Personalizado -->
+  <div class="modal-backdrop" id="newTagModal">
+    <div class="modal-box">
+      <h3 class="modal-title">Nuevo Tag o QR</h3>
+      <p class="modal-subtitle">Genera un enlace permanente y personaliza a qué acción redirige.</p>
+
+      <form id="newTagForm">
+        <div class="form-row">
+          <label for="newName">Nombre del Tag</label>
+          <input type="text" id="newName" class="form-control" placeholder="Ej: Mesa 1, WhatsApp Soporte, WiFi Local..." required />
+        </div>
+
+        <div class="form-row">
+          <label for="newSlug">Código Corto Fijo (Slug)</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="newSlug" class="form-control" placeholder="ej: mesa-1" required />
+            <button type="button" class="btn btn-subtle btn-sm" id="btnRandomSlug">Aleatorio</button>
+          </div>
+          <div class="hint-text" id="slugPreviewText">Link: https://gestor-nfc-qr-2026.web.app/r/mesa-1</div>
+        </div>
+
+        <!-- Selector de Tipo de Destino -->
+        <div class="form-row">
+          <label>Tipo de Acción / Destino</label>
+          <div class="dest-type-tabs" id="typeTabs">
+            <button type="button" class="type-tab active" data-type="web">🌐 Web / URL</button>
+            <button type="button" class="type-tab" data-type="whatsapp">💬 WhatsApp</button>
+            <button type="button" class="type-tab" data-type="wifi">📶 Wi-Fi</button>
+            <button type="button" class="type-tab" data-type="vcard">👤 Contacto (vCard)</button>
+            <button type="button" class="type-tab" data-type="phone">📞 Llamada</button>
+            <button type="button" class="type-tab" data-type="email">✉️ Correo</button>
+          </div>
+
+          <!-- Campos dinámicos según tipo -->
+          <div id="dynamicFieldsContainer">
+            <!-- 1. Web -->
+            <div class="type-panel" id="panelWeb">
+              <input type="text" id="targetWeb" class="form-control" placeholder="https://tu-sitio.com o https://drive.google.com/..." />
+            </div>
+
+            <!-- 2. WhatsApp -->
+            <div class="type-panel" id="panelWhatsapp" style="display: none;">
+              <input type="text" id="targetWaPhone" class="form-control" placeholder="Número con código de país (ej: +573001234567)" style="margin-bottom: 6px;" />
+              <input type="text" id="targetWaMsg" class="form-control" placeholder="Mensaje predeterminado (ej: ¡Hola! Quisiera más información)" />
+            </div>
+
+            <!-- 3. Wi-Fi -->
+            <div class="type-panel" id="panelWifi" style="display: none;">
+              <input type="text" id="targetWifiSsid" class="form-control" placeholder="Nombre de la red Wi-Fi (SSID)" style="margin-bottom: 6px;" />
+              <input type="text" id="targetWifiPass" class="form-control" placeholder="Contraseña de la red" />
+            </div>
+
+            <!-- 4. vCard Contacto -->
+            <div class="type-panel" id="panelVcard" style="display: none;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+                <input type="text" id="vcardName" class="form-control" placeholder="Nombre completo" />
+                <input type="text" id="vcardPhone" class="form-control" placeholder="Teléfono" />
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <input type="text" id="vcardOrg" class="form-control" placeholder="Empresa / Cargo" />
+                <input type="email" id="vcardEmail" class="form-control" placeholder="Correo electrónico" />
+              </div>
+            </div>
+
+            <!-- 5. Llamada -->
+            <div class="type-panel" id="panelPhone" style="display: none;">
+              <input type="tel" id="targetPhone" class="form-control" placeholder="Número telefónico (ej: +573001234567)" />
+            </div>
+
+            <!-- 6. Correo -->
+            <div class="type-panel" id="panelEmail" style="display: none;">
+              <input type="email" id="targetEmail" class="form-control" placeholder="destinatario@correo.com" style="margin-bottom: 6px;" />
+              <input type="text" id="targetEmailSubj" class="form-control" placeholder="Asunto predeterminado" />
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+          <button type="button" class="btn btn-subtle" id="btnCloseNewModal">Cancelar</button>
+          <button type="submit" class="btn btn-bc">+ Crear Enlace</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Creación Masiva (Lote) -->
+  <div class="modal-backdrop" id="bulkCreateModal">
+    <div class="modal-box">
+      <h3 class="modal-title">Creación Masiva en Lote</h3>
+      <p class="modal-subtitle">Genera múltiples tags a la vez mediante una serie numerada o pegando una lista.</p>
+
+      <div class="dest-type-tabs" style="margin-bottom: 14px;">
+        <button type="button" class="type-tab active" id="tabBulkSeries">Serie Numerada (ej: Mesas 1 al 20)</button>
+        <button type="button" class="type-tab" id="tabBulkList">Pegar Lista / CSV</button>
+      </div>
+
+      <!-- Modo Serie -->
+      <form id="formBulkSeries">
+        <div class="form-row">
+          <label>Prefijo del Nombre</label>
+          <input type="text" id="seriesPrefix" class="form-control" value="Mesa" placeholder="Mesa, Tag, Habitación..." required />
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+          <div>
+            <label style="font-size: 0.76rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Desde el número</label>
+            <input type="number" id="seriesFrom" class="form-control" value="1" min="1" required />
+          </div>
+          <div>
+            <label style="font-size: 0.76rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Hasta el número</label>
+            <input type="number" id="seriesTo" class="form-control" value="10" min="1" max="100" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Destino Inicial Común</label>
+          <input type="text" id="seriesTarget" class="form-control" placeholder="https://tu-web.com o menú..." required />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+          <button type="button" class="btn btn-subtle" id="btnCloseBulkCreateModal">Cancelar</button>
+          <button type="submit" class="btn btn-bc">Generar Lote en Serie</button>
+        </div>
+      </form>
+
+      <!-- Modo Lista -->
+      <form id="formBulkList" style="display: none;">
+        <div class="form-row">
+          <label>Pega una lista (Un tag por línea: Nombre, Destino)</label>
+          <textarea id="bulkListText" class="form-control" rows="6" placeholder="Mesa 1, https://menu.com/1&#10;Mesa 2, https://menu.com/2&#10;Recepción, https://wa.me/57300..."></textarea>
+          <div class="hint-text">Si omites el destino se usará la URL que definas abajo.</div>
+        </div>
+        <div class="form-row">
+          <label>Destino por defecto (si no se especifica en la línea)</label>
+          <input type="text" id="bulkListDefaultTarget" class="form-control" value="https://google.com" />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+          <button type="button" class="btn btn-subtle" id="btnCloseBulkListModal">Cancelar</button>
+          <button type="submit" class="btn btn-bc">Crear Tags de la Lista</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edición Masiva de Destino -->
+  <div class="modal-backdrop" id="bulkEditModal">
+    <div class="modal-box">
+      <h3 class="modal-title">Cambiar Destino a Seleccionados</h3>
+      <p class="modal-subtitle">Se actualizará inmediatamente la dirección de todos los tags marcados.</p>
+      <form id="bulkEditForm">
+        <div class="form-row">
+          <label>Nueva URL o Destino</label>
+          <input type="text" id="bulkNewTarget" class="form-control" placeholder="https://..." required />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+          <button type="button" class="btn btn-subtle" id="btnCloseBulkEditModal">Cancelar</button>
+          <button type="submit" class="btn btn-bc">Actualizar Todos</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: QR Studio & Exportación -->
+  <div class="modal-backdrop" id="qrModal">
+    <div class="modal-box" style="text-align: center;">
+      <h3 class="modal-title" id="qrModalTitle">Código QR</h3>
+      <p class="modal-subtitle">Opciones de exportación en alta calidad para impresión y digital.</p>
+
+      <div class="qr-export-preview">
+        <div id="qrCanvasBox"></div>
+        <div class="qr-export-label" id="qrModalLabel"></div>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <code id="qrModalUrl" style="font-family: var(--mono); font-size: 0.76rem; color: #93c5fd;"></code>
+      </div>
+
+      <div class="export-options-grid">
+        <button type="button" class="btn btn-bc btn-sm" id="btnExportPngTagged">
+          PNG con Etiqueta
+        </button>
+        <button type="button" class="btn btn-subtle btn-sm" id="btnExportPngClean">
+          PNG Limpio
+        </button>
+        <button type="button" class="btn btn-subtle btn-sm" id="btnExportSvg">
+          Vectorial SVG
+        </button>
+        <button type="button" class="btn btn-subtle btn-sm" id="btnCopyQrClip">
+          Copiar Imagen
+        </button>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button type="button" class="btn btn-subtle btn-sm" id="btnCloseQrModal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Toast -->
+  <div class="toast" id="toastBox">Acción realizada</div>
+
+  <script>
+    (function () {
+      const DB_URL = "https://gestor-nfc-qr-2026-default-rtdb.firebaseio.com";
+      const TEAM_KEY = "equipo4";
+
+      // Autenticación privada (link secreto /equipo-4x9k)
+      const urlParams = new URLSearchParams(window.location.search);
+      const curPath = window.location.pathname.replace(/^\/+|\/+$/g, "");
+      if (curPath === "equipo-4x9k" || urlParams.get("clave") === TEAM_KEY || urlParams.get("k") === TEAM_KEY) {
+        localStorage.setItem("bc_team_auth", "1");
+      }
+      const isAuthed = localStorage.getItem("bc_team_auth") === "1";
+      const gateScreen = document.getElementById("gateScreen");
+      if (!isAuthed) gateScreen.classList.add("active");
+
+      document.getElementById("gateForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const entered = document.getElementById("gateKeyInput").value.trim().toLowerCase();
+        if (entered === TEAM_KEY || entered === "nfc2026" || entered === "admin") {
+          localStorage.setItem("bc_team_auth", "1");
+          gateScreen.classList.remove("active");
+          window.history.replaceState({}, "", "/equipo-4x9k");
+        } else {
+          alert("Clave incorrecta");
+        }
+      });
+
+      // Estado
+      let itemsMap = {};
+      let selectedSlugs = new Set();
+      let searchQuery = "";
+      let activeQrItem = null;
+      let selectedDestType = "web";
+
+      function showToast(text) {
+        const t = document.getElementById("toastBox");
+        t.textContent = text;
+        t.classList.add("show");
+        clearTimeout(window.__tTimer);
+        window.__tTimer = setTimeout(function () { t.classList.remove("show"); }, 2600);
+      }
+
+      function cleanSlug(text) {
+        return (text || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9-_]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 48);
+      }
+
+      function getFixedUrl(slug) {
+        return window.location.origin + "/r/" + slug;
+      }
+
+      function detectDestType(target) {
+        if (!target) return "WEB";
+        if (target.startsWith("https://wa.me") || target.startsWith("whatsapp://")) return "WHATSAPP";
+        if (target.startsWith("WIFI:")) return "WI-FI";
+        if (target.startsWith("data:text/vcard") || target.startsWith("BEGIN:VCARD")) return "VCARD";
+        if (target.startsWith("tel:")) return "TEL";
+        if (target.startsWith("mailto:")) return "EMAIL";
+        return "WEB";
+      }
+
+      // Carga de datos
+      async function loadData() {
+        try {
+          const res = await fetch(DB_URL + "/links.json", { cache: "no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          itemsMap = (await res.json()) || {};
+          renderTable();
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      // Sincronización en tiempo real (EventSource)
+      function startSync() {
+        if (!window.EventSource) return;
+        try {
+          const sse = new EventSource(DB_URL + "/links.json");
+          sse.addEventListener("put", function (e) {
+            try {
+              const parsed = JSON.parse(e.data);
+              if (parsed.path === "/") {
+                itemsMap = parsed.data || {};
+              } else {
+                const key = parsed.path.replace(/^\//, "").split("/")[0];
+                if (key) {
+                  if (parsed.data === null) delete itemsMap[key];
+                  else if (parsed.path.split("/").filter(Boolean).length === 1) itemsMap[key] = parsed.data;
+                  else { loadData(); return; }
+                }
+              }
+              renderTable();
+            } catch (err) {}
+          });
+          sse.addEventListener("patch", function () { loadData(); });
+        } catch (e) {}
+      }
+
+      // Renderizado de tabla limpia
+      function renderTable() {
+        const container = document.getElementById("tagsContainer");
+        const allItems = Object.values(itemsMap).filter(Boolean).sort(function (a, b) {
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+
+        const filtered = allItems.filter(function (i) {
+          if (!searchQuery) return true;
+          const str = ((i.name || "") + " " + (i.slug || "") + " " + (i.targetUrl || "")).toLowerCase();
+          return str.includes(searchQuery);
+        });
+
+        container.innerHTML = "";
+
+        if (filtered.length === 0) {
+          container.innerHTML =
+            '<div style="text-align: center; padding: 48px 16px; border: 1px dashed var(--border); border-radius: 8px;">' +
+            '<p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px;">No hay tags o QRs registrados</p>' +
+            '<button class="btn btn-bc btn-sm" onclick="document.getElementById(\'btnOpenNewModal\').click()">+ Crear el primero</button>' +
+            '</div>';
+          updateBulkBar();
+          return;
+        }
+
+        filtered.forEach(function (item) {
+          container.appendChild(buildTagRow(item));
+        });
+
+        updateBulkBar();
+      }
+
+      function buildTagRow(item) {
+        const row = document.createElement("div");
+        const isSelected = selectedSlugs.has(item.slug);
+        row.className = "tag-row" + (isSelected ? " selected" : "") + (item.active === false ? " is-paused" : "");
+
+        const fixedUrl = getFixedUrl(item.slug);
+        const destType = detectDestType(item.targetUrl);
+
+        // 1. Checkbox
+        const cCheck = document.createElement("div");
+        cCheck.className = "custom-check";
+        const chk = document.createElement("input");
+        chk.type = "checkbox";
+        chk.checked = isSelected;
+        chk.addEventListener("change", function () {
+          if (chk.checked) selectedSlugs.add(item.slug);
+          else selectedSlugs.delete(item.slug);
+          row.classList.toggle("selected", chk.checked);
+          updateBulkBar();
+        });
+        cCheck.appendChild(chk);
+        row.appendChild(cCheck);
+
+        // 2. Info Celda
+        const cInfo = document.createElement("div");
+        cInfo.className = "cell-info";
+        cInfo.innerHTML =
+          '<div class="tag-name-text" title="' + (item.name || item.slug) + '">' + (item.name || item.slug) + '</div>' +
+          '<div class="tag-meta-sub">' +
+          '<span class="badge-dest-type">' + destType + '</span>' +
+          '<span>' + (Number(item.scans) || 0) + ' escaneos</span>' +
+          (item.active === false ? '<span style="color: var(--amber);">[Pausado]</span>' : '') +
+          '</div>';
+        row.appendChild(cInfo);
+
+        // 3. Link Fijo (NFC / QR)
+        const cFixed = document.createElement("div");
+        cFixed.className = "cell-fixed";
+        cFixed.innerHTML =
+          '<span class="fixed-link-display" title="' + fixedUrl + '">' + fixedUrl + '</span>' +
+          '<div class="fixed-actions">' +
+          '<button type="button" class="btn-icon btn-copy-link" title="Copiar Link para NFC/QR">' +
+          '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>' +
+          '</button>' +
+          '<button type="button" class="btn-icon btn-view-qr" title="Ver / Exportar QR">' +
+          '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' +
+          '</button>' +
+          '</div>';
+
+        cFixed.querySelector(".btn-copy-link").addEventListener("click", function () {
+          navigator.clipboard.writeText(fixedUrl).then(function () {
+            showToast("Link fijo copiado: " + fixedUrl);
+          });
+        });
+        cFixed.querySelector(".btn-view-qr").addEventListener("click", function () {
+          openQrStudio(item);
+        });
+        row.appendChild(cFixed);
+
+        // 4. Destino Actual Editable Inline
+        const cDest = document.createElement("div");
+        cDest.className = "cell-dest";
+        const destInput = document.createElement("input");
+        destInput.type = "text";
+        destInput.className = "dest-inline-input";
+        destInput.value = item.targetUrl || "";
+        destInput.placeholder = "https://...";
+
+        const destSaveBtn = document.createElement("button");
+        destSaveBtn.type = "button";
+        destSaveBtn.className = "btn-save-inline";
+        destSaveBtn.textContent = "Guardar";
+
+        async function saveInlineTarget() {
+          const val = destInput.value.trim();
+          if (!val) return;
+          if (val === item.targetUrl) {
+            showToast("Destino sin cambios.");
+            return;
+          }
+          item.targetUrl = val;
+          item.updatedAt = Date.now();
+          destSaveBtn.textContent = "✓";
+          setTimeout(function () { destSaveBtn.textContent = "Guardar"; }, 1500);
+
+          try {
+            await fetch(DB_URL + "/links/" + encodeURIComponent(item.slug) + ".json", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ targetUrl: val, updatedAt: Date.now() })
+            });
+            showToast("Destino actualizado para " + (item.name || item.slug));
+            renderTable();
+          } catch (e) {
+            showToast("Error al guardar en la nube");
+          }
+        }
+
+        destSaveBtn.addEventListener("click", saveInlineTarget);
+        destInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            saveInlineTarget();
+          }
+        });
+
+        cDest.appendChild(destInput);
+        cDest.appendChild(destSaveBtn);
+        row.appendChild(cDest);
+
+        // 5. Opciones (Probar, Pausar, Eliminar)
+        const cActions = document.createElement("div");
+        cActions.className = "cell-actions";
+        cActions.innerHTML =
+          '<a href="' + fixedUrl + '" target="_blank" rel="noopener" class="btn-icon" title="Probar enlace" style="color: var(--bc-cyan);">' +
+          '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>' +
+          '</a>' +
+          '<button type="button" class="btn-icon btn-toggle-state" title="' + (item.active === false ? 'Reactivar' : 'Pausar') + '">' +
+          (item.active === false ?
+            '<svg width="13" height="13" fill="none" stroke="var(--amber)" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>' :
+            '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>') +
+          '</button>' +
+          '<button type="button" class="btn-icon btn-del-item" title="Eliminar tag" style="color: #f87171;">' +
+          '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>' +
+          '</button>';
+
+        cActions.querySelector(".btn-toggle-state").addEventListener("click", async function () {
+          const next = item.active === false ? true : false;
+          item.active = next;
+          renderTable();
+          try {
+            await fetch(DB_URL + "/links/" + encodeURIComponent(item.slug) + ".json", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ active: next })
+            });
+            showToast(next ? "Enlace activado" : "Enlace pausado");
+          } catch (e) {}
+        });
+
+        cActions.querySelector(".btn-del-item").addEventListener("click", async function () {
+          if (!confirm("¿Eliminar '" + (item.name || item.slug) + "'?")) return;
+          delete itemsMap[item.slug];
+          selectedSlugs.delete(item.slug);
+          renderTable();
+          try {
+            await fetch(DB_URL + "/links/" + encodeURIComponent(item.slug) + ".json", {
+              method: "DELETE"
+            });
+            showToast("Tag eliminado.");
+          } catch (e) {}
+        });
+
+        row.appendChild(cActions);
+        return row;
+      }
+
+      // Control de Barra Flotante Masiva
+      function updateBulkBar() {
+        const bar = document.getElementById("bulkBar");
+        const count = selectedSlugs.size;
+        document.getElementById("bulkCount").textContent = count;
+        if (count > 0) bar.classList.add("visible");
+        else bar.classList.remove("visible");
+
+        const allSlugs = Object.keys(itemsMap);
+        const chkAll = document.getElementById("selectAllCheckbox");
+        chkAll.checked = allSlugs.length > 0 && count === allSlugs.length;
+      }
+
+      document.getElementById("selectAllCheckbox").addEventListener("change", function (e) {
+        if (e.target.checked) {
+          Object.keys(itemsMap).forEach(function (s) { selectedSlugs.add(s); });
+        } else {
+          selectedSlugs.clear();
+        }
+        renderTable();
+      });
+
+      // Acciones Masivas
+      document.getElementById("btnBulkToggleActive").addEventListener("click", async function () {
+        if (selectedSlugs.size === 0) return;
+        const slugs = Array.from(selectedSlugs);
+        // Determine whether to pause or activate based on majority
+        const activeCount = slugs.filter(function (s) { return itemsMap[s] && itemsMap[s].active !== false; }).length;
+        const targetActive = activeCount <= slugs.length / 2;
+
+        slugs.forEach(function (s) { if (itemsMap[s]) itemsMap[s].active = targetActive; });
+        renderTable();
+
+        for (const s of slugs) {
+          try {
+            await fetch(DB_URL + "/links/" + encodeURIComponent(s) + ".json", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ active: targetActive })
+            });
+          } catch (e) {}
+        }
+        showToast("Estado actualizado para " + slugs.length + " tags.");
+      });
+
+      document.getElementById("btnBulkDelete").addEventListener("click", async function () {
+        if (selectedSlugs.size === 0) return;
+        if (!confirm("¿Eliminar los " + selectedSlugs.size + " tags seleccionados?")) return;
+        const slugs = Array.from(selectedSlugs);
+        slugs.forEach(function (s) { delete itemsMap[s]; selectedSlugs.delete(s); });
+        renderTable();
+
+        for (const s of slugs) {
+          try {
+            await fetch(DB_URL + "/links/" + encodeURIComponent(s) + ".json", { method: "DELETE" });
+          } catch (e) {}
+        }
+        showToast("Tags eliminados con éxito.");
+      });
+
+      // Exportar QRs Masivos en ZIP
+      async function exportSlugsToZip(slugsList, zipName) {
+        if (!slugsList || slugsList.length === 0) {
+          showToast("No hay tags para exportar");
+          return;
+        }
+        showToast("Generando archivo ZIP de " + slugsList.length + " códigos QR...");
+        const zip = new JSZip();
+
+        slugsList.forEach(function (s) {
+          const item = itemsMap[s];
+          if (!item) return;
+          const fixedUrl = getFixedUrl(item.slug);
+          const qr = qrcode(0, "H");
+          qr.addData(fixedUrl);
+          qr.make();
+
+          const count = qr.getModuleCount();
+          const canvas = document.createElement("canvas");
+          const size = 1024;
+          const labelH = 88;
+          canvas.width = size;
+          canvas.height = size + labelH;
+          const ctx = canvas.getContext("2d");
+
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          const margin = 72;
+          const tile = (size - margin * 2) / count;
+
+          ctx.fillStyle = "#090b10";
+          for (let r = 0; r < count; r++) {
+            for (let c = 0; c < count; c++) {
+              if (qr.isDark(r, c)) {
+                ctx.fillRect(Math.round(margin + c * tile), Math.round(margin + r * tile), Math.ceil(tile), Math.ceil(tile));
+              }
+            }
+          }
+
+          ctx.font = "bold 34px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText((item.name || item.slug) + " — " + item.slug, size / 2, size + 42);
+
+          const b64 = canvas.toDataURL("image/png").split(",")[1];
+          zip.file("QR_" + item.slug + ".png", b64, { base64: true });
+        });
+
+        const blob = await zip.generateAsync({ type: "blob" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = zipName;
+        a.click();
+        showToast("¡Archivo ZIP descargado!");
+      }
+
+      document.getElementById("btnBulkExportZip").addEventListener("click", function () {
+        exportSlugsToZip(Array.from(selectedSlugs), "BlueCode_QRs_Seleccionados.zip");
+      });
+      document.getElementById("btnExportAllZip").addEventListener("click", function () {
+        exportSlugsToZip(Object.keys(itemsMap), "BlueCode_Todos_QRs.zip");
+      });
+
+      // Exportar Inventario CSV
+      document.getElementById("btnExportCsv").addEventListener("click", function () {
+        const items = Object.values(itemsMap);
+        if (items.length === 0) { showToast("No hay datos para exportar."); return; }
+        let csv = "Nombre,Slug,Tipo,Link Permanente,Destino Actual,Estado,Escaneos\n";
+        items.forEach(function (i) {
+          csv += '"' + (i.name || '').replace(/"/g, '""') + '",' +
+                 '"' + (i.slug || '') + '",' +
+                 '"' + detectDestType(i.targetUrl) + '",' +
+                 '"' + getFixedUrl(i.slug) + '",' +
+                 '"' + (i.targetUrl || '').replace(/"/g, '""') + '",' +
+                 '"' + (i.active === false ? 'Pausado' : 'Activo') + '",' +
+                 (i.scans || 0) + '\n';
+        });
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "BlueCode_Inventario_Tags.csv";
+        a.click();
+        showToast("Inventario CSV descargado.");
+      });
+
+      // Hoja de Impresión Ultra-Optimizada (Renderizado instantáneo < 50ms)
+      function printQrSheet(itemsToPrint) {
+        if (!itemsToPrint || itemsToPrint.length === 0) {
+          showToast("No hay tags para imprimir.");
+          return;
+        }
+
+        // Generar markup con imágenes en DataURL (100x más rápido que miles de nodos SVG)
+        let cardsHtml = "";
+        for (let i = 0; i < itemsToPrint.length; i++) {
+          const item = itemsToPrint[i];
+          const fixedUrl = getFixedUrl(item.slug);
+          const qr = qrcode(0, "M");
+          qr.addData(fixedUrl);
+          qr.make();
+          const qrImg = qr.createDataURL(4, 1);
+          const cleanName = (item.name || item.slug).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          const cleanSlug = item.slug.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+          cardsHtml +=
+            '<div class="print-card">' +
+              '<img src="' + qrImg + '" class="qr-img" alt="QR" />' +
+              '<div class="print-name">' + cleanName + '</div>' +
+              '<div class="print-slug">/r/' + cleanSlug + '</div>' +
+            '</div>';
+        }
+
+        // Iframe aislado para evitar congelamiento de la página principal
+        let pFrame = document.getElementById("hiddenPrintFrame");
+        if (!pFrame) {
+          pFrame = document.createElement("iframe");
+          pFrame.id = "hiddenPrintFrame";
+          pFrame.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;";
+          document.body.appendChild(pFrame);
+        }
+
+        const pDoc = pFrame.contentWindow.document;
+        pDoc.open();
+        pDoc.write(
+          '<!DOCTYPE html><html><head><meta charset="utf-8"><title>BlueCode — Hoja de Impresión</title>' +
+          '<style>' +
+            '@page { size: auto; margin: 8mm; }' +
+            '* { box-sizing: border-box; margin: 0; padding: 0; }' +
+            'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fff; color: #000; padding: 4mm; }' +
+            '.header { text-align: center; margin-bottom: 6mm; padding-bottom: 3mm; border-bottom: 1.5px solid #000; }' +
+            '.header h1 { font-size: 13pt; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }' +
+            '.header p { font-size: 8pt; color: #555; margin-top: 1mm; }' +
+            '.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }' +
+            '.print-card { border: 1px dashed #aaa; border-radius: 4px; padding: 3mm; text-align: center; page-break-inside: avoid; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }' +
+            '.qr-img { width: 32mm; height: 32mm; display: block; image-rendering: pixelated; }' +
+            '.print-name { font-size: 9pt; font-weight: 700; margin-top: 2mm; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }' +
+            '.print-slug { font-size: 7.5pt; font-family: monospace; color: #444; margin-top: 0.5mm; }' +
+          '</style>' +
+          '</head><body>' +
+          '<div class="header">' +
+            '<h1>BlueCode — Hoja de Impresión (' + itemsToPrint.length + ' tags)</h1>' +
+            '<p>Stickers y etiquetas listos para corte e impresión</p>' +
+          '</div>' +
+          '<div class="grid">' + cardsHtml + '</div>' +
+          '</body></html>'
+        );
+        pDoc.close();
+
+        // Lanzar diálogo de impresión de forma instantánea
+        setTimeout(function () {
+          pFrame.contentWindow.focus();
+          pFrame.contentWindow.print();
+        }, 50);
+      }
+
+      document.getElementById("btnPrintSheet").addEventListener("click", function () {
+        const allItems = Object.values(itemsMap).filter(Boolean);
+        printQrSheet(allItems);
+      });
+
+      const btnBulkPrint = document.getElementById("btnBulkPrint");
+      if (btnBulkPrint) {
+        btnBulkPrint.addEventListener("click", function () {
+          const selectedItems = Array.from(selectedSlugs).map(function (s) { return itemsMap[s]; }).filter(Boolean);
+          printQrSheet(selectedItems);
+        });
+      }
+
+      // Edición Masiva de Destino
+      const bulkEditModal = document.getElementById("bulkEditModal");
+      document.getElementById("btnBulkEditDest").addEventListener("click", function () {
+        document.getElementById("bulkNewTarget").value = "";
+        bulkEditModal.classList.add("open");
+      });
+      document.getElementById("btnCloseBulkEditModal").addEventListener("click", function () {
+        bulkEditModal.classList.remove("open");
+      });
+      document.getElementById("bulkEditForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const newTarget = document.getElementById("bulkNewTarget").value.trim();
+        if (!newTarget) return;
+        const slugs = Array.from(selectedSlugs);
+        slugs.forEach(function (s) {
+          if (itemsMap[s]) itemsMap[s].targetUrl = newTarget;
+        });
+        renderTable();
+        bulkEditModal.classList.remove("open");
+
+        for (const s of slugs) {
+          try {
+            await fetch(DB_URL + "/links/" + encodeURIComponent(s) + ".json", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ targetUrl: newTarget, updatedAt: Date.now() })
+            });
+          } catch (e) {}
+        }
+        showToast("Destino actualizado para " + slugs.length + " tags.");
+      });
+
+      // Modal Crear Nuevo Tag
+      const newTagModal = document.getElementById("newTagModal");
+      const newName = document.getElementById("newName");
+      const newSlug = document.getElementById("newSlug");
+      const slugPreviewText = document.getElementById("slugPreviewText");
+
+      function updateSlugPreview() {
+        const s = cleanSlug(newSlug.value) || "mi-tag";
+        slugPreviewText.textContent = "Link: " + getFixedUrl(s);
+      }
+
+      newName.addEventListener("input", function () {
+        if (!newSlug.dataset.manual) {
+          newSlug.value = cleanSlug(newName.value);
+          updateSlugPreview();
+        }
+      });
+      newSlug.addEventListener("input", function () {
+        newSlug.dataset.manual = "1";
+        newSlug.value = cleanSlug(newSlug.value);
+        updateSlugPreview();
+      });
+      document.getElementById("btnRandomSlug").addEventListener("click", function () {
+        const ch = "abcdefghjkmnpqrstuvwxyz23456789";
+        let r = "";
+        for (let i = 0; i < 5; i++) r += ch.charAt(Math.floor(Math.random() * ch.length));
+        newSlug.dataset.manual = "1";
+        newSlug.value = r;
+        updateSlugPreview();
+      });
+
+      document.getElementById("btnOpenNewModal").addEventListener("click", function () {
+        newName.value = "";
+        newSlug.value = "";
+        newSlug.dataset.manual = "";
+        updateSlugPreview();
+        newTagModal.classList.add("open");
+        newName.focus();
+      });
+      document.getElementById("btnCloseNewModal").addEventListener("click", function () {
+        newTagModal.classList.remove("open");
+      });
+
+      // Tabs de Tipo de Destino
+      document.querySelectorAll(".type-tab[data-type]").forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          document.querySelectorAll(".type-tab[data-type]").forEach(function (t) { t.classList.remove("active"); });
+          tab.classList.add("active");
+          selectedDestType = tab.getAttribute("data-type");
+
+          document.querySelectorAll(".type-panel").forEach(function (p) { p.style.display = "none"; });
+          const mapPanel = {
+            web: "panelWeb",
+            whatsapp: "panelWhatsapp",
+            wifi: "panelWifi",
+            vcard: "panelVcard",
+            phone: "panelPhone",
+            email: "panelEmail"
+          };
+          const pId = mapPanel[selectedDestType];
+          if (pId) document.getElementById(pId).style.display = "block";
+        });
+      });
+
+      // Construcción del Destino según el tipo seleccionado
+      function buildFinalTargetUrl() {
+        if (selectedDestType === "whatsapp") {
+          const ph = document.getElementById("targetWaPhone").value.replace(/[^0-9]/g, "");
+          const msg = encodeURIComponent(document.getElementById("targetWaMsg").value.trim());
+          return "https://wa.me/" + ph + (msg ? "?text=" + msg : "");
+        }
+        if (selectedDestType === "wifi") {
+          const ssid = document.getElementById("targetWifiSsid").value.trim();
+          const pass = document.getElementById("targetWifiPass").value.trim();
+          return "WIFI:S:" + ssid + ";T:WPA;P:" + pass + ";;";
+        }
+        if (selectedDestType === "vcard") {
+          const n = document.getElementById("vcardName").value.trim();
+          const p = document.getElementById("vcardPhone").value.trim();
+          const o = document.getElementById("vcardOrg").value.trim();
+          const m = document.getElementById("vcardEmail").value.trim();
+          const vcf = "BEGIN:VCARD\nVERSION:3.0\nFN:" + n + "\nTEL:" + p + "\nORG:" + o + "\nEMAIL:" + m + "\nEND:VCARD";
+          return "data:text/vcard;charset=utf-8," + encodeURIComponent(vcf);
+        }
+        if (selectedDestType === "phone") {
+          return "tel:" + document.getElementById("targetPhone").value.replace(/[^0-9+]/g, "");
+        }
+        if (selectedDestType === "email") {
+          const m = document.getElementById("targetEmail").value.trim();
+          const sub = encodeURIComponent(document.getElementById("targetEmailSubj").value.trim());
+          return "mailto:" + m + (sub ? "?subject=" + sub : "");
+        }
+        // Web default
+        let w = document.getElementById("targetWeb").value.trim();
+        if (w && !/^(https?:\/\/|mailto:|tel:|whatsapp:\/\/|sms:|geo:)/i.test(w)) {
+          w = "https://" + w;
+        }
+        return w || "https://google.com";
+      }
+
+      document.getElementById("newTagForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const name = newName.value.trim();
+        const slug = cleanSlug(newSlug.value);
+        const finalDest = buildFinalTargetUrl();
+
+        if (!slug) { alert("Ingresa un código válido"); return; }
+        if (itemsMap[slug]) { alert("Ya existe un tag con este código."); return; }
+
+        const newItem = {
+          slug: slug,
+          name: name,
+          type: "both",
+          targetUrl: finalDest,
+          active: true,
+          scans: 0,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+
+        itemsMap[slug] = newItem;
+        renderTable();
+        newTagModal.classList.remove("open");
+        showToast("Tag '" + name + "' creado.");
+
+        try {
+          await fetch(DB_URL + "/links/" + encodeURIComponent(slug) + ".json", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newItem)
+          });
+        } catch (err) {}
+      });
+
+      // Modal Creación Masiva (Lote)
+      const bulkCreateModal = document.getElementById("bulkCreateModal");
+      document.getElementById("btnOpenBulkModal").addEventListener("click", function () {
+        bulkCreateModal.classList.add("open");
+      });
+      document.getElementById("btnCloseBulkCreateModal").addEventListener("click", function () {
+        bulkCreateModal.classList.remove("open");
+      });
+      document.getElementById("btnCloseBulkListModal").addEventListener("click", function () {
+        bulkCreateModal.classList.remove("open");
+      });
+
+      document.getElementById("tabBulkSeries").addEventListener("click", function () {
+        this.classList.add("active");
+        document.getElementById("tabBulkList").classList.remove("active");
+        document.getElementById("formBulkSeries").style.display = "block";
+        document.getElementById("formBulkList").style.display = "none";
+      });
+      document.getElementById("tabBulkList").addEventListener("click", function () {
+        this.classList.add("active");
+        document.getElementById("tabBulkSeries").classList.remove("active");
+        document.getElementById("formBulkSeries").style.display = "none";
+        document.getElementById("formBulkList").style.display = "block";
+      });
+
+      // Generar Lote Serie
+      document.getElementById("formBulkSeries").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const pfx = document.getElementById("seriesPrefix").value.trim();
+        const from = parseInt(document.getElementById("seriesFrom").value, 10);
+        const to = parseInt(document.getElementById("seriesTo").value, 10);
+        const target = document.getElementById("seriesTarget").value.trim() || "https://google.com";
+
+        if (from > to) { alert("El número inicial debe ser menor o igual al final."); return; }
+        bulkCreateModal.classList.remove("open");
+        showToast("Generando lote de " + (to - from + 1) + " tags...");
+
+        for (let i = from; i <= to; i++) {
+          const name = pfx + " " + i;
+          const slug = cleanSlug(pfx) + "-" + i;
+          const newItem = {
+            slug: slug,
+            name: name,
+            type: "both",
+            targetUrl: target,
+            active: true,
+            scans: 0,
+            createdAt: Date.now() + i,
+            updatedAt: Date.now()
+          };
+          itemsMap[slug] = newItem;
+          fetch(DB_URL + "/links/" + encodeURIComponent(slug) + ".json", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newItem)
+          }).catch(function () {});
+        }
+        renderTable();
+        showToast("¡Lote creado exitosamente!");
+      });
+
+      // Generar Lote desde Lista
+      document.getElementById("formBulkList").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const text = document.getElementById("bulkListText").value.trim();
+        const defTarget = document.getElementById("bulkListDefaultTarget").value.trim() || "https://google.com";
+        if (!text) return;
+
+        const lines = text.split("\n").map(function (l) { return l.trim(); }).filter(Boolean);
+        bulkCreateModal.classList.remove("open");
+        showToast("Creando " + lines.length + " tags...");
+
+        lines.forEach(function (line, idx) {
+          const parts = line.split(",").map(function (p) { return p.trim(); });
+          const name = parts[0] || ("Tag " + (idx + 1));
+          const target = parts[1] || defTarget;
+          const slug = cleanSlug(name) || ("tag-" + Date.now().toString(36) + idx);
+
+          const newItem = {
+            slug: slug,
+            name: name,
+            type: "both",
+            targetUrl: target,
+            active: true,
+            scans: 0,
+            createdAt: Date.now() + idx,
+            updatedAt: Date.now()
+          };
+          itemsMap[slug] = newItem;
+          fetch(DB_URL + "/links/" + encodeURIComponent(slug) + ".json", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newItem)
+          }).catch(function () {});
+        });
+        renderTable();
+        showToast("¡Lista importada con éxito!");
+      });
+
+      // Modal QR Individual Studio
+      const qrModal = document.getElementById("qrModal");
+      function openQrStudio(item) {
+        activeQrItem = item;
+        const fixedUrl = getFixedUrl(item.slug);
+        document.getElementById("qrModalTitle").textContent = item.name || item.slug;
+        document.getElementById("qrModalLabel").textContent = (item.name || item.slug) + " — " + item.slug;
+        document.getElementById("qrModalUrl").textContent = fixedUrl;
+
+        const qr = qrcode(0, "M");
+        qr.addData(fixedUrl);
+        qr.make();
+
+        const box = document.getElementById("qrCanvasBox");
+        box.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2 });
+        const svg = box.querySelector("svg");
+        if (svg) { svg.style.width = "190px"; svg.style.height = "190px"; svg.style.display = "block"; }
+
+        qrModal.classList.add("open");
+      }
+
+      document.getElementById("btnCloseQrModal").addEventListener("click", function () {
+        qrModal.classList.remove("open");
+      });
+
+      function generateQrCanvas(withLabel) {
+        if (!activeQrItem) return null;
+        const fixedUrl = getFixedUrl(activeQrItem.slug);
+        const qr = qrcode(0, "H");
+        qr.addData(fixedUrl);
+        qr.make();
+
+        const count = qr.getModuleCount();
+        const canvas = document.createElement("canvas");
+        const size = 1024;
+        const labelHeight = withLabel ? 90 : 0;
+        canvas.width = size;
+        canvas.height = size + labelHeight;
+        const ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const margin = 70;
+        const tile = (size - margin * 2) / count;
+
+        ctx.fillStyle = "#090b10";
+        for (let r = 0; r < count; r++) {
+          for (let c = 0; c < count; c++) {
+            if (qr.isDark(r, c)) {
+              ctx.fillRect(Math.round(margin + c * tile), Math.round(margin + r * tile), Math.ceil(tile), Math.ceil(tile));
+            }
+          }
+        }
+
+        if (withLabel) {
+          ctx.font = "bold 34px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText((activeQrItem.name || activeQrItem.slug) + " — " + activeQrItem.slug, size / 2, size + 44);
+        }
+
+        return canvas;
+      }
+
+      document.getElementById("btnExportPngTagged").addEventListener("click", function () {
+        const c = generateQrCanvas(true);
+        if (!c) return;
+        const a = document.createElement("a");
+        a.download = "QR_" + activeQrItem.slug + "_etiqueta.png";
+        a.href = c.toDataURL("image/png");
+        a.click();
+        showToast("PNG con etiqueta descargado.");
+      });
+
+      document.getElementById("btnExportPngClean").addEventListener("click", function () {
+        const c = generateQrCanvas(false);
+        if (!c) return;
+        const a = document.createElement("a");
+        a.download = "QR_" + activeQrItem.slug + "_limpio.png";
+        a.href = c.toDataURL("image/png");
+        a.click();
+        showToast("PNG limpio descargado.");
+      });
+
+      document.getElementById("btnExportSvg").addEventListener("click", function () {
+        if (!activeQrItem) return;
+        const qr = qrcode(0, "M");
+        qr.addData(getFixedUrl(activeQrItem.slug));
+        qr.make();
+        const svg = qr.createSvgTag({ cellSize: 8, margin: 4 });
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        const a = document.createElement("a");
+        a.download = "QR_" + activeQrItem.slug + ".svg";
+        a.href = URL.createObjectURL(blob);
+        a.click();
+        showToast("Vectorial SVG descargado.");
+      });
+
+      document.getElementById("btnCopyQrClip").addEventListener("click", function () {
+        const c = generateQrCanvas(false);
+        if (!c) return;
+        c.toBlob(function (blob) {
+          try {
+            navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(function () {
+              showToast("Imagen QR copiada al portapapeles.");
+            });
+          } catch (e) {
+            showToast("No soportado en este navegador.");
+          }
+        });
+      });
+
+      // Compartir enlace privado del equipo
+      document.getElementById("btnShareLink").addEventListener("click", function () {
+        const url = window.location.origin + "/equipo-4x9k";
+        navigator.clipboard.writeText(url).then(function () {
+          showToast("Enlace de acceso del equipo copiado al portapapeles.");
+        });
+      });
+
+      // Buscador
+      document.getElementById("searchInput").addEventListener("input", function (e) {
+        searchQuery = e.target.value.trim().toLowerCase();
+        renderTable();
+      });
+
+      // Inicio
+      loadData();
+      startSync();
+    })();
+  </script>
+</body>
+</html>
