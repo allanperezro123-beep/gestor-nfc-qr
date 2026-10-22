@@ -1,10 +1,11 @@
 /**
- * BlueCode — Estudio Generador de Placas NFC & QR y Motor de QR Único Personalizable (600 DPI Ultra-HD)
+ * BlueCode — Estudio Generador de Placas NFC & QR y Motor de QR Único Personalizable (v5.0 - 600 DPI Ultra-HD)
  * - Logo BlueCode vectorial puro sin contornos blancos
  * - Ilustración NFC unificada (estilo Menú) en las 3 tarjetas
- * - Exportación PDF Individual y Masiva en cm reales (600 DPI)
- * - Exportación .PSD Multicapa para Adobe Photoshop
- * - Motor de QR Personalizable Avanzado (Patrones, Ojos, Degradados, Logos y Marcos, 100% escaneable Nivel H)
+ * - Personalización total de colores por tarjeta (Fondo, Textos/NFC, Acentos/Marcos y Temas Rápidos)
+ * - Modo QR Clean (limpio) o QR con Texto Inferior / ID personalizable
+ * - Drag & Drop interactivo + Zoom para mover y escalar cualquier elemento directamente sobre la placa
+ * - Exportación PDF Individual y Masiva en cm reales (600 DPI) y .PSD Multicapa para Adobe Photoshop
  */
 (function () {
   "use strict";
@@ -16,6 +17,31 @@
     "M 411 145 Q 420 145 426 151 L 441 166 Q 447 172 441 178 L 405 205 L 441 243 Q 447 249 441 255 L 427 263 Q 419 269 411 263 L 360 213 Q 353 206 360 198 L 401 152 Q 405 145 411 145 Z",
     "M 487 145 Q 478 145 472 152 L 466 159 Q 460 165 466 171 L 494 205 L 466 239 Q 460 245 466 251 L 472 258 Q 478 265 487 265 Q 493 265 499 258 L 538 213 Q 545 205 538 197 L 499 152 Q 493 145 487 145 Z"
   ];
+
+  // Cajas base (en espacio 1000x1000) de los elementos interactivos de cada placa para Drag & Drop
+  const BASE_HIT_BOXES = {
+    google: [
+      { id: "qr", label: "Código QR", x: 545, y: 535, w: 290, h: 325, cx: 690, cy: 685 },
+      { id: "nfc", label: "Ilustración NFC", x: 155, y: 560, w: 325, h: 280, cx: 326, cy: 706 },
+      { id: "title", label: "Título Principal", x: 280, y: 135, w: 440, h: 225, cx: 500, cy: 250 },
+      { id: "hero", label: "Anillo y Estrellas", x: 285, y: 45, w: 430, h: 495, cx: 500, cy: 290 },
+      { id: "brand", label: "Sello BlueCode", x: 250, y: 905, w: 500, h: 75, cx: 500, cy: 942 }
+    ],
+    menu: [
+      { id: "qr", label: "Código QR", x: 620, y: 515, w: 280, h: 365, cx: 760, cy: 714 },
+      { id: "nfc", label: "Ilustración NFC", x: 145, y: 540, w: 370, h: 330, cx: 338, cy: 720 },
+      { id: "hero", label: "Icono Cubiertos", x: 410, y: 30, w: 180, h: 185, cx: 500, cy: 120 },
+      { id: "title", label: "Título MENU", x: 180, y: 215, w: 640, h: 195, cx: 500, cy: 315 },
+      { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 945 }
+    ],
+    instagram: [
+      { id: "qr", label: "Código QR", x: 540, y: 525, w: 276, h: 305, cx: 678, cy: 668 },
+      { id: "nfc", label: "Ilustración NFC", x: 165, y: 545, w: 325, h: 275, cx: 332, cy: 682 },
+      { id: "hero", label: "Icono Instagram", x: 265, y: 145, w: 470, h: 225, cx: 500, cy: 260 },
+      { id: "title", label: "Título y Subtítulo", x: 170, y: 375, w: 660, h: 150, cx: 500, cy: 455 },
+      { id: "brand", label: "Sello BlueCode", x: 310, y: 820, w: 380, h: 95, cx: 500, cy: 868 }
+    ]
+  };
 
   let customQrLogoImage = null;
 
@@ -30,6 +56,68 @@
 
   function cmToPx300(cm) {
     return Math.round((cm / 2.54) * 300);
+  }
+
+  // Detecta si un color hex es oscuro para ajustar contrastes automáticamente
+  function isHexDark(hex) {
+    if (!hex || typeof hex !== "string") return false;
+    const clean = hex.replace("#", "").trim();
+    if (clean.length !== 6) return false;
+    const r = parseInt(clean.substring(0, 2), 16) || 0;
+    const g = parseInt(clean.substring(2, 4), 16) || 0;
+    const b = parseInt(clean.substring(4, 6), 16) || 0;
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum < 0.45;
+  }
+
+  // Obtiene la transformación (dx, dy, scale) de un grupo dentro de data.layout
+  function getGroupOffset(data, groupId) {
+    const lay = (data && data.layout && data.layout[groupId]) || null;
+    return {
+      x: lay && typeof lay.x === "number" ? lay.x : 0,
+      y: lay && typeof lay.y === "number" ? lay.y : 0,
+      scale: lay && typeof lay.scale === "number" ? lay.scale : 1
+    };
+  }
+
+  // Aplica traslación y escala alrededor del centro (cx, cy) de un elemento
+  function withGroupTransform(ctx, data, groupId, cx, cy, drawFn) {
+    const off = getGroupOffset(data, groupId);
+    ctx.save();
+    if (off.x !== 0 || off.y !== 0) {
+      ctx.translate(off.x, off.y);
+    }
+    if (off.scale && off.scale !== 1) {
+      ctx.translate(cx, cy);
+      ctx.scale(off.scale, off.scale);
+      ctx.translate(-cx, -cy);
+    }
+    drawFn();
+    ctx.restore();
+  }
+
+  // Devuelve las cajas interactivas transformadas para detección de clic/arrastre en el canvas
+  function getTransformedHitBoxes(motif, data) {
+    const list = BASE_HIT_BOXES[motif] || BASE_HIT_BOXES.google;
+    return list.map(function (b) {
+      const off = getGroupOffset(data, b.id);
+      const sc = off.scale || 1;
+      const w = b.w * sc;
+      const h = b.h * sc;
+      const cx = b.cx + off.x;
+      const cy = b.cy + off.y;
+      return {
+        id: b.id,
+        label: b.label,
+        x: cx - w / 2,
+        y: cy - h / 2,
+        w: w,
+        h: h,
+        cx: cx,
+        cy: cy,
+        scale: sc
+      };
+    });
   }
 
   // Rectángulo con esquinas redondeadas individuales [tl, tr, br, bl] o radio único
@@ -161,13 +249,11 @@
   }
 
   /**
-   * ILUSTRACIÓN UNIFICADA NFC (Idéntica a la imagen de Menú para las 3 tarjetas):
-   * - Óvalo abierto a la izquierda con 4 ondas curvas NFC en su interior
-   * - Smartphone inclinado (-9°) con altavoz y texto "NFC" en pantalla
-   * - Mano en línea limpia sujetando el teléfono (4 dedos a la izquierda, pulgar + palma a la derecha y puño)
+   * ILUSTRACIÓN UNIFICADA NFC (Idéntica a la imagen de Menú para las 3 tarjetas)
    */
-  function drawUnifiedMenuNfcIllustration(ctx, cx, cy, scale, strokeColor) {
+  function drawUnifiedMenuNfcIllustration(ctx, cx, cy, scale, strokeColor, fillBodyColor) {
     const col = strokeColor || "#181818";
+    const bodyFill = fillBodyColor || "#FFFFFF";
     ctx.save();
     ctx.translate(cx, cy);
     ctx.scale(scale, scale);
@@ -201,7 +287,7 @@
 
     ctx.lineWidth = 8;
     roundRectPath(ctx, -44, -84, 88, 168, 15);
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = bodyFill;
     ctx.fill();
     ctx.stroke();
 
@@ -227,7 +313,7 @@
       ctx.translate(-46, fingerY[f]);
       ctx.rotate((-8 * Math.PI) / 180);
       roundRectPath(ctx, -16, -9, 28, 18, 9);
-      ctx.fillStyle = "#FFFFFF";
+      ctx.fillStyle = bodyFill;
       ctx.fill();
       ctx.stroke();
       ctx.restore();
@@ -244,7 +330,7 @@
     ctx.lineTo(74, 108);
     ctx.lineTo(54, 98);
     ctx.quadraticCurveTo(36, 106, 22, 84);
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = bodyFill;
     ctx.fill();
     ctx.lineWidth = 7.5;
     ctx.stroke();
@@ -256,7 +342,7 @@
     ctx.lineTo(90, 122);
     ctx.lineTo(64, 110);
     ctx.closePath();
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = bodyFill;
     ctx.fill();
     ctx.lineWidth = 7.5;
     ctx.stroke();
@@ -411,128 +497,142 @@
    * - 'square': Cuadrado clásico
    * - 'rounded': Esquinas redondeadas modernas
    * - 'circle': Anillo circular perfecto + núcleo circular
-   * - 'leaf': Hoja / Gota asimétrica (esquina sup-izq e inf-der muy curvas)
+   * - 'leaf': Hoja / Gota asimétrica
    * - 'shield': Escudo / Diamante redondeado
    */
   function drawCustomFinderEye(ctx, x, y, cell, fillStyle, eyeStyle) {
     const outerSize = 7 * cell;
     const innerOffset = 2 * cell;
     const innerSize = 3 * cell;
+    const ringStroke = cell;
+    const ringX = x + cell * 0.5;
+    const ringY = y + cell * 0.5;
+    const ringDim = 6 * cell;
 
     ctx.save();
     ctx.strokeStyle = fillStyle;
     ctx.fillStyle = fillStyle;
-    ctx.lineWidth = cell;
+    ctx.lineWidth = ringStroke;
 
     if (eyeStyle === "circle") {
       const cx = x + outerSize / 2;
       const cy = y + outerSize / 2;
       ctx.beginPath();
-      ctx.arc(cx, cy, (outerSize - cell) / 2, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 3 * cell, 0, Math.PI * 2);
       ctx.stroke();
 
       ctx.beginPath();
-      ctx.arc(cx, cy, innerSize / 2, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 1.5 * cell, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (eyeStyle === "rounded") {
+      roundRectPath(ctx, ringX, ringY, ringDim, ringDim, cell * 1.65);
+      ctx.stroke();
+
+      roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, cell * 0.85);
       ctx.fill();
     } else if (eyeStyle === "leaf") {
-      // Forma de hoja/gota elegante
-      const rBig = cell * 2.6;
+      const rBig = cell * 2.3;
       const rSmall = cell * 0.45;
-      roundRectPath(ctx, x + cell * 0.5, y + cell * 0.5, outerSize - cell, outerSize - cell, [rBig, rSmall, rBig, rSmall]);
+      roundRectPath(ctx, ringX, ringY, ringDim, ringDim, [rBig, rSmall, rBig, rSmall]);
       ctx.stroke();
 
-      roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, [cell * 1.3, cell * 0.25, cell * 1.3, cell * 0.25]);
+      roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, [cell * 1.25, cell * 0.25, cell * 1.25, cell * 0.25]);
       ctx.fill();
     } else if (eyeStyle === "shield") {
-      const rTop = cell * 0.5;
-      const rBot = cell * 2.5;
-      roundRectPath(ctx, x + cell * 0.5, y + cell * 0.5, outerSize - cell, outerSize - cell, [rTop, rTop, rBot, rBot]);
+      roundRectPath(ctx, ringX, ringY, ringDim, ringDim, [cell * 0.4, cell * 2.0, cell * 0.4, cell * 2.0]);
       ctx.stroke();
 
-      roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, [cell * 0.3, cell * 0.3, cell * 1.4, cell * 1.4]);
+      const cx = x + outerSize / 2;
+      const cy = y + outerSize / 2;
+      const d = 1.65 * cell;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - d);
+      ctx.lineTo(cx + d, cy);
+      ctx.lineTo(cx, cy + d);
+      ctx.lineTo(cx - d, cy);
+      ctx.closePath();
       ctx.fill();
     } else {
-      const radiusOuter = eyeStyle === "square" ? 0 : cell * 1.85;
-      const radiusInner = eyeStyle === "square" ? 0 : cell * 0.95;
-      roundRectPath(ctx, x + cell * 0.5, y + cell * 0.5, outerSize - cell, outerSize - cell, radiusOuter);
-      ctx.stroke();
-
-      roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, radiusInner);
-      ctx.fill();
+      ctx.strokeRect(ringX, ringY, ringDim, ringDim);
+      ctx.fillRect(x + innerOffset, y + innerOffset, innerSize, innerSize);
     }
 
     ctx.restore();
   }
 
-  /**
-   *Construye el estilo de relleno (sólido o degradado de alto contraste) para los módulos del QR.
-   */
   function buildQrFillStyle(ctx, x, y, size, opts) {
     const mode = opts.qrColorMode || "solid";
+    const baseColor = opts.color || "#111111";
+
     if (mode === "grad-bc") {
       const g = ctx.createLinearGradient(x, y, x + size, y + size);
-      g.addColorStop(0, "#052E7A");
-      g.addColorStop(0.5, "#0865F5");
-      g.addColorStop(1, "#0284A8");
+      g.addColorStop(0, "#0865F5");
+      g.addColorStop(0.55, "#0696EE");
+      g.addColorStop(1, "#00B4D8");
       return g;
     }
     if (mode === "grad-ig") {
       const g = ctx.createLinearGradient(x, y + size, x + size, y);
-      g.addColorStop(0, "#B43E00");
-      g.addColorStop(0.5, "#C2185B");
-      g.addColorStop(1, "#6A1B9A");
+      g.addColorStop(0, "#F58529");
+      g.addColorStop(0.5, "#DD2A7B");
+      g.addColorStop(1, "#8134AF");
       return g;
     }
     if (mode === "grad-gold") {
       const g = ctx.createLinearGradient(x, y, x + size, y + size);
-      g.addColorStop(0, "#451A03");
-      g.addColorStop(0.5, "#92400E");
-      g.addColorStop(1, "#3F2E05");
+      g.addColorStop(0, "#1E1B18");
+      g.addColorStop(0.55, "#785A28");
+      g.addColorStop(1, "#B48327");
       return g;
     }
-    if (mode === "grad-custom") {
+    if (mode === "grad-custom" && opts.color2) {
       const g = ctx.createLinearGradient(x, y, x + size, y + size);
-      g.addColorStop(0, opts.color || "#0865F5");
-      g.addColorStop(1, opts.color2 || "#0F172A");
+      g.addColorStop(0, baseColor);
+      g.addColorStop(1, opts.color2);
       return g;
     }
-    return opts.color || "#111111";
+    return baseColor;
   }
 
   /**
-   * MOTOR AVANZADO DE CÓDIGO QR PERSONALIZADO Y 100% ESCANEABLE (NIVEL 'H')
-   * Soporta:
-   * - qrStyle: 'classic' | 'rounded' | 'dots' | 'liquid' | 'diamond' | 'star'
-   * - qrEyeStyle: 'square' | 'rounded' | 'circle' | 'leaf' | 'shield'
-   * - qrColorMode: 'solid' | 'grad-bc' | 'grad-ig' | 'grad-gold' | 'grad-custom'
-   * - eyeColorMode: 'match' | 'bc-blue' | 'google-multi' | 'custom'
-   * - centerLogo: 'bluecode' | 'google' | 'instagram' | 'menu' | 'whatsapp' | 'wifi' | 'star' | 'custom' | 'none'
-   * - logoShape: 'rounded' | 'circle' | 'clean'
-   * - frameStyle: 'none' | 'scan-bottom' | 'corners'
+   * MOTOR QR ULTRA-PERSONALIZABLE Y 100% ESCANEABLE (NIVEL H - 30% TOLERANCIA)
    */
   function drawQrMatrix(ctx, url, x, y, size, opts) {
+    if (typeof qrcode !== "function") return;
     opts = opts || {};
-    const logoType = opts.centerLogo && opts.centerLogo !== "none" ? opts.centerLogo : null;
-    const qr = window.qrcode(0, "H");
-    qr.addData(url || "https://gestor-nfc-qr-2026.web.app");
-    qr.make();
 
-    const count = qr.getModuleCount();
+    const logoType = opts.centerLogo && opts.centerLogo !== "none" ? opts.centerLogo : null;
     const style = opts.qrStyle || "classic";
-    const eyeStyle = opts.qrEyeStyle || (style === "classic" ? "square" : "rounded");
+    const eyeStyle = opts.qrEyeStyle || "square";
     const logoShape = opts.logoShape || "rounded";
     const frameStyle = opts.frameStyle || "none";
 
-    // Si hay marco exterior decorativo (ej. scan-bottom o corners), ajustamos el área interior del QR
+    const qr = qrcode(0, "H");
+    qr.addData(url || "https://gestor-nfc-qr-2026.web.app");
+    qr.make();
+    const count = qr.getModuleCount();
+
     let qrX = x;
     let qrY = y;
     let qrSize = size;
 
     ctx.save();
     if (opts.bgWhite) {
-      roundRectPath(ctx, x - size * 0.04, y - size * 0.04, size * 1.08, size * 1.08, opts.bgRadius || 0);
-      ctx.fillStyle = "#FFFFFF";
-      ctx.fill();
+      const padBg = size * 0.055;
+      if (opts.bgShadow) {
+        ctx.save();
+        ctx.shadowColor = "rgba(0,0,0,0.14)";
+        ctx.shadowBlur = size * 0.06;
+        ctx.shadowOffsetY = size * 0.018;
+        roundRectPath(ctx, x - padBg, y - padBg, size + padBg * 2, size + padBg * 2, opts.bgRadius || size * 0.06);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+        ctx.restore();
+      } else {
+        roundRectPath(ctx, x - padBg, y - padBg, size + padBg * 2, size + padBg * 2, opts.bgRadius || size * 0.06);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+      }
     }
 
     const mainFill = buildQrFillStyle(ctx, x, y, size, opts);
@@ -544,7 +644,6 @@
       qrX = x + (size - qrSize) / 2;
       qrY = y + pad;
 
-      // Marco redondeado con pastilla inferior "ESCANÉAME"
       roundRectPath(ctx, x, y, size, size - bottomBarH * 0.35, size * 0.07);
       ctx.strokeStyle = mainFill;
       ctx.lineWidth = size * 0.022;
@@ -573,7 +672,6 @@
       ctx.lineWidth = size * 0.024;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      // 4 esquinas
       ctx.beginPath();
       ctx.moveTo(x, y + cLen); ctx.lineTo(x, y); ctx.lineTo(x + cLen, y);
       ctx.moveTo(x + size - cLen, y); ctx.lineTo(x + size, y); ctx.lineTo(x + size, y + cLen);
@@ -583,7 +681,6 @@
     }
 
     const cell = qrSize / count;
-    // Zona central despejada segura (máximo 20.5% del ancho = 4.2% del área total, 100% seguro en Nivel H)
     const clearHalf = logoType ? count * 0.105 : 0;
     const centerIdx = (count - 1) / 2;
 
@@ -594,7 +691,7 @@
       return !qr.isDark(r, c);
     }
 
-    // 1. Dibujar los 3 Ojos Buscadores con su forma y color elegido
+    // 1. Dibujar los 3 Ojos Buscadores
     const eyeColorMode = opts.eyeColorMode || "match";
     let eyeTopLeft = mainFill;
     let eyeTopRight = mainFill;
@@ -614,7 +711,7 @@
     drawCustomFinderEye(ctx, qrX + (count - 7) * cell, qrY, cell, eyeTopRight, eyeStyle);
     drawCustomFinderEye(ctx, qrX, qrY + (count - 7) * cell, cell, eyeBottomLeft, eyeStyle);
 
-    // 2. Dibujar los módulos de datos con el patrón elegido
+    // 2. Dibujar los módulos de datos
     ctx.fillStyle = mainFill;
     for (let r = 0; r < count; r++) {
       for (let c = 0; c < count; c++) {
@@ -631,7 +728,6 @@
           roundRectPath(ctx, mx + cell * 0.04, my + cell * 0.04, cell * 0.92, cell * 0.92, cell * 0.34);
           ctx.fill();
         } else if (style === "liquid") {
-          // Barras verticales fluidas conectadas
           const up = !isSkipped(r - 1, c);
           const down = !isSkipped(r + 1, c);
           const rad = cell * 0.44;
@@ -676,13 +772,12 @@
           ctx.closePath();
           ctx.fill();
         } else {
-          // Clásico ultra nítido
           ctx.fillRect(mx, my, cell + 0.35, cell + 0.35);
         }
       }
     }
 
-    // 3. Dibujar el Logo Central dentro de su escudo protector
+    // 3. Dibujar el Logo Central
     if (logoType) {
       const boxSize = qrSize * 0.215;
       const bx = qrX + (qrSize - boxSize) / 2;
@@ -788,7 +883,7 @@
     return requested;
   }
 
-  function buildQrOptionsFromData(motif, data, defaultColor) {
+  function buildQrOptionsFromData(motif, data, defaultColor, forceWhiteCard) {
     return {
       centerLogo: resolvePlaqueQrLogo(motif, data),
       qrStyle: data.qrStyle || "classic",
@@ -800,8 +895,77 @@
       eyeColor: data.eyeColor || "#0865F5",
       logoShape: data.logoShape || "rounded",
       frameStyle: data.frameStyle || "none",
-      frameText: data.frameText || "ESCANÉAME"
+      frameText: data.frameText || "ESCANÉAME",
+      bgWhite: Boolean(forceWhiteCard),
+      bgShadow: Boolean(forceWhiteCard),
+      bgRadius: 20
     };
+  }
+
+  /**
+   * Dibuja el bloque de texto opcional debajo del QR según `data.qrCaptionMode`:
+   * - 'clean': No dibuja nada (QR 100% limpio)
+   * - 'bottom-text': Dibuja solo el texto personalizado debajo del QR
+   * - 'bottom-text-id': Dibuja el texto personalizado + el ID del tag debajo
+   */
+  function drawQrBottomCaption(ctx, centerX, topY, data, textColor) {
+    const mode = data.qrCaptionMode || "clean";
+    if (mode === "clean") return;
+
+    const caption = (data.qrCaptionText || "").trim();
+    const slugText = (data.slug || "TAG-ID").toUpperCase();
+
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    let curY = topY;
+
+    if (caption) {
+      ctx.fillStyle = textColor || "#181818";
+      ctx.font = "800 24px 'Plus Jakarta Sans', Arial, sans-serif";
+      ctx.fillText(caption, centerX, curY);
+      curY += 28;
+    }
+
+    if (mode === "bottom-text-id") {
+      ctx.fillStyle = textColor || "#333333";
+      ctx.globalAlpha = 0.78;
+      ctx.font = "600 19px 'JetBrains Mono', monospace";
+      ctx.fillText("ID: " + slugText, centerX, curY);
+    }
+    ctx.restore();
+  }
+
+  // Dibuja el indicador interactivo de selección / arrastre (SOLO en la vista previa en pantalla)
+  function drawSelectionOverlayIfActive(ctx, motif, data) {
+    if (!data || !data.__activeDragGroup) return;
+    const boxes = getTransformedHitBoxes(motif, data);
+    const active = boxes.find(function (b) { return b.id === data.__activeDragGroup; });
+    if (!active) return;
+
+    ctx.save();
+    ctx.strokeStyle = "#08D0E6";
+    ctx.lineWidth = 3.5;
+    ctx.setLineDash([10, 6]);
+    roundRectPath(ctx, active.x - 8, active.y - 8, active.w + 16, active.h + 16, 16);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Etiqueta flotante superior
+    const tagText = "✥ " + active.label + " (" + Math.round((active.scale || 1) * 100) + "%)";
+    ctx.font = "700 20px 'Plus Jakarta Sans', Arial, sans-serif";
+    const tw = ctx.measureText(tagText).width + 24;
+    const tx = Math.max(20, Math.min(980 - tw, active.cx - tw / 2));
+    const ty = Math.max(16, active.y - 42);
+    roundRectPath(ctx, tx, ty, tw, 30, 8);
+    ctx.fillStyle = "#0865F5";
+    ctx.fill();
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(tagText, tx + tw / 2, ty + 15);
+    ctx.restore();
   }
 
   // ============================================================================
@@ -818,19 +982,25 @@
     const showBrand = !layerFilter || layerFilter === "all" || layerFilter === "brand";
     const showQr = !layerFilter || layerFilter === "all" || layerFilter === "qr";
 
+    const bgColor = data.bgColor || "#FFFFFF";
+    const textColor = data.textColor || "#202124";
+    const accentColor = data.accentColor || "#FBC02D";
+    const darkBg = isHexDark(bgColor);
+
     roundRectPath(ctx, 0, 0, 1000, 1000, 76);
     ctx.clip();
 
     if (showBg) {
-      ctx.fillStyle = "#FFFFFF";
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, 1000, 1000);
 
+      const useCustomBorder = data.borderStyle === "accent";
       ctx.beginPath();
       ctx.moveTo(0, 340);
       ctx.lineTo(122, 515);
       ctx.lineTo(0, 540);
       ctx.closePath();
-      ctx.fillStyle = "#EA4335";
+      ctx.fillStyle = useCustomBorder ? accentColor : "#EA4335";
       ctx.fill();
 
       ctx.beginPath();
@@ -841,7 +1011,7 @@
       ctx.lineTo(465, 1000);
       ctx.lineTo(0, 1000);
       ctx.closePath();
-      ctx.fillStyle = "#FBBC05";
+      ctx.fillStyle = useCustomBorder ? accentColor : "#FBBC05";
       ctx.fill();
 
       ctx.beginPath();
@@ -850,7 +1020,7 @@
       ctx.lineTo(975, 1000);
       ctx.lineTo(465, 1000);
       ctx.closePath();
-      ctx.fillStyle = "#34A853";
+      ctx.fillStyle = useCustomBorder ? accentColor : "#34A853";
       ctx.fill();
 
       ctx.beginPath();
@@ -860,130 +1030,154 @@
       ctx.lineTo(975, 1000);
       ctx.lineTo(878, 888);
       ctx.closePath();
-      ctx.fillStyle = "#4285F4";
+      ctx.fillStyle = useCustomBorder ? accentColor : "#4285F4";
       ctx.fill();
 
       roundRectPath(ctx, 118, 40, 764, 850, 36);
-      ctx.fillStyle = "#FFFFFF";
+      ctx.fillStyle = bgColor;
       ctx.fill();
 
       roundRectPath(ctx, 2, 2, 996, 996, 75);
-      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.strokeStyle = darkBg ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)";
       ctx.lineWidth = 4;
       ctx.stroke();
     }
 
     if (showIcons) {
-      const cx = 500, cy = 252, r = 194;
-      ctx.save();
-      ctx.lineWidth = 22;
-      ctx.lineCap = "butt";
+      // Grupo HERO: Anillo Google + 5 Estrellas
+      withGroupTransform(ctx, data, "hero", 500, 290, function () {
+        const cx = 500, cy = 252, r = 194;
+        const useCustomRing = data.borderStyle === "accent";
+        ctx.save();
+        ctx.lineWidth = 22;
+        ctx.lineCap = "butt";
 
-      ctx.beginPath();
-      ctx.strokeStyle = "#4285F4";
-      ctx.arc(cx, cy, r, (172 * Math.PI) / 180, (270 * Math.PI) / 180);
-      ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = useCustomRing ? accentColor : "#4285F4";
+        ctx.arc(cx, cy, r, (172 * Math.PI) / 180, (270 * Math.PI) / 180);
+        ctx.stroke();
 
-      ctx.beginPath();
-      ctx.strokeStyle = "#EA4335";
-      ctx.arc(cx, cy, r, (270 * Math.PI) / 180, (368 * Math.PI) / 180);
-      ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = useCustomRing ? accentColor : "#EA4335";
+        ctx.arc(cx, cy, r, (270 * Math.PI) / 180, (368 * Math.PI) / 180);
+        ctx.stroke();
 
-      ctx.beginPath();
-      ctx.strokeStyle = "#FBBC05";
-      ctx.arc(cx, cy, r, (8 * Math.PI) / 180, (90 * Math.PI) / 180);
-      ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = useCustomRing ? accentColor : "#FBBC05";
+        ctx.arc(cx, cy, r, (8 * Math.PI) / 180, (90 * Math.PI) / 180);
+        ctx.stroke();
 
-      ctx.beginPath();
-      ctx.strokeStyle = "#34A853";
-      ctx.arc(cx, cy, r, (90 * Math.PI) / 180, (172 * Math.PI) / 180);
-      ctx.stroke();
-      ctx.restore();
+        ctx.beginPath();
+        ctx.strokeStyle = useCustomRing ? accentColor : "#34A853";
+        ctx.arc(cx, cy, r, (90 * Math.PI) / 180, (172 * Math.PI) / 180);
+        ctx.stroke();
+        ctx.restore();
 
-      const starX = [392, 446, 500, 554, 608];
-      for (let i = 0; i < starX.length; i++) {
-        drawStar(ctx, starX[i], 508, 21, 10, "#FBC02D");
-      }
+        const starX = [392, 446, 500, 554, 608];
+        for (let i = 0; i < starX.length; i++) {
+          drawStar(ctx, starX[i], 508, 21, 10, accentColor);
+        }
+      });
 
-      // Ilustración NFC unificada (mismo diseño que la tarjeta de Menú)
-      drawUnifiedMenuNfcIllustration(ctx, 326, 706, 0.88, "#181818");
+      // Grupo NFC: Ilustración teléfono y mano
+      withGroupTransform(ctx, data, "nfc", 326, 706, function () {
+        drawUnifiedMenuNfcIllustration(ctx, 326, 706, 0.88, textColor, darkBg ? bgColor : "#FFFFFF");
+      });
     }
 
     if (showText) {
-      ctx.save();
-      ctx.fillStyle = "#202124";
-      ctx.textAlign = "center";
-      const line1 = data.titleLine1 || data.googleLine1 || "Valóranos";
-      const line2 = data.titleLine2 || data.googleLine2 || "en";
-      const line3 = data.titleLine3 || "Google";
+      // Grupo TITLE: Textos dentro del círculo
+      withGroupTransform(ctx, data, "title", 500, 250, function () {
+        ctx.save();
+        ctx.fillStyle = textColor;
+        ctx.textAlign = "center";
+        const line1 = data.titleLine1 || data.googleLine1 || "Valóranos";
+        const line2 = data.titleLine2 || data.googleLine2 || "en";
+        const line3 = data.titleLine3 || "Google";
 
-      ctx.font = "700 49px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.fillText(line1, 500, 195);
-      ctx.font = "700 45px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.fillText(line2, 500, 249);
+        ctx.font = "700 49px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillText(line1, 500, 195);
+        ctx.font = "700 45px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillText(line2, 500, 249);
 
-      if (line3.toLowerCase() === "google") {
-        const gLetters = [
-          { ch: "G", color: "#4285F4" },
-          { ch: "o", color: "#EA4335" },
-          { ch: "o", color: "#FBBC05" },
-          { ch: "g", color: "#4285F4" },
-          { ch: "l", color: "#34A853" },
-          { ch: "e", color: "#EA4335" }
-        ];
-        ctx.font = "700 76px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.textAlign = "left";
-        let totalGW = 0;
-        const widths = gLetters.map(function (item) {
-          const w = ctx.measureText(item.ch).width;
-          totalGW += w;
-          return w;
-        });
-        let curX = 500 - totalGW / 2;
-        for (let i = 0; i < gLetters.length; i++) {
-          ctx.fillStyle = gLetters[i].color;
-          ctx.fillText(gLetters[i].ch, curX, 329);
-          curX += widths[i];
+        if (line3.toLowerCase() === "google" && data.borderStyle !== "accent") {
+          const gLetters = [
+            { ch: "G", color: "#4285F4" },
+            { ch: "o", color: "#EA4335" },
+            { ch: "o", color: "#FBBC05" },
+            { ch: "g", color: "#4285F4" },
+            { ch: "l", color: "#34A853" },
+            { ch: "e", color: "#EA4335" }
+          ];
+          ctx.font = "700 76px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.textAlign = "left";
+          let totalGW = 0;
+          const widths = gLetters.map(function (item) {
+            const w = ctx.measureText(item.ch).width;
+            totalGW += w;
+            return w;
+          });
+          let curX = 500 - totalGW / 2;
+          for (let i = 0; i < gLetters.length; i++) {
+            ctx.fillStyle = gLetters[i].color;
+            ctx.fillText(gLetters[i].ch, curX, 329);
+            curX += widths[i];
+          }
+        } else {
+          ctx.font = "800 68px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillStyle = data.borderStyle === "accent" ? accentColor : "#4285F4";
+          ctx.fillText(line3, 500, 329);
         }
-      } else {
-        ctx.font = "800 68px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillStyle = "#4285F4";
-        ctx.fillText(line3, 500, 329);
-      }
-      ctx.restore();
+        ctx.restore();
+      });
     }
 
     if (showQr) {
-      const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
-      drawQrMatrix(
-        ctx,
-        targetUrl,
-        565,
-        560,
-        250,
-        buildQrOptionsFromData("google", data, "#111111")
-      );
+      withGroupTransform(ctx, data, "qr", 690, 685, function () {
+        const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
+        const hasCaption = (data.qrCaptionMode && data.qrCaptionMode !== "clean");
+        const qrY = hasCaption ? 548 : 560;
+        const qrSize = hasCaption ? 236 : 250;
+        const qrX = 690 - qrSize / 2;
+
+        drawQrMatrix(
+          ctx,
+          targetUrl,
+          qrX,
+          qrY,
+          qrSize,
+          buildQrOptionsFromData("google", data, "#111111", darkBg || data.qrBoxCard)
+        );
+
+        drawQrBottomCaption(ctx, 690, qrY + qrSize + 34, data, textColor);
+      });
     }
 
     if (showBrand) {
-      ctx.save();
-      ctx.fillStyle = "#181818";
-      ctx.font = "700 26px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.textAlign = "right";
-      ctx.textBaseline = "alphabetic";
-      ctx.fillText("Powered by", 448, 954);
+      withGroupTransform(ctx, data, "brand", 500, 942, function () {
+        ctx.save();
+        ctx.fillStyle = "#181818";
+        ctx.font = "700 26px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText("Powered by", 448, 954);
 
-      roundRectPath(ctx, 476, 913, 252, 58, 29);
-      ctx.fillStyle = "#FFFFFF";
-      ctx.fill();
+        roundRectPath(ctx, 476, 913, 252, 58, 29);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
 
-      drawBlueCodeLogo(ctx, 494, 924, 36);
+        drawBlueCodeLogo(ctx, 494, 924, 36);
 
-      ctx.fillStyle = "#0F172A";
-      ctx.font = "800 30px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.textAlign = "left";
-      ctx.fillText("BlueCode", 568, 953);
-      ctx.restore();
+        ctx.fillStyle = "#0F172A";
+        ctx.font = "800 30px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("BlueCode", 568, 953);
+        ctx.restore();
+      });
+    }
+
+    if (!layerFilter || layerFilter === "all") {
+      drawSelectionOverlayIfActive(ctx, "google", data);
     }
 
     ctx.restore();
@@ -1003,17 +1197,26 @@
     const showBrand = !layerFilter || layerFilter === "all" || layerFilter === "brand";
     const showQr = !layerFilter || layerFilter === "all" || layerFilter === "qr";
 
+    const bgColor = data.bgColor || "#FFFFFF";
+    const textColor = data.textColor || "#141414";
+    const accentColor = data.accentColor || "#E11D74";
+    const darkBg = isHexDark(bgColor);
+
     roundRectPath(ctx, 0, 0, 1000, 1000, 88);
     ctx.clip();
 
     if (showBg) {
-      const igBorderGrad = ctx.createLinearGradient(0, 0, 1000, 1000);
-      igBorderGrad.addColorStop(0, "#FFE033");
-      igBorderGrad.addColorStop(0.22, "#FF7A1A");
-      igBorderGrad.addColorStop(0.5, "#FF0069");
-      igBorderGrad.addColorStop(0.78, "#E0009B");
-      igBorderGrad.addColorStop(1, "#9B2DEF");
-      ctx.fillStyle = igBorderGrad;
+      if (data.borderStyle === "accent") {
+        ctx.fillStyle = accentColor;
+      } else {
+        const igBorderGrad = ctx.createLinearGradient(0, 0, 1000, 1000);
+        igBorderGrad.addColorStop(0, "#FFE033");
+        igBorderGrad.addColorStop(0.22, "#FF7A1A");
+        igBorderGrad.addColorStop(0.5, "#FF0069");
+        igBorderGrad.addColorStop(0.78, "#E0009B");
+        igBorderGrad.addColorStop(1, "#9B2DEF");
+        ctx.fillStyle = igBorderGrad;
+      }
       ctx.fillRect(0, 0, 1000, 1000);
 
       ctx.save();
@@ -1027,112 +1230,138 @@
       ctx.restore();
 
       roundRectPath(ctx, 56, 56, 888, 888, 62);
-      ctx.fillStyle = "#FFFFFF";
+      ctx.fillStyle = bgColor;
       ctx.fill();
 
       ctx.save();
-      ctx.strokeStyle = "#181818";
+      ctx.strokeStyle = textColor;
       ctx.lineWidth = 5.5;
       ctx.lineCap = "round";
       roundRectPath(ctx, 114, 114, 772, 766, 44);
       ctx.stroke();
 
-      ctx.fillStyle = "#FFFFFF";
+      ctx.fillStyle = bgColor;
       ctx.fillRect(345, 868, 310, 26);
       ctx.restore();
     }
 
     if (showIcons) {
-      ctx.save();
-      const camGrad = ctx.createLinearGradient(408, 352, 592, 168);
-      camGrad.addColorStop(0, "#FEDA75");
-      camGrad.addColorStop(0.28, "#FA7E1E");
-      camGrad.addColorStop(0.6, "#D62976");
-      camGrad.addColorStop(1, "#962FBF");
+      withGroupTransform(ctx, data, "hero", 500, 260, function () {
+        ctx.save();
+        let camStroke;
+        if (data.borderStyle === "accent") {
+          camStroke = accentColor;
+        } else {
+          const camGrad = ctx.createLinearGradient(408, 352, 592, 168);
+          camGrad.addColorStop(0, "#FEDA75");
+          camGrad.addColorStop(0.28, "#FA7E1E");
+          camGrad.addColorStop(0.6, "#D62976");
+          camGrad.addColorStop(1, "#962FBF");
+          camStroke = camGrad;
+        }
 
-      ctx.strokeStyle = camGrad;
-      ctx.lineWidth = 17;
-      roundRectPath(ctx, 412, 172, 176, 176, 46);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.arc(500, 260, 44, 0, Math.PI * 2);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.arc(548, 212, 11, 0, Math.PI * 2);
-      ctx.fillStyle = camGrad;
-      ctx.fill();
-
-      ctx.strokeStyle = "#E11D74";
-      ctx.lineWidth = 11;
-      ctx.lineCap = "round";
-      const waveRadii = [58, 92, 126];
-      for (let i = 0; i < waveRadii.length; i++) {
-        ctx.beginPath();
-        ctx.arc(405, 260, waveRadii[i], (142 * Math.PI) / 180, (218 * Math.PI) / 180);
+        ctx.strokeStyle = camStroke;
+        ctx.lineWidth = 17;
+        roundRectPath(ctx, 412, 172, 176, 176, 46);
         ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(595, 260, waveRadii[i], (-38 * Math.PI) / 180, (38 * Math.PI) / 180);
-        ctx.stroke();
-      }
-      ctx.restore();
 
-      // Ilustración NFC unificada (mismo diseño que la tarjeta de Menú)
-      drawUnifiedMenuNfcIllustration(ctx, 332, 682, 0.86, "#141414");
+        ctx.beginPath();
+        ctx.arc(500, 260, 44, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(548, 212, 11, 0, Math.PI * 2);
+        ctx.fillStyle = camStroke;
+        ctx.fill();
+
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 11;
+        ctx.lineCap = "round";
+        const waveRadii = [58, 92, 126];
+        for (let i = 0; i < waveRadii.length; i++) {
+          ctx.beginPath();
+          ctx.arc(405, 260, waveRadii[i], (142 * Math.PI) / 180, (218 * Math.PI) / 180);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(595, 260, waveRadii[i], (-38 * Math.PI) / 180, (38 * Math.PI) / 180);
+          ctx.stroke();
+        }
+        ctx.restore();
+      });
+
+      withGroupTransform(ctx, data, "nfc", 332, 682, function () {
+        drawUnifiedMenuNfcIllustration(ctx, 332, 682, 0.86, textColor, darkBg ? bgColor : "#FFFFFF");
+      });
     }
 
     if (showText) {
-      ctx.save();
-      ctx.fillStyle = "#141414";
-      ctx.textAlign = "center";
+      withGroupTransform(ctx, data, "title", 500, 455, function () {
+        ctx.save();
+        ctx.fillStyle = textColor;
+        ctx.textAlign = "center";
 
-      ctx.font = "400 78px 'Grand Hotel', 'Brush Script MT', cursive";
-      ctx.fillText(data.titleScript || data.igTitle || "Instagram", 500, 446);
+        ctx.font = "400 78px 'Grand Hotel', 'Brush Script MT', cursive";
+        ctx.fillText(data.titleScript || data.igTitle || "Instagram", 500, 446);
 
-      ctx.font = "500 33px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.fillText(data.subtitle || data.igSubtitle || "¡Acerca tu móvil y síguenos!", 500, 504);
-      ctx.restore();
+        ctx.font = "500 33px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillText(data.subtitle || data.igSubtitle || "¡Acerca tu móvil y síguenos!", 500, 504);
+        ctx.restore();
+      });
     }
 
     if (showQr) {
-      const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
-      drawQrMatrix(
-        ctx,
-        targetUrl,
-        558,
-        548,
-        240,
-        buildQrOptionsFromData("instagram", data, "#141414")
-      );
+      withGroupTransform(ctx, data, "qr", 678, 668, function () {
+        const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
+        const hasCaption = (data.qrCaptionMode && data.qrCaptionMode !== "clean");
+        const qrSize = hasCaption ? 224 : 240;
+        const qrX = 678 - qrSize / 2;
+        const qrY = hasCaption ? 536 : 548;
+
+        drawQrMatrix(
+          ctx,
+          targetUrl,
+          qrX,
+          qrY,
+          qrSize,
+          buildQrOptionsFromData("instagram", data, "#141414", darkBg || data.qrBoxCard)
+        );
+
+        drawQrBottomCaption(ctx, 678, qrY + qrSize + 34, data, textColor);
+      });
     }
 
     if (showBrand) {
-      ctx.save();
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#555555";
-      ctx.font = "600 18px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.fillText("Powered by", 500, 842);
+      withGroupTransform(ctx, data, "brand", 500, 868, function () {
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.fillStyle = darkBg ? "rgba(255,255,255,0.75)" : "#555555";
+        ctx.font = "600 18px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillText("Powered by", 500, 842);
 
-      const logoH = 34;
-      const logoW = (490 / 271) * logoH;
-      ctx.font = "800 31px 'Plus Jakarta Sans', Arial, sans-serif";
-      const txtW = ctx.measureText("BlueCode").width;
-      const gap = 10;
-      const totalW = logoW + gap + txtW;
-      const startX = 500 - totalW / 2;
+        const logoH = 34;
+        const logoW = (490 / 271) * logoH;
+        ctx.font = "800 31px 'Plus Jakarta Sans', Arial, sans-serif";
+        const txtW = ctx.measureText("BlueCode").width;
+        const gap = 10;
+        const totalW = logoW + gap + txtW;
+        const startX = 500 - totalW / 2;
 
-      drawBlueCodeLogo(ctx, startX, 853, logoH);
+        drawBlueCodeLogo(ctx, startX, 853, logoH);
 
-      ctx.fillStyle = "#111111";
-      ctx.textAlign = "left";
-      ctx.fillText("BlueCode", startX + logoW + gap, 881);
+        ctx.fillStyle = textColor;
+        ctx.textAlign = "left";
+        ctx.fillText("BlueCode", startX + logoW + gap, 881);
 
-      const miniStars = [468, 484, 500, 516, 532];
-      for (let s = 0; s < miniStars.length; s++) {
-        drawStar(ctx, miniStars[s], 903, 6, 3, "#F59E0B");
-      }
-      ctx.restore();
+        const miniStars = [468, 484, 500, 516, 532];
+        for (let s = 0; s < miniStars.length; s++) {
+          drawStar(ctx, miniStars[s], 903, 6, 3, "#F59E0B");
+        }
+        ctx.restore();
+      });
+    }
+
+    if (!layerFilter || layerFilter === "all") {
+      drawSelectionOverlayIfActive(ctx, "instagram", data);
     }
 
     ctx.restore();
@@ -1152,11 +1381,19 @@
     const showBrand = !layerFilter || layerFilter === "all" || layerFilter === "brand";
     const showQr = !layerFilter || layerFilter === "all" || layerFilter === "qr";
 
+    const bgColor = data.bgColor || "#FFFFFF";
+    const textColor = data.textColor || "#1B1A1A";
+    const accentColor = data.accentColor || "#1B1A1A";
+    const waveSubColor = data.waveSubColor || "#DCE8F3";
+    const darkBg = isHexDark(bgColor);
+    const darkHeader = isHexDark(accentColor);
+    const headerContentColor = darkHeader ? "#FFFFFF" : "#111827";
+
     roundRectPath(ctx, 0, 0, 1000, 1000, 82);
     ctx.clip();
 
     if (showBg) {
-      ctx.fillStyle = "#FFFFFF";
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, 1000, 1000);
 
       ctx.beginPath();
@@ -1165,7 +1402,7 @@
       ctx.lineTo(1000, 492);
       ctx.bezierCurveTo(760, 505, 520, 365, 0, 542);
       ctx.closePath();
-      ctx.fillStyle = "#DCE8F3";
+      ctx.fillStyle = waveSubColor;
       ctx.fill();
 
       ctx.beginPath();
@@ -1174,121 +1411,153 @@
       ctx.lineTo(1000, 472);
       ctx.bezierCurveTo(760, 485, 520, 342, 0, 520);
       ctx.closePath();
-      ctx.fillStyle = "#1B1A1A";
+      ctx.fillStyle = accentColor;
       ctx.fill();
 
       roundRectPath(ctx, 2, 2, 996, 996, 80);
-      ctx.strokeStyle = "rgba(0,0,0,0.1)";
+      ctx.strokeStyle = darkBg ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)";
       ctx.lineWidth = 4;
       ctx.stroke();
     }
 
     if (showIcons) {
-      ctx.save();
-      ctx.fillStyle = "#FFFFFF";
+      // Grupo HERO: Tenedor y cuchara superiores
+      withGroupTransform(ctx, data, "hero", 500, 120, function () {
+        ctx.save();
+        ctx.fillStyle = headerContentColor;
 
-      roundRectPath(ctx, 442, 42, 9, 48, 4);
-      ctx.fill();
-      roundRectPath(ctx, 461, 42, 9, 48, 4);
-      ctx.fill();
-      roundRectPath(ctx, 480, 42, 9, 48, 4);
-      ctx.fill();
+        roundRectPath(ctx, 442, 42, 9, 48, 4);
+        ctx.fill();
+        roundRectPath(ctx, 461, 42, 9, 48, 4);
+        ctx.fill();
+        roundRectPath(ctx, 480, 42, 9, 48, 4);
+        ctx.fill();
 
-      ctx.beginPath();
-      ctx.moveTo(442, 82);
-      ctx.lineTo(489, 82);
-      ctx.quadraticCurveTo(489, 114, 474, 118);
-      ctx.lineTo(478, 194);
-      ctx.quadraticCurveTo(465, 204, 453, 194);
-      ctx.lineTo(457, 118);
-      ctx.quadraticCurveTo(442, 114, 442, 82);
-      ctx.closePath();
-      ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(442, 82);
+        ctx.lineTo(489, 82);
+        ctx.quadraticCurveTo(489, 114, 474, 118);
+        ctx.lineTo(478, 194);
+        ctx.quadraticCurveTo(465, 204, 453, 194);
+        ctx.lineTo(457, 118);
+        ctx.quadraticCurveTo(442, 114, 442, 82);
+        ctx.closePath();
+        ctx.fill();
 
-      ctx.beginPath();
-      ctx.ellipse(536, 78, 25, 36, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(527, 108);
-      ctx.lineTo(545, 108);
-      ctx.lineTo(549, 194);
-      ctx.quadraticCurveTo(536, 204, 523, 194);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
+        ctx.beginPath();
+        ctx.ellipse(536, 78, 25, 36, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(527, 108);
+        ctx.lineTo(545, 108);
+        ctx.lineTo(549, 194);
+        ctx.quadraticCurveTo(536, 204, 523, 194);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      });
 
-      drawUnifiedMenuNfcIllustration(ctx, 338, 732, 0.96, "#1B1A1A");
+      // Grupo NFC: Ilustración teléfono y mano (+ texto en arco cuando se arrastra junto)
+      withGroupTransform(ctx, data, "nfc", 338, 720, function () {
+        drawUnifiedMenuNfcIllustration(ctx, 338, 732, 0.96, textColor, darkBg ? bgColor : "#FFFFFF");
+        drawArcText(
+          ctx,
+          data.arcText || data.menuTapText || "TAP YOUR PHONE",
+          3,
+          342,
+          795,
+          228,
+          (-126 * Math.PI) / 180,
+          (-54 * Math.PI) / 180,
+          33,
+          textColor
+        );
+      });
     }
 
     if (showText) {
-      ctx.save();
-      ctx.textAlign = "center";
+      withGroupTransform(ctx, data, "title", 500, 315, function () {
+        ctx.save();
+        ctx.textAlign = "center";
 
-      ctx.fillStyle = "#FFFFFF";
-      ctx.font = "800 124px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.fillText(data.titleMain || data.menuTitle || "MENU", 500, 322);
+        ctx.fillStyle = headerContentColor;
+        ctx.font = "800 124px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillText(data.titleMain || data.menuTitle || "MENU", 500, 322);
 
-      ctx.font = "400 34px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.fillText(data.subtitle || data.menuSubtitle || "VIEW OUR MENU ONLINE", 500, 386);
-
-      drawArcText(
-        ctx,
-        data.arcText || data.menuTapText || "TAP YOUR PHONE",
-        3,
-        342,
-        795,
-        228,
-        (-126 * Math.PI) / 180,
-        (-54 * Math.PI) / 180,
-        33,
-        "#1B1A1A"
-      );
-
-      ctx.fillStyle = "#1B1A1A";
-      ctx.font = "500 26px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.fillText("OR", 760, 542);
-      ctx.font = "800 30px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.fillText("SCAN QR", 760, 578);
-
-      ctx.fillStyle = "#333333";
-      ctx.font = "600 21px 'JetBrains Mono', monospace";
-      ctx.fillText((data.slug || "TAG-ID").toUpperCase(), 760, 868);
-      ctx.restore();
+        ctx.font = "400 34px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillText(data.subtitle || data.menuSubtitle || "VIEW OUR MENU ONLINE", 500, 386);
+        ctx.restore();
+      });
     }
 
     if (showQr) {
-      const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
-      ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.12)";
-      ctx.shadowBlur = 14;
-      ctx.shadowOffsetY = 4;
-      roundRectPath(ctx, 644, 598, 232, 232, 16);
-      ctx.fillStyle = "#FFFFFF";
-      ctx.fill();
-      ctx.restore();
+      withGroupTransform(ctx, data, "qr", 760, 714, function () {
+        const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
+        const captionMode = data.qrCaptionMode || "bottom-text-id";
 
-      roundRectPath(ctx, 644, 598, 232, 232, 16);
-      ctx.strokeStyle = "#E2E8F0";
-      ctx.lineWidth = 3;
-      ctx.stroke();
+        ctx.save();
+        ctx.shadowColor = "rgba(0,0,0,0.12)";
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 4;
+        roundRectPath(ctx, 644, 598, 232, 232, 16);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+        ctx.restore();
 
-      drawQrMatrix(
-        ctx,
-        targetUrl,
-        662,
-        616,
-        196,
-        buildQrOptionsFromData("menu", data, "#1B1A1A")
-      );
+        roundRectPath(ctx, 644, 598, 232, 232, 16);
+        ctx.strokeStyle = "#E2E8F0";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        drawQrMatrix(
+          ctx,
+          targetUrl,
+          662,
+          616,
+          196,
+          buildQrOptionsFromData("menu", data, "#1B1A1A", false)
+        );
+
+        // Si el usuario elige "QR Clean", ocultamos todo texto alrededor del QR
+        if (captionMode !== "clean") {
+          ctx.save();
+          ctx.textAlign = "center";
+          ctx.fillStyle = textColor;
+          ctx.font = "500 25px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillText("OR", 760, 542);
+          ctx.font = "800 29px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillText((data.qrCaptionText || "SCAN QR").toUpperCase(), 760, 578);
+
+          if (captionMode === "bottom-text-id") {
+            ctx.fillStyle = textColor;
+            ctx.globalAlpha = 0.82;
+            ctx.font = "600 21px 'JetBrains Mono', monospace";
+            ctx.fillText((data.slug || "TAG-ID").toUpperCase(), 760, 868);
+          } else if (captionMode === "bottom-text" && data.qrCaptionText) {
+            ctx.fillStyle = textColor;
+            ctx.font = "800 23px 'Plus Jakarta Sans', Arial, sans-serif";
+            ctx.fillText(data.qrCaptionText, 760, 868);
+          }
+          ctx.restore();
+        }
+      });
     }
 
     if (showBrand) {
-      drawPoweredByBlueCodeFooter(ctx, 500, 954, {
-        lowercase: true,
-        fontSize: 27,
-        brandFontSize: 30,
-        logoHeight: 33
+      withGroupTransform(ctx, data, "brand", 500, 945, function () {
+        drawPoweredByBlueCodeFooter(ctx, 500, 954, {
+          lowercase: true,
+          fontSize: 27,
+          brandFontSize: 30,
+          logoHeight: 33,
+          prefixColor: darkBg ? "rgba(255,255,255,0.78)" : "#222222",
+          brandColor: darkBg ? "#FFFFFF" : "#0F172A"
+        });
       });
+    }
+
+    if (!layerFilter || layerFilter === "all") {
+      drawSelectionOverlayIfActive(ctx, "menu", data);
     }
 
     ctx.restore();
@@ -1319,14 +1588,14 @@
       if (notifyFn) notifyFn("Cargando motor Photoshop (.PSD), intenta de nuevo en 1 segundo.");
       return false;
     }
-    // Para PSD usamos 300 DPI por defecto para que el archivo binario sea ágil de abrir en Photoshop
+    const cleanCfg = Object.assign({}, cfg, { __activeDragGroup: null });
     const dpi = customDpi ? Math.min(customDpi, 300) : 300;
     const W = Math.round((widthCm / 2.54) * dpi);
     const H = Math.round((heightCm / 2.54) * dpi);
 
     function makeLayerCanvas(filterName) {
       const c = document.createElement("canvas");
-      renderPlaqueToCanvas(c, motif, W, H, cfg, filterName);
+      renderPlaqueToCanvas(c, motif, W, H, cleanCfg, filterName);
       return c;
     }
 
@@ -1353,7 +1622,7 @@
     };
 
     const compositeCanvas = document.createElement("canvas");
-    renderPlaqueToCanvas(compositeCanvas, motif, W, H, cfg, "all");
+    renderPlaqueToCanvas(compositeCanvas, motif, W, H, cleanCfg, "all");
     psd.canvas = compositeCanvas;
 
     const buffer = window.agPsd.writePsd(psd);
@@ -1387,26 +1656,9 @@
     for (let i = 0; i < queueItems.length; i++) {
       const raw = queueItems[i];
       const motif = raw.motif;
-      const cfg = raw.cfg || raw;
+      const cfg = Object.assign({}, raw.cfg || raw, { __activeDragGroup: null });
       const copies = raw.copies || 1;
-      const cacheKey = JSON.stringify({
-        m: motif,
-        s: cfg.slug,
-        u: cfg.qrUrl || cfg.url,
-        l: cfg.qrCenterLogo,
-        st: cfg.qrStyle,
-        ey: cfg.qrEyeStyle,
-        cm: cfg.qrColorMode,
-        c1: cfg.qrColor,
-        c2: cfg.qrColor2,
-        ec: cfg.eyeColorMode,
-        ecv: cfg.eyeColor,
-        ls: cfg.logoShape,
-        fs: cfg.frameStyle,
-        t1: cfg.titleLine1 || cfg.titleMain || cfg.titleScript,
-        t2: cfg.titleLine2 || cfg.subtitle,
-        t3: cfg.titleLine3
-      });
+      const cacheKey = JSON.stringify(cfg);
 
       if (!cacheByMotif[cacheKey]) {
         renderPlaqueToCanvas(workCanvas, motif, pxW, pxH, cfg, "all");
@@ -1539,6 +1791,7 @@
     drawBlueCodeLogo: drawBlueCodeLogo,
     drawQrMatrix: drawQrMatrix,
     setCustomQrLogoImage: setCustomQrLogoImage,
+    getTransformedHitBoxes: getTransformedHitBoxes,
     renderPlaqueToCanvas: renderPlaqueToCanvas,
     exportLayeredPsdFile: exportLayeredPsdFile,
     exportPlaquesToPdf: exportPlaquesToPdf,
