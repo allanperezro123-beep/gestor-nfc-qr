@@ -8,10 +8,13 @@
   <link rel="preconnect" href="https://gestor-nfc-qr-2026-default-rtdb.firebaseio.com" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Librerías cliente ultra-ligeras -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ag-psd@15.1.1/dist/bundle.js"></script>
+  <script src="/placas.js"></script>
 
   <style>
     :root {
@@ -534,6 +537,246 @@
       padding: 20px;
     }
     #gateScreen.active { display: flex; }
+
+    /* ==========================================================
+       ESTUDIO DE PLACAS (GOOGLE · MENÚ · INSTAGRAM)
+       ========================================================== */
+    .view-switcher {
+      display: inline-flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 4px;
+    }
+    .view-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.16s ease;
+    }
+    .view-tab-btn:hover {
+      color: var(--text);
+    }
+    .view-tab-btn.active {
+      background: var(--bc-gradient);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(8, 101, 245, 0.3);
+    }
+
+    #plaqueStudioSection {
+      display: none;
+      padding-top: 22px;
+    }
+    #plaqueStudioSection.active {
+      display: block;
+    }
+
+    .plaque-studio-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .plaque-config-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+    }
+
+    .cm-input-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+    .cm-input-group input {
+      width: 54px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      outline: none;
+    }
+    .cm-preset-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.14s ease;
+    }
+    .cm-preset-btn:hover, .cm-preset-btn.active {
+      border-color: var(--bc-cyan);
+      color: var(--text);
+      background: rgba(8, 208, 230, 0.1);
+    }
+
+    .plaque-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .plaque-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .plaque-card.selected-motif {
+      border-color: rgba(8, 101, 245, 0.55);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    }
+    .plaque-card.disabled-motif {
+      opacity: 0.55;
+    }
+
+    .plaque-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .plaque-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+    .qty-badge-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+    .qty-badge-control input {
+      width: 42px;
+      background: transparent;
+      border: none;
+      color: var(--bc-cyan);
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .plaque-canvas-wrap {
+      background: radial-gradient(circle at center, #1b2030 0%, #0b0d14 100%);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .plaque-canvas-wrap canvas {
+      width: 100%;
+      max-width: 270px;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.55);
+    }
+    .plaque-size-pill {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      background: rgba(8, 9, 13, 0.82);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      backdrop-filter: blur(4px);
+    }
+
+    .plaque-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .plaque-field-group label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+    .plaque-select, .plaque-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.78rem;
+      padding: 7px 10px;
+      border-radius: 6px;
+      outline: none;
+    }
+    .plaque-select:focus, .plaque-input:focus {
+      border-color: var(--bc-blue);
+    }
+
+    .plaque-card-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 920px) {
+      .plaque-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -564,6 +807,15 @@
       </a>
 
       <div class="header-actions">
+        <div class="view-switcher">
+          <button type="button" class="view-tab-btn active" id="tabViewLinks">
+            📋 Enlaces & QR
+          </button>
+          <button type="button" class="view-tab-btn" id="tabViewPlaques">
+            🪧 Estudio de Placas (Google · Menú · IG)
+          </button>
+        </div>
+
         <button type="button" class="btn btn-subtle btn-sm" id="btnShareLink" title="Copiar enlace de acceso directo para el equipo">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
           Link del Equipo
@@ -582,46 +834,283 @@
 
   <main class="container">
 
-    <!-- Barra de Búsqueda y Exportación Masiva -->
-    <section class="top-toolbar">
-      <div class="search-box">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, código o destino..." />
+    <!-- VISTA 1: GESTOR DE ENLACES Y QR -->
+    <div id="linksViewWrapper">
+      <!-- Barra de Búsqueda y Exportación Masiva -->
+      <section class="top-toolbar">
+        <div class="search-box">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, código o destino..." />
+        </div>
+
+        <div class="toolbar-actions">
+          <button type="button" class="btn btn-subtle btn-sm" id="btnGoToPlaqueStudioQuick" style="border-color: rgba(8, 208, 230, 0.35); color: var(--bc-cyan);">
+            🪧 Diseñar / Imprimir Placas
+          </button>
+          <button type="button" class="btn btn-subtle btn-sm" id="btnExportCsv" title="Descargar inventario en archivo CSV">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Exportar CSV
+          </button>
+          <button type="button" class="btn btn-subtle btn-sm" id="btnExportAllZip" title="Descargar todos los códigos QR en un archivo .ZIP">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            Exportar Todos QR (ZIP)
+          </button>
+          <button type="button" class="btn btn-subtle btn-sm" id="btnPrintSheet" title="Hoja de impresión de stickers para mandar a imprimir">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Hoja de Impresión
+          </button>
+        </div>
+      </section>
+
+      <!-- Cabecera de Columnas -->
+      <div class="table-header">
+        <div>
+          <label class="custom-check" title="Seleccionar todo">
+            <input type="checkbox" id="selectAllCheckbox" />
+          </label>
+        </div>
+        <div>Identificador / Tag</div>
+        <div>Link Fijo (NFC / QR)</div>
+        <div>Destino Actual (Editable)</div>
+        <div style="text-align: right;">Acciones</div>
       </div>
 
-      <div class="toolbar-actions">
-        <button type="button" class="btn btn-subtle btn-sm" id="btnExportCsv" title="Descargar inventario en archivo CSV">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          Exportar CSV
-        </button>
-        <button type="button" class="btn btn-subtle btn-sm" id="btnExportAllZip" title="Descargar todos los códigos QR en un archivo .ZIP">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-          Exportar Todos QR (ZIP)
-        </button>
-        <button type="button" class="btn btn-subtle btn-sm" id="btnPrintSheet" title="Hoja de impresión de stickers para mandar a imprimir">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-          Hoja de Impresión
-        </button>
+      <!-- Contenedor de Tags -->
+      <div class="tags-container" id="tagsContainer">
+        <!-- Cargado dinámicamente -->
+      </div>
+    </div>
+
+    <!-- VISTA 2: ESTUDIO GENERADOR DE PLACAS (GOOGLE · MENÚ · INSTAGRAM) -->
+    <section id="plaqueStudioSection">
+      <div class="plaque-studio-header">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span class="brand-pill">300 DPI · Vectorial & Editable</span>
+            <h2 style="font-size: 1.05rem; font-weight: 700;">Estudio Generador de Placas NFC & QR — Powered by BlueCode</h2>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted);">
+            Diseños 100% idénticos para <strong>Google Review</strong>, <strong>Menú Digital</strong> e <strong>Instagram</strong> con sello oficial BlueCode. Elige qué motivos y cuántas copias imprimir en PDF o exportar a Adobe Photoshop editable (.PSD multicapa y Script .JSX).
+          </p>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <button type="button" class="btn btn-bc btn-sm" id="btnExportPlaquePdf" title="Generar PDF listo para imprenta en centímetros exactos a 300 DPI">
+            📄 Exportar PDF Impresión
+          </button>
+          <button type="button" class="btn btn-subtle btn-sm" id="btnExportPlaqueJsxAll" style="border-color: rgba(8, 208, 230, 0.4); color: var(--bc-cyan);" title="Descargar Script .JSX para Adobe Photoshop con capas de texto editables y QR vectorial">
+            🎨 Script Photoshop (.JSX)
+          </button>
+          <button type="button" class="btn btn-subtle btn-sm" id="btnExportPlaqueZipPng" title="Descargar todas las placas seleccionadas en PNG de 300 DPI dentro de un ZIP">
+            📦 Descargar Placas (ZIP)
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Medidas en cm y Modo de Impresión -->
+      <div class="plaque-config-bar">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 0.76rem; font-weight: 600; color: var(--text-muted);">Medida Física (cm):</span>
+          <div class="cm-input-group">
+            <span style="font-size: 0.7rem; color: var(--text-dim);">Ancho</span>
+            <input type="number" id="plaqueWidthCm" value="10" min="4" max="50" step="0.5" />
+            <span style="font-size: 0.75rem; color: var(--text-dim);">×</span>
+            <span style="font-size: 0.7rem; color: var(--text-dim);">Alto</span>
+            <input type="number" id="plaqueHeightCm" value="10" min="4" max="50" step="0.5" />
+            <span style="font-size: 0.72rem; font-family: var(--mono); color: var(--bc-cyan);">cm</span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <button type="button" class="cm-preset-btn" data-w="8" data-h="8">8×8 cm</button>
+          <button type="button" class="cm-preset-btn active" data-w="10" data-h="10">10×10 cm</button>
+          <button type="button" class="cm-preset-btn" data-w="12" data-h="12">12×12 cm</button>
+          <button type="button" class="cm-preset-btn" data-w="15" data-h="15">15×15 cm</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Formato PDF:</span>
+          <select id="plaquePdfMode" class="plaque-select" style="width: auto; min-width: 225px;">
+            <option value="sheet">Hoja Impresión con Guías de Corte (cm exactos)</option>
+            <option value="exact">Páginas 1:1 al Tamaño Exacto en cm (Imprenta)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Grid de los 3 Motivos -->
+      <div class="plaque-cards-grid">
+
+        <!-- MOTIVO 1: GOOGLE REVIEW -->
+        <div class="plaque-card selected-motif" id="cardMotif_google">
+          <div class="plaque-card-top">
+            <label class="plaque-card-title" style="cursor: pointer;">
+              <input type="checkbox" id="chkMotif_google" checked style="accent-color: var(--bc-blue); width: 16px; height: 16px;" />
+              <span>⭐ Google Review</span>
+            </label>
+            <div class="qty-badge-control" title="Cantidad de copias a imprimir en el PDF">
+              <span>Copias:</span>
+              <input type="number" id="qtyMotif_google" value="1" min="0" max="100" />
+            </div>
+          </div>
+
+          <div class="plaque-canvas-wrap">
+            <canvas id="canvasMotif_google" width="800" height="800"></canvas>
+            <span class="plaque-size-pill" id="pillSize_google">10 × 10 cm · 300 DPI</span>
+          </div>
+
+          <div class="plaque-field-group">
+            <label>
+              <span>Tag / QR Dinámico Asignado</span>
+              <a href="javascript:void(0)" class="quick-new-tag-link" data-motif="google" style="color: var(--bc-cyan); text-decoration: none;">+ Crear Tag</a>
+            </label>
+            <select id="selectTag_google" class="plaque-select"></select>
+          </div>
+
+          <div class="plaque-field-group">
+            <label><span>URL o Link del QR (Editable)</span></label>
+            <input type="text" id="customUrl_google" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Línea 1</span></label>
+              <input type="text" id="t1_google" class="plaque-input" value="Valóranos" />
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Línea 2</span></label>
+              <input type="text" id="t2_google" class="plaque-input" value="en" />
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Línea 3</span></label>
+              <input type="text" id="t3_google" class="plaque-input" value="Google" />
+            </div>
+          </div>
+
+          <div class="plaque-card-actions">
+            <button type="button" class="btn btn-bc btn-sm" data-psd-motif="google" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+              .PSD Capas
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-jsx-motif="google" title="Descargar Script .JSX de Photoshop con textos editables">
+              Script .JSX
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-png-motif="google" title="Descargar imagen PNG a 300 DPI">
+              PNG 300dpi
+            </button>
+          </div>
+        </div>
+
+        <!-- MOTIVO 2: MENÚ DIGITAL -->
+        <div class="plaque-card selected-motif" id="cardMotif_menu">
+          <div class="plaque-card-top">
+            <label class="plaque-card-title" style="cursor: pointer;">
+              <input type="checkbox" id="chkMotif_menu" checked style="accent-color: var(--bc-blue); width: 16px; height: 16px;" />
+              <span>🍴 Menú Digital</span>
+            </label>
+            <div class="qty-badge-control" title="Cantidad de copias a imprimir en el PDF">
+              <span>Copias:</span>
+              <input type="number" id="qtyMotif_menu" value="1" min="0" max="100" />
+            </div>
+          </div>
+
+          <div class="plaque-canvas-wrap">
+            <canvas id="canvasMotif_menu" width="800" height="800"></canvas>
+            <span class="plaque-size-pill" id="pillSize_menu">10 × 10 cm · 300 DPI</span>
+          </div>
+
+          <div class="plaque-field-group">
+            <label>
+              <span>Tag / QR Dinámico Asignado</span>
+              <a href="javascript:void(0)" class="quick-new-tag-link" data-motif="menu" style="color: var(--bc-cyan); text-decoration: none;">+ Crear Tag</a>
+            </label>
+            <select id="selectTag_menu" class="plaque-select"></select>
+          </div>
+
+          <div class="plaque-field-group">
+            <label><span>URL o Link del QR (Editable)</span></label>
+            <input type="text" id="customUrl_menu" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Título Principal</span></label>
+              <input type="text" id="t1_menu" class="plaque-input" value="MENU" />
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Subtítulo</span></label>
+              <input type="text" id="t2_menu" class="plaque-input" value="VIEW OUR MENU ONLINE" />
+            </div>
+          </div>
+
+          <div class="plaque-card-actions">
+            <button type="button" class="btn btn-bc btn-sm" data-psd-motif="menu" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+              .PSD Capas
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-jsx-motif="menu" title="Descargar Script .JSX de Photoshop con textos editables">
+              Script .JSX
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-png-motif="menu" title="Descargar imagen PNG a 300 DPI">
+              PNG 300dpi
+            </button>
+          </div>
+        </div>
+
+        <!-- MOTIVO 3: INSTAGRAM -->
+        <div class="plaque-card selected-motif" id="cardMotif_instagram">
+          <div class="plaque-card-top">
+            <label class="plaque-card-title" style="cursor: pointer;">
+              <input type="checkbox" id="chkMotif_instagram" checked style="accent-color: var(--bc-blue); width: 16px; height: 16px;" />
+              <span>📸 Instagram</span>
+            </label>
+            <div class="qty-badge-control" title="Cantidad de copias a imprimir en el PDF">
+              <span>Copias:</span>
+              <input type="number" id="qtyMotif_instagram" value="1" min="0" max="100" />
+            </div>
+          </div>
+
+          <div class="plaque-canvas-wrap">
+            <canvas id="canvasMotif_instagram" width="800" height="800"></canvas>
+            <span class="plaque-size-pill" id="pillSize_instagram">10 × 10 cm · 300 DPI</span>
+          </div>
+
+          <div class="plaque-field-group">
+            <label>
+              <span>Tag / QR Dinámico Asignado</span>
+              <a href="javascript:void(0)" class="quick-new-tag-link" data-motif="instagram" style="color: var(--bc-cyan); text-decoration: none;">+ Crear Tag</a>
+            </label>
+            <select id="selectTag_instagram" class="plaque-select"></select>
+          </div>
+
+          <div class="plaque-field-group">
+            <label><span>URL o Link del QR (Editable)</span></label>
+            <input type="text" id="customUrl_instagram" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Título Cursiva</span></label>
+              <input type="text" id="t1_instagram" class="plaque-input" value="Instagram" />
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Llamado a la acción</span></label>
+              <input type="text" id="t2_instagram" class="plaque-input" value="¡Acerca tu móvil y síguenos!" />
+            </div>
+          </div>
+
+          <div class="plaque-card-actions">
+            <button type="button" class="btn btn-bc btn-sm" data-psd-motif="instagram" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+              .PSD Capas
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-jsx-motif="instagram" title="Descargar Script .JSX de Photoshop con textos editables">
+              Script .JSX
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-png-motif="instagram" title="Descargar imagen PNG a 300 DPI">
+              PNG 300dpi
+            </button>
+          </div>
+        </div>
+
       </div>
     </section>
-
-    <!-- Cabecera de Columnas -->
-    <div class="table-header">
-      <div>
-        <label class="custom-check" title="Seleccionar todo">
-          <input type="checkbox" id="selectAllCheckbox" />
-        </label>
-      </div>
-      <div>Identificador / Tag</div>
-      <div>Link Fijo (NFC / QR)</div>
-      <div>Destino Actual (Editable)</div>
-      <div style="text-align: right;">Acciones</div>
-    </div>
-
-    <!-- Contenedor de Tags -->
-    <div class="tags-container" id="tagsContainer">
-      <!-- Cargado dinámicamente -->
-    </div>
 
   </main>
 
@@ -971,6 +1460,7 @@
             '<button class="btn btn-bc btn-sm" onclick="document.getElementById(\'btnOpenNewModal\').click()">+ Crear el primero</button>' +
             '</div>';
           updateBulkBar();
+          if (typeof syncPlaqueStudioTags === "function") syncPlaqueStudioTags();
           return;
         }
 
@@ -979,6 +1469,7 @@
         });
 
         updateBulkBar();
+        if (typeof syncPlaqueStudioTags === "function") syncPlaqueStudioTags();
       }
 
       function buildTagRow(item) {
@@ -1028,6 +1519,9 @@
           '<button type="button" class="btn-icon btn-view-qr" title="Ver / Exportar QR">' +
           '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' +
           '</button>' +
+          '<button type="button" class="btn-icon btn-send-plaque" title="Usar este QR en el Estudio de Placas (Google / Menú / IG)" style="color: var(--bc-cyan); font-size: 0.72rem; width: auto; padding: 0 6px; font-weight: 700;">' +
+          '🪧 Placa' +
+          '</button>' +
           '</div>';
 
         cFixed.querySelector(".btn-copy-link").addEventListener("click", function () {
@@ -1037,6 +1531,9 @@
         });
         cFixed.querySelector(".btn-view-qr").addEventListener("click", function () {
           openQrStudio(item);
+        });
+        cFixed.querySelector(".btn-send-plaque").addEventListener("click", function () {
+          openPlaqueStudioWithTag(item);
         });
         row.appendChild(cFixed);
 
@@ -1756,6 +2253,384 @@
         searchQuery = e.target.value.trim().toLowerCase();
         renderTable();
       });
+
+      // ==========================================================
+      // CONTROLADOR DEL ESTUDIO DE PLACAS (GOOGLE · MENÚ · IG)
+      // ==========================================================
+      const MOTIFS = ["google", "menu", "instagram"];
+      const tabViewLinks = document.getElementById("tabViewLinks");
+      const tabViewPlaques = document.getElementById("tabViewPlaques");
+      const linksViewWrapper = document.getElementById("linksViewWrapper");
+      const plaqueStudioSection = document.getElementById("plaqueStudioSection");
+
+      function switchMainView(view) {
+        if (view === "plaques") {
+          tabViewLinks.classList.remove("active");
+          tabViewPlaques.classList.add("active");
+          linksViewWrapper.style.display = "none";
+          plaqueStudioSection.classList.add("active");
+          document.getElementById("bulkBar").classList.remove("visible");
+          syncPlaqueStudioTags();
+          renderAllPlaquePreviews();
+        } else {
+          tabViewPlaques.classList.remove("active");
+          tabViewLinks.classList.add("active");
+          plaqueStudioSection.classList.remove("active");
+          linksViewWrapper.style.display = "block";
+          updateBulkBar();
+        }
+      }
+
+      tabViewLinks.addEventListener("click", function () { switchMainView("links"); });
+      tabViewPlaques.addEventListener("click", function () { switchMainView("plaques"); });
+      document.getElementById("btnGoToPlaqueStudioQuick").addEventListener("click", function () {
+        switchMainView("plaques");
+      });
+
+      function openPlaqueStudioWithTag(item) {
+        if (!item) return;
+        switchMainView("plaques");
+        const hay = ((item.name || "") + " " + (item.slug || "") + " " + (item.targetUrl || "")).toLowerCase();
+        let targetMotif = "google";
+        if (hay.includes("menu") || hay.includes("menú") || hay.includes("carta") || hay.includes("mesa")) {
+          targetMotif = "menu";
+        } else if (hay.includes("insta") || hay.includes("ig")) {
+          targetMotif = "instagram";
+        }
+        const sel = document.getElementById("selectTag_" + targetMotif);
+        const urlIn = document.getElementById("customUrl_" + targetMotif);
+        if (sel) sel.value = item.slug;
+        if (urlIn) urlIn.value = getFixedUrl(item.slug);
+        renderSinglePlaquePreview(targetMotif);
+        const card = document.getElementById("cardMotif_" + targetMotif);
+        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+        showToast("Tag '" + (item.name || item.slug) + "' cargado en placa " + targetMotif.toUpperCase());
+      }
+
+      function syncPlaqueStudioTags() {
+        const allItems = Object.values(itemsMap).filter(Boolean).sort(function (a, b) {
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+
+        MOTIFS.forEach(function (m, idx) {
+          const sel = document.getElementById("selectTag_" + m);
+          const urlIn = document.getElementById("customUrl_" + m);
+          if (!sel) return;
+          const prevVal = sel.value;
+          sel.innerHTML = "";
+
+          if (allItems.length === 0) {
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.textContent = "— Sin tags creados (usando URL de ejemplo) —";
+            sel.appendChild(opt);
+            if (!urlIn.value) {
+              urlIn.value = window.location.origin + "/r/" + m + "-demo";
+            }
+            return;
+          }
+
+          allItems.forEach(function (it) {
+            const opt = document.createElement("option");
+            opt.value = it.slug;
+            opt.textContent = (it.name || it.slug) + " (/r/" + it.slug + ")";
+            sel.appendChild(opt);
+          });
+
+          const customOpt = document.createElement("option");
+          customOpt.value = "__custom__";
+          customOpt.textContent = "✏️ URL libre / personalizada...";
+          sel.appendChild(customOpt);
+
+          // Mantener selección previa o elegir inteligentemente según motivo
+          if (prevVal && (itemsMap[prevVal] || prevVal === "__custom__")) {
+            sel.value = prevVal;
+          } else {
+            const match = allItems.find(function (it) {
+              const s = ((it.name || "") + " " + (it.slug || "")).toLowerCase();
+              if (m === "google") return s.includes("google") || s.includes("rese") || s.includes("review");
+              if (m === "menu") return s.includes("menu") || s.includes("menú") || s.includes("mesa") || s.includes("carta");
+              if (m === "instagram") return s.includes("insta") || s.includes("ig");
+              return false;
+            });
+            const chosen = match || allItems[idx % allItems.length] || allItems[0];
+            if (chosen) {
+              sel.value = chosen.slug;
+              urlIn.value = getFixedUrl(chosen.slug);
+            }
+          }
+        });
+
+        renderAllPlaquePreviews();
+      }
+
+      function getMotifConfig(motif) {
+        const sel = document.getElementById("selectTag_" + motif);
+        const urlIn = document.getElementById("customUrl_" + motif);
+        const slugVal = sel && sel.value && sel.value !== "__custom__" ? sel.value : (motif + "-bc");
+        const qrUrl = (urlIn && urlIn.value.trim()) ? urlIn.value.trim() : getFixedUrl(slugVal);
+        const enabled = document.getElementById("chkMotif_" + motif).checked;
+        const qty = Math.max(0, parseInt(document.getElementById("qtyMotif_" + motif).value, 10) || 0);
+
+        if (motif === "google") {
+          return {
+            motif: "google",
+            enabled: enabled,
+            qty: qty,
+            slug: slugVal.toUpperCase(),
+            qrUrl: qrUrl,
+            titleLine1: document.getElementById("t1_google").value || "Valóranos",
+            titleLine2: document.getElementById("t2_google").value || "en",
+            titleLine3: document.getElementById("t3_google").value || "Google"
+          };
+        }
+        if (motif === "menu") {
+          return {
+            motif: "menu",
+            enabled: enabled,
+            qty: qty,
+            slug: slugVal.toUpperCase(),
+            qrUrl: qrUrl,
+            titleMain: document.getElementById("t1_menu").value || "MENU",
+            subtitle: document.getElementById("t2_menu").value || "VIEW OUR MENU ONLINE",
+            arcText: "TAP YOUR PHONE"
+          };
+        }
+        return {
+          motif: "instagram",
+          enabled: enabled,
+          qty: qty,
+          slug: slugVal.toUpperCase(),
+          qrUrl: qrUrl,
+          titleScript: document.getElementById("t1_instagram").value || "Instagram",
+          subtitle: document.getElementById("t2_instagram").value || "¡Acerca tu móvil y síguenos!"
+        };
+      }
+
+      function getPlaqueDimensionsCm() {
+        const w = Math.max(3, Math.min(50, parseFloat(document.getElementById("plaqueWidthCm").value) || 10));
+        const h = Math.max(3, Math.min(50, parseFloat(document.getElementById("plaqueHeightCm").value) || 10));
+        return { w: w, h: h };
+      }
+
+      function renderSinglePlaquePreview(motif) {
+        if (!window.BlueCodePlaqueStudio) return;
+        const canvas = document.getElementById("canvasMotif_" + motif);
+        if (!canvas) return;
+        const cfg = getMotifConfig(motif);
+        const dims = getPlaqueDimensionsCm();
+
+        // Actualizar etiqueta de medidas en cm
+        const pill = document.getElementById("pillSize_" + motif);
+        if (pill) pill.textContent = dims.w + " × " + dims.h + " cm · 300 DPI";
+
+        // Ajustar proporción visual del canvas de previsualización
+        const basePx = 800;
+        const ratio = dims.h / dims.w;
+        canvas.width = basePx;
+        canvas.height = Math.round(basePx * ratio);
+        canvas.style.aspectRatio = dims.w + " / " + dims.h;
+
+        window.BlueCodePlaqueStudio.renderPlaqueToCanvas(canvas, motif, canvas.width, canvas.height, cfg, "all");
+
+        const card = document.getElementById("cardMotif_" + motif);
+        if (card) {
+          card.classList.toggle("selected-motif", cfg.enabled && cfg.qty > 0);
+          card.classList.toggle("disabled-motif", !cfg.enabled || cfg.qty === 0);
+        }
+      }
+
+      function renderAllPlaquePreviews() {
+        MOTIFS.forEach(renderSinglePlaquePreview);
+      }
+
+      // Eventos de cambio en cada tarjeta de motivo
+      MOTIFS.forEach(function (m) {
+        const sel = document.getElementById("selectTag_" + m);
+        const urlIn = document.getElementById("customUrl_" + m);
+        const chk = document.getElementById("chkMotif_" + m);
+        const qty = document.getElementById("qtyMotif_" + m);
+
+        sel.addEventListener("change", function () {
+          if (sel.value && sel.value !== "__custom__" && itemsMap[sel.value]) {
+            urlIn.value = getFixedUrl(sel.value);
+          }
+          renderSinglePlaquePreview(m);
+        });
+
+        urlIn.addEventListener("input", function () {
+          renderSinglePlaquePreview(m);
+        });
+
+        chk.addEventListener("change", function () {
+          if (chk.checked && (parseInt(qty.value, 10) || 0) === 0) {
+            qty.value = 1;
+          }
+          renderSinglePlaquePreview(m);
+        });
+
+        qty.addEventListener("input", function () {
+          const v = parseInt(qty.value, 10) || 0;
+          chk.checked = v > 0;
+          renderSinglePlaquePreview(m);
+        });
+
+        ["t1_" + m, "t2_" + m, "t3_" + m].forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el) el.addEventListener("input", function () { renderSinglePlaquePreview(m); });
+        });
+      });
+
+      // Botones "+ Crear Tag" desde el Estudio de Placas
+      document.querySelectorAll(".quick-new-tag-link").forEach(function (link) {
+        link.addEventListener("click", function () {
+          const motif = this.getAttribute("data-motif");
+          document.getElementById("btnOpenNewModal").click();
+          if (motif === "google") {
+            newName.value = "Google Review";
+            newSlug.value = "google-review";
+          } else if (motif === "menu") {
+            newName.value = "Menú Principal";
+            newSlug.value = "menu-digital";
+          } else {
+            newName.value = "Síguenos en Instagram";
+            newSlug.value = "instagram";
+          }
+          slugPreviewText.textContent = "Link: " + getFixedUrl(newSlug.value);
+        });
+      });
+
+      // Eventos de medida en cm y presets
+      document.getElementById("plaqueWidthCm").addEventListener("input", renderAllPlaquePreviews);
+      document.getElementById("plaqueHeightCm").addEventListener("input", renderAllPlaquePreviews);
+
+      document.querySelectorAll(".cm-preset-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".cm-preset-btn").forEach(function (b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          document.getElementById("plaqueWidthCm").value = btn.getAttribute("data-w");
+          document.getElementById("plaqueHeightCm").value = btn.getAttribute("data-h");
+          renderAllPlaquePreviews();
+        });
+      });
+
+      // Exportación Individual por Tarjeta (.PSD Multicapa, Script .JSX, PNG 300 DPI)
+      document.querySelectorAll("[data-psd-motif]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const motif = btn.getAttribute("data-psd-motif");
+          const dims = getPlaqueDimensionsCm();
+          const cfg = getMotifConfig(motif);
+          window.BlueCodePlaqueStudio.exportLayeredPsdFile(motif, cfg, dims.w, dims.h, showToast);
+        });
+      });
+
+      document.querySelectorAll("[data-jsx-motif]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const motif = btn.getAttribute("data-jsx-motif");
+          const dims = getPlaqueDimensionsCm();
+          const cfg = getMotifConfig(motif);
+          const jsxCode = window.BlueCodePlaqueStudio.generatePhotoshopJsx([cfg], dims.w, dims.h);
+          const blob = new Blob([jsxCode], { type: "text/javascript;charset=utf-8" });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "Placa_BlueCode_" + motif.toUpperCase() + "_" + dims.w + "x" + dims.h + "cm_300DPI.jsx";
+          a.click();
+          showToast("Script Photoshop (.JSX) descargado para " + motif.toUpperCase());
+        });
+      });
+
+      document.querySelectorAll("[data-png-motif]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const motif = btn.getAttribute("data-png-motif");
+          const dims = getPlaqueDimensionsCm();
+          const cfg = getMotifConfig(motif);
+          const wPx = window.BlueCodePlaqueStudio.cmToPx300(dims.w);
+          const hPx = window.BlueCodePlaqueStudio.cmToPx300(dims.h);
+          const hiCanvas = document.createElement("canvas");
+          window.BlueCodePlaqueStudio.renderPlaqueToCanvas(hiCanvas, motif, wPx, hPx, cfg, "all");
+          const a = document.createElement("a");
+          a.href = hiCanvas.toDataURL("image/png");
+          a.download = "Placa_BlueCode_" + motif.toUpperCase() + "_" + dims.w + "x" + dims.h + "cm_300DPI.png";
+          a.click();
+          showToast("PNG 300 DPI (" + wPx + "×" + hPx + " px) descargado.");
+        });
+      });
+
+      // Exportación Global: PDF de Impresión (según motivos seleccionados y cantidad de copias)
+      document.getElementById("btnExportPlaquePdf").addEventListener("click", function () {
+        const dims = getPlaqueDimensionsCm();
+        const pdfMode = document.getElementById("plaquePdfMode").value;
+        const queue = [];
+        MOTIFS.forEach(function (m) {
+          const cfg = getMotifConfig(m);
+          if (cfg.enabled && cfg.qty > 0) {
+            for (let i = 0; i < cfg.qty; i++) {
+              queue.push({ motif: m, cfg: cfg });
+            }
+          }
+        });
+        if (queue.length === 0) {
+          showToast("Selecciona al menos un motivo con 1 o más copias.");
+          return;
+        }
+        window.BlueCodePlaqueStudio.exportPlaquesToPdf(queue, dims.w, dims.h, pdfMode, showToast);
+      });
+
+      // Exportación Global: Script Photoshop (.JSX) con todos los motivos activos
+      document.getElementById("btnExportPlaqueJsxAll").addEventListener("click", function () {
+        const dims = getPlaqueDimensionsCm();
+        const activeConfigs = MOTIFS.map(getMotifConfig).filter(function (c) { return c.enabled && c.qty > 0; });
+        if (activeConfigs.length === 0) {
+          showToast("Activa al menos un motivo para generar el Script .JSX");
+          return;
+        }
+        const jsxCode = window.BlueCodePlaqueStudio.generatePhotoshopJsx(activeConfigs, dims.w, dims.h);
+        const blob = new Blob([jsxCode], { type: "text/javascript;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "Placas_BlueCode_" + activeConfigs.length + "Motivos_" + dims.w + "x" + dims.h + "cm_300DPI.jsx";
+        a.click();
+        showToast("Script Photoshop (.JSX) con " + activeConfigs.length + " motivos descargado.");
+      });
+
+      // Exportación Global: ZIP con todas las placas seleccionadas en PNG 300 DPI + el Script .JSX incluido
+      document.getElementById("btnExportPlaqueZipPng").addEventListener("click", async function () {
+        const dims = getPlaqueDimensionsCm();
+        const activeConfigs = MOTIFS.map(getMotifConfig).filter(function (c) { return c.enabled && c.qty > 0; });
+        if (activeConfigs.length === 0) {
+          showToast("Selecciona al menos un motivo para exportar el paquete ZIP.");
+          return;
+        }
+        showToast("Generando paquete ZIP en 300 DPI...");
+        const zip = new JSZip();
+        const wPx = window.BlueCodePlaqueStudio.cmToPx300(dims.w);
+        const hPx = window.BlueCodePlaqueStudio.cmToPx300(dims.h);
+
+        activeConfigs.forEach(function (cfg) {
+          const c = document.createElement("canvas");
+          window.BlueCodePlaqueStudio.renderPlaqueToCanvas(c, cfg.motif, wPx, hPx, cfg, "all");
+          const b64 = c.toDataURL("image/png").split(",")[1];
+          zip.file("Placa_" + cfg.motif.toUpperCase() + "_" + dims.w + "x" + dims.h + "cm_300DPI.png", b64, { base64: true });
+        });
+
+        // Incluir también el Script editable de Photoshop dentro del ZIP
+        const jsxCode = window.BlueCodePlaqueStudio.generatePhotoshopJsx(activeConfigs, dims.w, dims.h);
+        zip.file("Abrir_En_Photoshop_Editable_" + dims.w + "x" + dims.h + "cm.jsx", jsxCode);
+
+        const blob = await zip.generateAsync({ type: "blob" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "Pack_Placas_BlueCode_" + dims.w + "x" + dims.h + "cm.zip";
+        a.click();
+        showToast("¡Paquete ZIP de Placas 300 DPI + Script Photoshop descargado!");
+      });
+
+      // Re-renderizar cuando la fuente cursiva Grand Hotel termine de cargar
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
+          renderAllPlaquePreviews();
+        });
+      }
 
       // Inicio
       loadData();

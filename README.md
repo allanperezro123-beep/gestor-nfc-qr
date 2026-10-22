@@ -37,6 +37,14 @@
   - **Exportar Todos en ZIP:** Empaqueta todos los QRs generados en un archivo comprimido `.zip` en el navegador.
   - **Hoja de Impresión Instantánea:** Genera una plantilla de corte/impresión en segundos optimizada para stickers.
   - **Exportar Inventario CSV:** Reporte de tags, slugs, destinos y conteo de escaneos.
+- **🪧 Estudio Generador de Placas Imprimibles (Google Review · Menú Digital · Instagram):**
+  - Réplica 100% fiel de las placas comerciales de **Google Review**, **Menú Online** e **Instagram**, personalizadas con sello **`Powered by BlueCode`** y logo vectorial oficial.
+  - Inserta automáticamente el **código QR dinámico** generado para cualquier tag de la plataforma.
+  - Configuración libre de **medidas físicas en centímetros (`cm`)** a **300 DPI** reales y selector de cantidad de copias por motivo.
+  - **Exportación a PDF de Imprenta (300 DPI):** Modo hoja con guías de corte o páginas 1:1 al tamaño exacto en `cm`.
+  - **Exportación Editable para Adobe Photoshop:**
+    - Descarga directa de archivo **`.PSD` multicapa** (Fondo/Marco, Iconos NFC, Código QR, Sello BlueCode y Textos en capas separadas).
+    - Generador de **Script `.JSX` ExtendScript para Photoshop** a 300 DPI con grupos ordenados, código QR dibujado y capas de texto 100% editables (`LayerKind.TEXT`).
 - **Sincronización en Tiempo Real:** Todos los integrantes del equipo ven los cambios en vivo gracias a Firebase Realtime Database.
 - **Acceso Privado:** Enlace directo privado (`/equipo-4x9k`) con bloqueo por clave compartida si se ingresa por la raíz.
 
@@ -86,3 +94,4 @@ firebase deploy --project gestor-nfc-qr-2026
 
 - **Panel del Equipo:** [https://gestor-nfc-qr-2026.web.app/equipo-4x9k](https://gestor-nfc-qr-2026.web.app/equipo-4x9k)
 - **Ejemplo de Redirección:** [https://gestor-nfc-qr-2026.web.app/r/tag-ejemplo](https://gestor-nfc-qr-2026.web.app/r/tag-ejemplo)
+
