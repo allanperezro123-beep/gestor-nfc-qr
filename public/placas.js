@@ -1135,9 +1135,11 @@
     if (showQr) {
       withGroupTransform(ctx, data, "qr", 690, 685, function () {
         const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
-        const hasCaption = (data.qrCaptionMode && data.qrCaptionMode !== "clean");
-        const qrY = hasCaption ? 548 : 560;
-        const qrSize = hasCaption ? 236 : 250;
+        const captionMode = data.qrCaptionMode || "clean";
+        const hasCaption = captionMode !== "clean";
+        const hasId = captionMode === "bottom-text-id";
+        const qrSize = hasId ? 216 : (hasCaption ? 228 : 250);
+        const qrY = hasId ? 540 : (hasCaption ? 546 : 560);
         const qrX = 690 - qrSize / 2;
 
         drawQrMatrix(
@@ -1149,14 +1151,15 @@
           buildQrOptionsFromData("google", data, "#111111", darkBg || data.qrBoxCard)
         );
 
-        drawQrBottomCaption(ctx, 690, qrY + qrSize + 34, data, textColor);
+        drawQrBottomCaption(ctx, 690, qrY + qrSize + (darkBg ? 38 : 30), data, textColor);
       });
     }
 
     if (showBrand) {
       withGroupTransform(ctx, data, "brand", 500, 942, function () {
         ctx.save();
-        ctx.fillStyle = "#181818";
+        const borderIsDark = data.borderStyle === "accent" && isHexDark(accentColor);
+        ctx.fillStyle = borderIsDark ? "#FFFFFF" : "#181818";
         ctx.font = "700 26px 'Plus Jakarta Sans', Arial, sans-serif";
         ctx.textAlign = "right";
         ctx.textBaseline = "alphabetic";
@@ -1312,10 +1315,12 @@
     if (showQr) {
       withGroupTransform(ctx, data, "qr", 678, 668, function () {
         const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
-        const hasCaption = (data.qrCaptionMode && data.qrCaptionMode !== "clean");
-        const qrSize = hasCaption ? 224 : 240;
+        const captionMode = data.qrCaptionMode || "clean";
+        const hasCaption = captionMode !== "clean";
+        const hasId = captionMode === "bottom-text-id";
+        const qrSize = hasId ? 204 : (hasCaption ? 218 : 240);
         const qrX = 678 - qrSize / 2;
-        const qrY = hasCaption ? 536 : 548;
+        const qrY = hasId ? 528 : (hasCaption ? 536 : 548);
 
         drawQrMatrix(
           ctx,
@@ -1326,7 +1331,7 @@
           buildQrOptionsFromData("instagram", data, "#141414", darkBg || data.qrBoxCard)
         );
 
-        drawQrBottomCaption(ctx, 678, qrY + qrSize + 34, data, textColor);
+        drawQrBottomCaption(ctx, 678, qrY + qrSize + (darkBg ? 34 : 26), data, textColor);
       });
     }
 
@@ -1494,17 +1499,23 @@
       withGroupTransform(ctx, data, "qr", 760, 714, function () {
         const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
         const captionMode = data.qrCaptionMode || "bottom-text-id";
+        const isClean = captionMode === "clean";
+        const boxSize = isClean ? 248 : 232;
+        const boxX = 760 - boxSize / 2;
+        const boxY = isClean ? 580 : 598;
+        const qrPad = 18;
+        const qrSize = boxSize - qrPad * 2;
 
         ctx.save();
         ctx.shadowColor = "rgba(0,0,0,0.12)";
         ctx.shadowBlur = 14;
         ctx.shadowOffsetY = 4;
-        roundRectPath(ctx, 644, 598, 232, 232, 16);
+        roundRectPath(ctx, boxX, boxY, boxSize, boxSize, 16);
         ctx.fillStyle = "#FFFFFF";
         ctx.fill();
         ctx.restore();
 
-        roundRectPath(ctx, 644, 598, 232, 232, 16);
+        roundRectPath(ctx, boxX, boxY, boxSize, boxSize, 16);
         ctx.strokeStyle = "#E2E8F0";
         ctx.lineWidth = 3;
         ctx.stroke();
@@ -1512,14 +1523,14 @@
         drawQrMatrix(
           ctx,
           targetUrl,
-          662,
-          616,
-          196,
+          boxX + qrPad,
+          boxY + qrPad,
+          qrSize,
           buildQrOptionsFromData("menu", data, "#1B1A1A", false)
         );
 
         // Si el usuario elige "QR Clean", ocultamos todo texto alrededor del QR
-        if (captionMode !== "clean") {
+        if (!isClean) {
           ctx.save();
           ctx.textAlign = "center";
           ctx.fillStyle = textColor;
@@ -1533,10 +1544,6 @@
             ctx.globalAlpha = 0.82;
             ctx.font = "600 21px 'JetBrains Mono', monospace";
             ctx.fillText((data.slug || "TAG-ID").toUpperCase(), 760, 868);
-          } else if (captionMode === "bottom-text" && data.qrCaptionText) {
-            ctx.fillStyle = textColor;
-            ctx.font = "800 23px 'Plus Jakarta Sans', Arial, sans-serif";
-            ctx.fillText(data.qrCaptionText, 760, 868);
           }
           ctx.restore();
         }

@@ -14,7 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle.js"></script>
-  <script src="/placas.js?v=5"></script>
+  <script src="/placas.js?v=6"></script>
 
   <style>
     :root {
@@ -22,11 +22,11 @@
       --surface: #0f1118;
       --surface-elevated: #151822;
       --surface-hover: #191c28;
-      --border: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.08);
       --border-focus: #0865F5;
       --text: #f1f5f9;
-      --text-muted: #8e9bb0;
-      --text-dim: #556277;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
       --bc-blue: #0865F5;
       --bc-cyan: #08D0E6;
       --bc-gradient: linear-gradient(135deg, #0865F5 0%, #087CF5 28%, #079AF0 53%, #04B9EA 76%, #08D0E6 100%);
@@ -49,26 +49,27 @@
     }
 
     .container {
-      max-width: 1040px;
+      max-width: 1320px;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 24px;
     }
 
     /* Header Minimalista BlueCode */
     header {
-      background: rgba(8, 9, 13, 0.88);
-      backdrop-filter: blur(14px);
+      background: rgba(8, 9, 13, 0.9);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 40;
-      padding: 14px 0;
+      padding: 12px 0;
     }
     .header-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 14px;
+      flex-wrap: wrap;
     }
     .brand-link {
       display: flex;
@@ -105,6 +106,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     /* Botones Minimalistas */
@@ -148,19 +150,81 @@
     .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
     .btn-sm { padding: 5px 10px; font-size: 0.77rem; }
 
+    /* Barra Superior de Estadísticas y Filtros Rápidos */
+    .stats-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 20px 0 12px;
+      flex-wrap: wrap;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 16px;
+    }
+    .kpi-pills-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .kpi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .kpi-badge strong {
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      padding: 1px 7px;
+      border-radius: 5px;
+    }
+    .filter-pills-group {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .filter-pill-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-pill-btn:hover { color: var(--text); }
+    .filter-pill-btn.active {
+      background: rgba(8, 101, 245, 0.22);
+      color: #93c5fd;
+    }
+
     /* Barra Superior de Herramientas & Masivo */
     .top-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      margin: 22px 0 16px;
+      margin: 12px 0 14px;
       flex-wrap: wrap;
     }
     .search-box {
       position: relative;
       flex: 1;
-      max-width: 340px;
+      max-width: 380px;
       min-width: 220px;
     }
     .search-box svg {
@@ -175,13 +239,29 @@
       width: 100%;
       background: var(--surface);
       border: 1px solid var(--border);
-      padding: 8px 12px 8px 34px;
+      padding: 8px 30px 8px 34px;
       border-radius: 6px;
       color: var(--text);
       font-size: 0.84rem;
       outline: none;
+      transition: border-color 0.15s ease;
     }
     .search-input:focus { border-color: var(--border-focus); }
+    .search-clear-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      padding: 2px 5px;
+      border-radius: 4px;
+      display: none;
+    }
+    .search-clear-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
 
     .toolbar-actions {
       display: flex;
@@ -193,7 +273,7 @@
     /* Tabla / Lista de Tags */
     .table-header {
       display: grid;
-      grid-template-columns: 36px 1.2fr 1.3fr 1.6fr 100px;
+      grid-template-columns: 36px 1.2fr 1.3fr 1.6fr 110px;
       align-items: center;
       gap: 12px;
       padding: 8px 16px;
@@ -204,7 +284,7 @@
       color: var(--text-dim);
       border-bottom: 1px solid var(--border);
     }
-    @media (max-width: 820px) {
+    @media (max-width: 860px) {
       .table-header { display: none; }
     }
 
@@ -222,7 +302,7 @@
       border-radius: 8px;
       padding: 12px 16px;
       display: grid;
-      grid-template-columns: 36px 1.2fr 1.3fr 1.6fr 100px;
+      grid-template-columns: 36px 1.2fr 1.3fr 1.6fr 110px;
       align-items: center;
       gap: 12px;
       transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -239,7 +319,7 @@
       opacity: 0.55;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 860px) {
       .tag-row {
         grid-template-columns: 1fr;
         gap: 10px;
@@ -266,6 +346,12 @@
       gap: 2px;
       min-width: 0;
     }
+    .tag-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
     .tag-name-text {
       font-size: 0.9rem;
       font-weight: 700;
@@ -274,12 +360,22 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    .btn-rename-tag {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      font-size: 0.7rem;
+      padding: 2px 4px;
+    }
+    .tag-row:hover .btn-rename-tag {
+      opacity: 0.85;
+    }
     .tag-meta-sub {
       font-size: 0.72rem;
       color: var(--text-dim);
       display: flex;
       align-items: center;
       gap: 6px;
+      flex-wrap: wrap;
     }
     .badge-dest-type {
       font-size: 0.65rem;
@@ -310,6 +406,11 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      cursor: pointer;
+    }
+    .fixed-link-display:hover {
+      text-decoration: underline;
+      color: var(--bc-cyan);
     }
     .fixed-actions {
       display: flex;
@@ -322,7 +423,7 @@
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      padding: 3px;
+      padding: 4px;
       border-radius: 4px;
       display: flex;
       align-items: center;
@@ -346,27 +447,30 @@
       border-radius: 5px;
       outline: none;
       min-width: 0;
-      transition: border-color 0.15s ease;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .dest-inline-input:focus {
       border-color: var(--bc-blue);
+      box-shadow: 0 0 0 2px rgba(8, 101, 245, 0.18);
     }
     .btn-save-inline {
       background: var(--surface-elevated);
       border: 1px solid var(--border);
-      color: var(--text);
+      color: var(--text-muted);
       font-size: 0.75rem;
       font-weight: 600;
-      padding: 5px 9px;
+      padding: 6px 10px;
       border-radius: 5px;
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.15s ease;
     }
-    .btn-save-inline:hover {
+    .btn-save-inline:hover,
+    .btn-save-inline.dirty {
       background: var(--bc-blue);
       border-color: var(--bc-blue);
       color: #fff;
+      box-shadow: 0 2px 8px rgba(8, 101, 245, 0.35);
     }
 
     /* Celda Opciones */
@@ -417,20 +521,22 @@
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
     }
     .modal-backdrop.open { display: flex; }
     .modal-box {
       background: var(--surface-elevated);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       width: 100%;
       max-width: 520px;
-      padding: 24px;
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      padding: 22px 24px;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
     }
     .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-    .modal-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px; }
+    .modal-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; }
 
     .form-row { margin-bottom: 14px; }
     .form-row label {
@@ -484,25 +590,24 @@
     /* Modal QR Studio */
     .qr-export-preview {
       background: #ffffff;
-      padding: 20px;
+      padding: 16px;
       border-radius: 8px;
       display: inline-block;
-      margin: 16px auto;
+      margin: 10px auto 12px;
     }
     .qr-export-label {
       color: #0f172a;
       font-weight: 700;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       text-align: center;
-      margin-top: 8px;
+      margin-top: 6px;
     }
     .export-options-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
       gap: 8px;
-      margin-top: 14px;
+      margin-top: 12px;
     }
-
 
     /* Toast */
     .toast {
@@ -575,7 +680,7 @@
 
     #plaqueStudioSection {
       display: none;
-      padding-top: 22px;
+      padding-top: 20px;
     }
     #plaqueStudioSection.active {
       display: block;
@@ -585,8 +690,8 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 18px 20px;
-      margin-bottom: 18px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -602,8 +707,8 @@
       background: var(--surface-elevated);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 20px;
+      padding: 10px 16px;
+      margin-bottom: 14px;
     }
 
     .cm-input-group {
@@ -616,7 +721,7 @@
       padding: 4px 10px;
     }
     .cm-input-group input {
-      width: 54px;
+      width: 52px;
       background: transparent;
       border: none;
       color: var(--text);
@@ -645,7 +750,7 @@
 
     .plaque-cards-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 18px;
       margin-bottom: 28px;
     }
@@ -657,8 +762,9 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 11px;
       transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      min-width: 0;
     }
     .plaque-card.selected-motif {
       border-color: rgba(8, 101, 245, 0.55);
@@ -679,7 +785,7 @@
       align-items: center;
       gap: 8px;
       font-weight: 700;
-      font-size: 0.92rem;
+      font-size: 0.94rem;
     }
     .qty-badge-control {
       display: inline-flex;
@@ -704,11 +810,12 @@
       outline: none;
     }
 
+    /* Padding superior e inferior amplio para que los botones/badges NUNCA tapen el canvas */
     .plaque-canvas-wrap {
       background: radial-gradient(circle at center, #1b2030 0%, #0b0d14 100%);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 14px;
+      padding: 36px 16px 34px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -717,11 +824,11 @@
     }
     .plaque-canvas-wrap canvas {
       width: 100%;
-      max-width: 275px;
+      max-width: 300px;
       height: auto;
       aspect-ratio: 1 / 1;
       border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
       cursor: grab;
       touch-action: none;
       transition: box-shadow 0.15s ease;
@@ -732,13 +839,13 @@
     .plaque-drag-hint {
       position: absolute;
       top: 7px;
-      left: 9px;
-      background: rgba(8, 9, 13, 0.84);
+      left: 10px;
+      background: rgba(8, 9, 13, 0.88);
       border: 1px solid rgba(8, 208, 230, 0.28);
       color: var(--bc-cyan);
-      font-size: 0.63rem;
+      font-size: 0.64rem;
       font-weight: 600;
-      padding: 2px 7px;
+      padding: 2px 8px;
       border-radius: 4px;
       pointer-events: none;
       backdrop-filter: blur(4px);
@@ -746,14 +853,14 @@
     .plaque-reset-btn {
       position: absolute;
       top: 7px;
-      right: 9px;
-      background: rgba(15, 17, 24, 0.88);
+      right: 10px;
+      background: rgba(15, 17, 24, 0.9);
       border: 1px solid var(--border);
       color: var(--text-muted);
       font-family: var(--font);
-      font-size: 0.64rem;
+      font-size: 0.65rem;
       font-weight: 600;
-      padding: 2px 7px;
+      padding: 2px 8px;
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -765,14 +872,14 @@
     }
     .plaque-size-pill {
       position: absolute;
-      bottom: 8px;
+      bottom: 7px;
       right: 10px;
-      background: rgba(8, 9, 13, 0.82);
+      background: rgba(8, 9, 13, 0.86);
       border: 1px solid var(--border);
       color: var(--text-muted);
       font-family: var(--mono);
       font-size: 0.66rem;
-      padding: 2px 7px;
+      padding: 2px 8px;
       border-radius: 4px;
       pointer-events: none;
       backdrop-filter: blur(4px);
@@ -783,57 +890,103 @@
       align-items: center;
       gap: 6px;
       background: rgba(8, 101, 245, 0.06);
-      border: 1px solid rgba(8, 101, 245, 0.2);
+      border: 1px solid rgba(8, 101, 245, 0.22);
       border-radius: 7px;
-      padding: 5px 8px;
-      font-size: 0.7rem;
+      padding: 6px 8px;
+      font-size: 0.71rem;
+      flex-wrap: wrap;
     }
     .elem-adjust-bar select {
       background: var(--bg);
       border: 1px solid var(--border);
       color: var(--text);
       font-family: var(--font);
-      font-size: 0.7rem;
+      font-size: 0.72rem;
+      font-weight: 600;
       padding: 3px 6px;
       border-radius: 5px;
       outline: none;
     }
     .elem-adjust-bar input[type="range"] {
       flex: 1;
+      min-width: 65px;
       accent-color: var(--bc-cyan);
       cursor: pointer;
       height: 4px;
     }
+    .btn-center-elem {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.66rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.14s ease;
+    }
+    .btn-center-elem:hover {
+      color: #fff;
+      border-color: var(--bc-cyan);
+      background: rgba(8, 208, 230, 0.12);
+    }
 
     .plaque-color-strip {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .plaque-color-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 6px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 6px 8px;
+    }
+    .btn-sync-colors {
+      background: rgba(8, 208, 230, 0.08);
+      border: 1px solid rgba(8, 208, 230, 0.25);
+      color: var(--bc-cyan);
+      font-family: var(--font);
+      font-size: 0.66rem;
+      font-weight: 600;
+      padding: 3px 7px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .btn-sync-colors:hover {
+      background: rgba(8, 208, 230, 0.18);
+      color: #fff;
     }
     .color-chip-group {
-      display: flex;
-      align-items: center;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
     }
     .color-swatch-chip {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      font-size: 0.68rem;
+      justify-content: center;
+      gap: 5px;
+      font-size: 0.7rem;
+      font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
       background: var(--surface-elevated);
       border: 1px solid var(--border);
-      padding: 2px 6px 2px 4px;
+      padding: 4px 6px;
       border-radius: 5px;
+      transition: all 0.14s ease;
     }
     .color-swatch-chip:hover {
-      border-color: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.25);
       color: var(--text);
     }
     .color-swatch-chip input[type="color"] {
@@ -846,6 +999,7 @@
       background: transparent;
       cursor: pointer;
       padding: 0;
+      flex-shrink: 0;
     }
     .color-swatch-chip input[type="color"]::-webkit-color-swatch-wrapper {
       padding: 0;
@@ -858,7 +1012,12 @@
     .plaque-field-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
+      transition: opacity 0.18s ease;
+    }
+    .plaque-field-group.dimmed-field {
+      opacity: 0.38;
+      pointer-events: none;
     }
     .plaque-field-group label {
       font-size: 0.72rem;
@@ -866,6 +1025,7 @@
       color: var(--text-muted);
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
     .plaque-select, .plaque-input {
       width: 100%;
@@ -877,6 +1037,7 @@
       padding: 7px 10px;
       border-radius: 6px;
       outline: none;
+      transition: border-color 0.15s ease;
     }
     .plaque-select:focus, .plaque-input:focus {
       border-color: var(--bc-blue);
@@ -884,14 +1045,19 @@
 
     .plaque-card-actions {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
       margin-top: auto;
-      padding-top: 6px;
+      padding-top: 8px;
       border-top: 1px solid var(--border);
     }
 
-    @media (max-width: 920px) {
+    @media (max-width: 1120px) {
+      .plaque-cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 760px) {
       .plaque-cards-grid {
         grid-template-columns: 1fr;
       }
@@ -955,11 +1121,26 @@
 
     <!-- VISTA 1: GESTOR DE ENLACES Y QR -->
     <div id="linksViewWrapper">
+      <!-- Barra de Resumen KPI y Filtros Rápidos -->
+      <section class="stats-filter-bar">
+        <div class="kpi-pills-row">
+          <div class="kpi-badge">Total Tags: <strong id="kpiTotalCount">0</strong></div>
+          <div class="kpi-badge">Activos: <strong id="kpiActiveCount" style="color: var(--emerald);">0</strong></div>
+          <div class="kpi-badge">Escaneos Totales: <strong id="kpiTotalScans" style="color: var(--bc-cyan);">0</strong></div>
+        </div>
+        <div class="filter-pills-group">
+          <button type="button" class="filter-pill-btn active" data-filter-status="all">Todos</button>
+          <button type="button" class="filter-pill-btn" data-filter-status="active">Activos</button>
+          <button type="button" class="filter-pill-btn" data-filter-status="paused">Pausados</button>
+        </div>
+      </section>
+
       <!-- Barra de Búsqueda y Exportación Masiva -->
       <section class="top-toolbar">
         <div class="search-box">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, código o destino..." />
+          <button type="button" class="search-clear-btn" id="btnClearSearch" title="Limpiar búsqueda">✕</button>
         </div>
 
         <div class="toolbar-actions">
@@ -1065,7 +1246,7 @@
       </div>
 
       <!-- Barra 2: Personalizador Avanzado de QR Único -->
-      <div class="plaque-config-bar" style="margin-bottom: 20px; background: rgba(8, 101, 245, 0.05); border-color: rgba(8, 101, 245, 0.22);">
+      <div class="plaque-config-bar" style="margin-bottom: 18px; background: rgba(8, 101, 245, 0.05); border-color: rgba(8, 101, 245, 0.22);">
         <span style="font-size: 0.75rem; font-weight: 700; color: var(--bc-cyan);">✨ Estilo Único del QR:</span>
 
         <div style="display: flex; align-items: center; gap: 5px;">
@@ -1137,35 +1318,38 @@
 
           <div class="plaque-canvas-wrap">
             <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
-            <button type="button" class="plaque-reset-btn" data-reset-motif="google" title="Restaurar posiciones, tamaños y colores originales">↺ Resetear</button>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="google" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
             <canvas id="canvasMotif_google" width="1200" height="1200"></canvas>
             <span class="plaque-size-pill" id="pillSize_google">10 × 10 cm · 600 DPI</span>
           </div>
 
-          <!-- Barra de Ajuste de Elemento (Mover / Escalar) -->
+          <!-- Barra de Ajuste de Elemento (Mover / Escalar / Centrar) -->
           <div class="elem-adjust-bar">
-            <span style="color: var(--bc-cyan); font-weight: 700;">✥ Elemento:</span>
-            <select id="elemSelect_google">
+            <span style="color: var(--bc-cyan); font-weight: 700;">✥</span>
+            <select id="elemSelect_google" title="Elemento a ajustar">
               <option value="qr" selected>Código QR</option>
               <option value="nfc">Ilustración NFC</option>
               <option value="title">Título Principal</option>
               <option value="hero">Anillo y Estrellas</option>
               <option value="brand">Sello BlueCode</option>
             </select>
-            <span style="color: var(--text-muted);">Tamaño:</span>
             <input type="range" id="elemScale_google" min="0.55" max="1.65" step="0.03" value="1" title="Escalar elemento seleccionado" />
             <span id="elemScaleVal_google" style="font-family: var(--mono); width: 34px; text-align: right; color: var(--bc-cyan);">100%</span>
+            <button type="button" class="btn-center-elem" data-center-motif="google" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
           </div>
 
           <!-- Barra de Colores de Fondo y Elementos -->
           <div class="plaque-color-strip">
-            <select id="palettePreset_google" class="plaque-select" style="width: auto; padding: 3px 6px; font-size: 0.72rem;" title="Temas rápidos de color">
-              <option value="original" selected>🎨 Tema Original</option>
-              <option value="dark-gold">🖤 Dark Luxe & Oro</option>
-              <option value="bc-tech">💠 BlueCode Tech</option>
-              <option value="cream-boutique">🥂 Crema Boutique</option>
-              <option value="minimal-bw">⚪ Blanco & Negro</option>
-            </select>
+            <div class="plaque-color-top">
+              <select id="palettePreset_google" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                <option value="original" selected>🎨 Tema Original</option>
+                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                <option value="bc-tech">💠 BlueCode Tech</option>
+                <option value="cream-boutique">🥂 Crema Boutique</option>
+                <option value="minimal-bw">⚪ Blanco & Negro</option>
+              </select>
+              <button type="button" class="btn-sync-colors" data-sync-colors-motif="google" title="Aplicar este tema y colores a las 3 placas">⚡ Aplicar a las 3</button>
+            </div>
             <div class="color-chip-group">
               <label class="color-swatch-chip" title="Color de fondo de la tarjeta">
                 <input type="color" id="bgColor_google" value="#FFFFFF" />
@@ -1190,7 +1374,7 @@
             <select id="selectTag_google" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 6px;">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
             <div class="plaque-field-group">
               <label><span>Logo Central del QR</span></label>
               <select id="qrLogo_google" class="plaque-select">
@@ -1228,7 +1412,7 @@
                 <option value="bottom-text-id">🆔 QR + Texto + ID</option>
               </select>
             </div>
-            <div class="plaque-field-group">
+            <div class="plaque-field-group dimmed-field" id="wrapCaptionText_google">
               <label><span>Texto Abajo del QR</span></label>
               <input type="text" id="qrCaptionText_google" class="plaque-input" value="SCAN QR CODE" placeholder="Ej: ESCANÉAME" />
             </div>
@@ -1282,35 +1466,38 @@
 
           <div class="plaque-canvas-wrap">
             <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
-            <button type="button" class="plaque-reset-btn" data-reset-motif="menu" title="Restaurar posiciones, tamaños y colores originales">↺ Resetear</button>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="menu" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
             <canvas id="canvasMotif_menu" width="1200" height="1200"></canvas>
             <span class="plaque-size-pill" id="pillSize_menu">10 × 10 cm · 600 DPI</span>
           </div>
 
-          <!-- Barra de Ajuste de Elemento (Mover / Escalar) -->
+          <!-- Barra de Ajuste de Elemento (Mover / Escalar / Centrar) -->
           <div class="elem-adjust-bar">
-            <span style="color: var(--bc-cyan); font-weight: 700;">✥ Elemento:</span>
-            <select id="elemSelect_menu">
+            <span style="color: var(--bc-cyan); font-weight: 700;">✥</span>
+            <select id="elemSelect_menu" title="Elemento a ajustar">
               <option value="qr" selected>Código QR</option>
               <option value="nfc">Ilustración NFC</option>
               <option value="title">Título MENU</option>
               <option value="hero">Icono Cubiertos</option>
               <option value="brand">Sello BlueCode</option>
             </select>
-            <span style="color: var(--text-muted);">Tamaño:</span>
             <input type="range" id="elemScale_menu" min="0.55" max="1.65" step="0.03" value="1" title="Escalar elemento seleccionado" />
             <span id="elemScaleVal_menu" style="font-family: var(--mono); width: 34px; text-align: right; color: var(--bc-cyan);">100%</span>
+            <button type="button" class="btn-center-elem" data-center-motif="menu" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
           </div>
 
           <!-- Barra de Colores de Fondo y Elementos -->
           <div class="plaque-color-strip">
-            <select id="palettePreset_menu" class="plaque-select" style="width: auto; padding: 3px 6px; font-size: 0.72rem;" title="Temas rápidos de color">
-              <option value="original" selected>🎨 Tema Original</option>
-              <option value="dark-gold">🖤 Dark Luxe & Oro</option>
-              <option value="bc-tech">💠 BlueCode Tech</option>
-              <option value="cream-boutique">🥂 Crema Boutique</option>
-              <option value="minimal-bw">⚪ Blanco & Negro</option>
-            </select>
+            <div class="plaque-color-top">
+              <select id="palettePreset_menu" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                <option value="original" selected>🎨 Tema Original</option>
+                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                <option value="bc-tech">💠 BlueCode Tech</option>
+                <option value="cream-boutique">🥂 Crema Boutique</option>
+                <option value="minimal-bw">⚪ Blanco & Negro</option>
+              </select>
+              <button type="button" class="btn-sync-colors" data-sync-colors-motif="menu" title="Aplicar este tema y colores a las 3 placas">⚡ Aplicar a las 3</button>
+            </div>
             <div class="color-chip-group">
               <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
                 <input type="color" id="bgColor_menu" value="#FFFFFF" />
@@ -1335,7 +1522,7 @@
             <select id="selectTag_menu" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 6px;">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
             <div class="plaque-field-group">
               <label><span>Logo Central del QR</span></label>
               <select id="qrLogo_menu" class="plaque-select">
@@ -1372,7 +1559,7 @@
                 <option value="clean">🧼 QR Clean (Solo QR)</option>
               </select>
             </div>
-            <div class="plaque-field-group">
+            <div class="plaque-field-group" id="wrapCaptionText_menu">
               <label><span>Texto del QR</span></label>
               <input type="text" id="qrCaptionText_menu" class="plaque-input" value="SCAN QR" placeholder="Ej: VER MENÚ" />
             </div>
@@ -1422,35 +1609,38 @@
 
           <div class="plaque-canvas-wrap">
             <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
-            <button type="button" class="plaque-reset-btn" data-reset-motif="instagram" title="Restaurar posiciones, tamaños y colores originales">↺ Resetear</button>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="instagram" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
             <canvas id="canvasMotif_instagram" width="1200" height="1200"></canvas>
             <span class="plaque-size-pill" id="pillSize_instagram">10 × 10 cm · 600 DPI</span>
           </div>
 
-          <!-- Barra de Ajuste de Elemento (Mover / Escalar) -->
+          <!-- Barra de Ajuste de Elemento (Mover / Escalar / Centrar) -->
           <div class="elem-adjust-bar">
-            <span style="color: var(--bc-cyan); font-weight: 700;">✥ Elemento:</span>
-            <select id="elemSelect_instagram">
+            <span style="color: var(--bc-cyan); font-weight: 700;">✥</span>
+            <select id="elemSelect_instagram" title="Elemento a ajustar">
               <option value="qr" selected>Código QR</option>
               <option value="nfc">Ilustración NFC</option>
               <option value="title">Título y Subtítulo</option>
               <option value="hero">Icono Instagram</option>
               <option value="brand">Sello BlueCode</option>
             </select>
-            <span style="color: var(--text-muted);">Tamaño:</span>
             <input type="range" id="elemScale_instagram" min="0.55" max="1.65" step="0.03" value="1" title="Escalar elemento seleccionado" />
             <span id="elemScaleVal_instagram" style="font-family: var(--mono); width: 34px; text-align: right; color: var(--bc-cyan);">100%</span>
+            <button type="button" class="btn-center-elem" data-center-motif="instagram" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
           </div>
 
           <!-- Barra de Colores de Fondo y Elementos -->
           <div class="plaque-color-strip">
-            <select id="palettePreset_instagram" class="plaque-select" style="width: auto; padding: 3px 6px; font-size: 0.72rem;" title="Temas rápidos de color">
-              <option value="original" selected>🎨 Tema Original</option>
-              <option value="dark-gold">🖤 Dark Luxe & Oro</option>
-              <option value="bc-tech">💠 BlueCode Tech</option>
-              <option value="cream-boutique">🥂 Crema Boutique</option>
-              <option value="minimal-bw">⚪ Blanco & Negro</option>
-            </select>
+            <div class="plaque-color-top">
+              <select id="palettePreset_instagram" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                <option value="original" selected>🎨 Tema Original</option>
+                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                <option value="bc-tech">💠 BlueCode Tech</option>
+                <option value="cream-boutique">🥂 Crema Boutique</option>
+                <option value="minimal-bw">⚪ Blanco & Negro</option>
+              </select>
+              <button type="button" class="btn-sync-colors" data-sync-colors-motif="instagram" title="Aplicar este tema y colores a las 3 placas">⚡ Aplicar a las 3</button>
+            </div>
             <div class="color-chip-group">
               <label class="color-swatch-chip" title="Color de fondo interior de la tarjeta">
                 <input type="color" id="bgColor_instagram" value="#FFFFFF" />
@@ -1475,7 +1665,7 @@
             <select id="selectTag_instagram" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 6px;">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
             <div class="plaque-field-group">
               <label><span>Logo Central del QR</span></label>
               <select id="qrLogo_instagram" class="plaque-select">
@@ -1512,7 +1702,7 @@
                 <option value="bottom-text-id">🆔 QR + Texto + ID</option>
               </select>
             </div>
-            <div class="plaque-field-group">
+            <div class="plaque-field-group dimmed-field" id="wrapCaptionText_instagram">
               <label><span>Texto Abajo del QR</span></label>
               <input type="text" id="qrCaptionText_instagram" class="plaque-input" value="SÍGUENOS" placeholder="Ej: ESCANÉAME" />
             </div>
@@ -1876,6 +2066,7 @@
       let itemsMap = {};
       let selectedSlugs = new Set();
       let searchQuery = "";
+      let statusFilter = "all";
       let activeQrItem = null;
       let selectedDestType = "web";
 
@@ -1948,14 +2139,26 @@
         } catch (e) {}
       }
 
-      // Renderizado de tabla limpia
+      // Renderizado de tabla limpia y métricas KPI
       function renderTable() {
         const container = document.getElementById("tagsContainer");
         const allItems = Object.values(itemsMap).filter(Boolean).sort(function (a, b) {
           return (b.createdAt || 0) - (a.createdAt || 0);
         });
 
+        // Actualizar KPIs
+        const activeTotal = allItems.filter(function (i) { return i.active !== false; }).length;
+        const scansTotal = allItems.reduce(function (acc, i) { return acc + (Number(i.scans) || 0); }, 0);
+        const kpiTotalEl = document.getElementById("kpiTotalCount");
+        const kpiActEl = document.getElementById("kpiActiveCount");
+        const kpiScansEl = document.getElementById("kpiTotalScans");
+        if (kpiTotalEl) kpiTotalEl.textContent = allItems.length;
+        if (kpiActEl) kpiActEl.textContent = activeTotal;
+        if (kpiScansEl) kpiScansEl.textContent = scansTotal;
+
         const filtered = allItems.filter(function (i) {
+          if (statusFilter === "active" && i.active === false) return false;
+          if (statusFilter === "paused" && i.active !== false) return false;
           if (!searchQuery) return true;
           const str = ((i.name || "") + " " + (i.slug || "") + " " + (i.targetUrl || "")).toLowerCase();
           return str.includes(searchQuery);
@@ -1964,11 +2167,29 @@
         container.innerHTML = "";
 
         if (filtered.length === 0) {
+          const emptyMsg = allItems.length === 0
+            ? "No hay tags o QRs registrados"
+            : "No se encontraron tags con el filtro o búsqueda actual";
           container.innerHTML =
             '<div style="text-align: center; padding: 48px 16px; border: 1px dashed var(--border); border-radius: 8px;">' +
-            '<p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px;">No hay tags o QRs registrados</p>' +
-            '<button class="btn btn-bc btn-sm" onclick="document.getElementById(\'btnOpenNewModal\').click()">+ Crear el primero</button>' +
+            '<p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">' + emptyMsg + '</p>' +
+            (allItems.length === 0
+              ? '<button class="btn btn-bc btn-sm" onclick="document.getElementById(\'btnOpenNewModal\').click()">+ Crear el primero</button>'
+              : '<button class="btn btn-subtle btn-sm" id="btnResetFiltersInline">Mostrar todos</button>') +
             '</div>';
+          const resetBtn = document.getElementById("btnResetFiltersInline");
+          if (resetBtn) {
+            resetBtn.addEventListener("click", function () {
+              searchQuery = "";
+              statusFilter = "all";
+              document.getElementById("searchInput").value = "";
+              document.getElementById("btnClearSearch").style.display = "none";
+              document.querySelectorAll(".filter-pill-btn").forEach(function (b) {
+                b.classList.toggle("active", b.getAttribute("data-filter-status") === "all");
+              });
+              renderTable();
+            });
+          }
           updateBulkBar();
           if (typeof syncPlaqueStudioTags === "function") syncPlaqueStudioTags();
           return;
@@ -2005,28 +2226,46 @@
         cCheck.appendChild(chk);
         row.appendChild(cCheck);
 
-        // 2. Info Celda
+        // 2. Info Celda (con renombrado rápido inline)
         const cInfo = document.createElement("div");
         cInfo.className = "cell-info";
         cInfo.innerHTML =
+          '<div class="tag-name-row">' +
           '<div class="tag-name-text" title="' + (item.name || item.slug) + '">' + (item.name || item.slug) + '</div>' +
+          '<button type="button" class="btn-icon btn-rename-tag" title="Renombrar tag">✏️</button>' +
+          '</div>' +
           '<div class="tag-meta-sub">' +
           '<span class="badge-dest-type">' + destType + '</span>' +
           '<span>' + (Number(item.scans) || 0) + ' escaneos</span>' +
           (item.active === false ? '<span style="color: var(--amber);">[Pausado]</span>' : '') +
           '</div>';
+
+        cInfo.querySelector(".btn-rename-tag").addEventListener("click", async function () {
+          const nextName = prompt("Nuevo nombre para el tag (" + item.slug + "):", item.name || item.slug);
+          if (!nextName || !nextName.trim() || nextName.trim() === item.name) return;
+          item.name = nextName.trim();
+          renderTable();
+          try {
+            await fetch(DB_URL + "/links/" + encodeURIComponent(item.slug) + ".json", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name: item.name, updatedAt: Date.now() })
+            });
+            showToast("Nombre actualizado a '" + item.name + "'");
+          } catch (e) {}
+        });
         row.appendChild(cInfo);
 
         // 3. Link Fijo (NFC / QR)
         const cFixed = document.createElement("div");
         cFixed.className = "cell-fixed";
         cFixed.innerHTML =
-          '<span class="fixed-link-display" title="' + fixedUrl + '">' + fixedUrl + '</span>' +
+          '<span class="fixed-link-display" title="Clic para copiar: ' + fixedUrl + '">' + fixedUrl + '</span>' +
           '<div class="fixed-actions">' +
           '<button type="button" class="btn-icon btn-copy-link" title="Copiar Link para NFC/QR">' +
           '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>' +
           '</button>' +
-          '<button type="button" class="btn-icon btn-view-qr" title="Ver / Exportar QR">' +
+          '<button type="button" class="btn-icon btn-view-qr" title="Personalizar / Exportar QR">' +
           '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' +
           '</button>' +
           '<button type="button" class="btn-icon btn-send-plaque" title="Usar este QR en el Estudio de Placas (Google / Menú / IG)" style="color: var(--bc-cyan); font-size: 0.72rem; width: auto; padding: 0 6px; font-weight: 700;">' +
@@ -2034,11 +2273,13 @@
           '</button>' +
           '</div>';
 
-        cFixed.querySelector(".btn-copy-link").addEventListener("click", function () {
+        function copyFixedLinkAction() {
           navigator.clipboard.writeText(fixedUrl).then(function () {
             showToast("Link fijo copiado: " + fixedUrl);
           });
-        });
+        }
+        cFixed.querySelector(".fixed-link-display").addEventListener("click", copyFixedLinkAction);
+        cFixed.querySelector(".btn-copy-link").addEventListener("click", copyFixedLinkAction);
         cFixed.querySelector(".btn-view-qr").addEventListener("click", function () {
           openQrStudio(item);
         });
@@ -2061,6 +2302,11 @@
         destSaveBtn.className = "btn-save-inline";
         destSaveBtn.textContent = "Guardar";
 
+        destInput.addEventListener("input", function () {
+          const isDirty = destInput.value.trim() !== (item.targetUrl || "");
+          destSaveBtn.classList.toggle("dirty", isDirty);
+        });
+
         async function saveInlineTarget() {
           const val = destInput.value.trim();
           if (!val) return;
@@ -2070,8 +2316,9 @@
           }
           item.targetUrl = val;
           item.updatedAt = Date.now();
-          destSaveBtn.textContent = "✓";
-          setTimeout(function () { destSaveBtn.textContent = "Guardar"; }, 1500);
+          destSaveBtn.classList.remove("dirty");
+          destSaveBtn.textContent = "✓ Guardado";
+          setTimeout(function () { destSaveBtn.textContent = "Guardar"; }, 1400);
 
           try {
             await fetch(DB_URL + "/links/" + encodeURIComponent(item.slug) + ".json", {
@@ -2825,10 +3072,46 @@
         });
       });
 
-      // Buscador
-      document.getElementById("searchInput").addEventListener("input", function (e) {
+      // Buscador y Botón Limpiar
+      const searchInputEl = document.getElementById("searchInput");
+      const btnClearSearchEl = document.getElementById("btnClearSearch");
+      searchInputEl.addEventListener("input", function (e) {
         searchQuery = e.target.value.trim().toLowerCase();
+        if (btnClearSearchEl) btnClearSearchEl.style.display = searchQuery ? "block" : "none";
         renderTable();
+      });
+      if (btnClearSearchEl) {
+        btnClearSearchEl.addEventListener("click", function () {
+          searchInputEl.value = "";
+          searchQuery = "";
+          btnClearSearchEl.style.display = "none";
+          renderTable();
+          searchInputEl.focus();
+        });
+      }
+
+      // Filtros rápidos por estado (Todos / Activos / Pausados)
+      document.querySelectorAll(".filter-pill-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".filter-pill-btn").forEach(function (b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          statusFilter = btn.getAttribute("data-filter-status") || "all";
+          renderTable();
+        });
+      });
+
+      // Cerrar cualquier modal haciendo clic fuera (backdrop) o presionando Escape
+      document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
+        backdrop.addEventListener("click", function (ev) {
+          if (ev.target === backdrop) backdrop.classList.remove("open");
+        });
+      });
+      document.addEventListener("keydown", function (ev) {
+        if (ev.key === "Escape") {
+          document.querySelectorAll(".modal-backdrop.open").forEach(function (m) {
+            m.classList.remove("open");
+          });
+        }
       });
 
       // ==========================================================
@@ -2874,6 +3157,13 @@
         menu: "original",
         instagram: "original"
       };
+
+      function syncCaptionFieldVisibility(motif) {
+        const modeEl = document.getElementById("qrCaptionMode_" + motif);
+        const wrapEl = document.getElementById("wrapCaptionText_" + motif);
+        if (!modeEl || !wrapEl) return;
+        wrapEl.classList.toggle("dimmed-field", modeEl.value === "clean");
+      }
 
       function applyPalettePreset(motif, preset) {
         const bgEl = document.getElementById("bgColor_" + motif);
@@ -3283,6 +3573,7 @@
       // Eventos de cambio en cada tarjeta de motivo
       MOTIFS.forEach(function (m) {
         setupInteractivePlaqueCanvas(m);
+        syncCaptionFieldVisibility(m);
 
         const sel = document.getElementById("selectTag_" + m);
         const urlIn = document.getElementById("customUrl_" + m);
@@ -3325,7 +3616,15 @@
 
         if (qrLogoSel) qrLogoSel.addEventListener("change", function () { renderSinglePlaquePreview(m); });
         if (qrColorSel) qrColorSel.addEventListener("change", function () { renderSinglePlaquePreview(m); });
-        if (qrCaptionModeSel) qrCaptionModeSel.addEventListener("change", function () { renderSinglePlaquePreview(m); });
+        if (qrCaptionModeSel) {
+          qrCaptionModeSel.addEventListener("change", function () {
+            syncCaptionFieldVisibility(m);
+            renderSinglePlaquePreview(m);
+            if (qrCaptionModeSel.value !== "clean" && qrCaptionTextIn) {
+              qrCaptionTextIn.focus();
+            }
+          });
+        }
         if (qrCaptionTextIn) qrCaptionTextIn.addEventListener("input", function () { renderSinglePlaquePreview(m); });
 
         if (paletteSel) {
@@ -3374,6 +3673,51 @@
         ["t1_" + m, "t2_" + m, "t3_" + m].forEach(function (id) {
           const el = document.getElementById(id);
           if (el) el.addEventListener("input", function () { renderSinglePlaquePreview(m); });
+        });
+      });
+
+      // Botón "⊕ Centrar" para centrar y restaurar escala únicamente del elemento activo
+      document.querySelectorAll("[data-center-motif]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const m = btn.getAttribute("data-center-motif");
+          const elemSel = document.getElementById("elemSelect_" + m);
+          const g = elemSel ? elemSel.value : "qr";
+          layoutState[m][g] = { x: 0, y: 0, scale: 1 };
+          syncElemToolbar(m, g);
+          activeGroupState[m] = g;
+          renderSinglePlaquePreview(m);
+          setTimeout(function () {
+            activeGroupState[m] = null;
+            renderSinglePlaquePreview(m);
+          }, 700);
+          showToast("Elemento centrado al 100%");
+        });
+      });
+
+      // Botón "⚡ Aplicar a las 3" para sincronizar tema/colores en las 3 placas
+      document.querySelectorAll("[data-sync-colors-motif]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const srcMotif = btn.getAttribute("data-sync-colors-motif");
+          const presetVal = document.getElementById("palettePreset_" + srcMotif).value;
+          const srcBg = document.getElementById("bgColor_" + srcMotif).value;
+          const srcTxt = document.getElementById("textColor_" + srcMotif).value;
+          const srcAcc = document.getElementById("accentColor_" + srcMotif).value;
+
+          MOTIFS.forEach(function (targetM) {
+            if (targetM === srcMotif) return;
+            const pSel = document.getElementById("palettePreset_" + targetM);
+            if (pSel) pSel.value = presetVal;
+            if (presetVal !== "original") {
+              applyPalettePreset(targetM, presetVal);
+            } else {
+              document.getElementById("bgColor_" + targetM).value = srcBg;
+              document.getElementById("textColor_" + targetM).value = srcTxt;
+              document.getElementById("accentColor_" + targetM).value = srcAcc;
+              borderStyleState[targetM] = targetM === "google" ? "original" : "accent";
+              renderSinglePlaquePreview(targetM);
+            }
+          });
+          showToast("Colores aplicados a las 3 placas.");
         });
       });
 
