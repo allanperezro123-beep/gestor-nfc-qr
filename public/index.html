@@ -13,8 +13,8 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ag-psd@15.1.1/dist/bundle.js"></script>
-  <script src="/placas.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle.js"></script>
+  <script src="/placas.js?v=4"></script>
 
   <style>
     :root {
@@ -890,16 +890,13 @@
             <h2 style="font-size: 1.05rem; font-weight: 700;">Estudio Generador de Placas NFC & QR — Powered by BlueCode</h2>
           </div>
           <p style="font-size: 0.78rem; color: var(--text-muted);">
-            Diseños con <strong>logo BlueCode vectorial limpio</strong>, <strong>ilustración NFC unificada estilo Menú</strong> y <strong>QRs personalizables con logo al centro (100% escaneables Nivel H)</strong>. Exporta en PDF Ultra-HD o Adobe Photoshop editable (.PSD multicapa y Script .JSX).
+            Diseños con <strong>logo BlueCode vectorial limpio</strong>, <strong>ilustración NFC unificada estilo Menú</strong> y <strong>motor de QR único 100% personalizable (Nivel H sin fallos)</strong>. Exporta en PDF Individual, PDF Masivo, PNG Ultra-HD o Adobe Photoshop (.PSD multicapa).
           </p>
         </div>
 
         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <button type="button" class="btn btn-bc btn-sm" id="btnExportPlaquePdf" title="Generar PDF en máxima calidad en centímetros exactos">
-            📄 Exportar PDF Ultra-HD
-          </button>
-          <button type="button" class="btn btn-subtle btn-sm" id="btnExportPlaqueJsxAll" style="border-color: rgba(8, 208, 230, 0.4); color: var(--bc-cyan);" title="Descargar Script .JSX para Adobe Photoshop con capas de texto editables y QR vectorial">
-            🎨 Script Photoshop (.JSX)
+          <button type="button" class="btn btn-bc btn-sm" id="btnExportPlaquePdf" title="Generar PDF con todas las placas y copias seleccionadas en centímetros exactos">
+            📄 Exportar PDF Selección
           </button>
           <button type="button" class="btn btn-subtle btn-sm" id="btnExportPlaqueZipPng" title="Descargar todas las placas seleccionadas en PNG de máxima resolución dentro de un ZIP">
             📦 Descargar Placas (ZIP)
@@ -907,8 +904,8 @@
         </div>
       </div>
 
-      <!-- Barra de Medidas en cm, Estilo de QR y Calidad Ultra-HD -->
-      <div class="plaque-config-bar">
+      <!-- Barra 1: Medidas en cm, Modo de PDF y Calidad Ultra-HD -->
+      <div class="plaque-config-bar" style="margin-bottom: 10px;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 0.76rem; font-weight: 600; color: var(--text-muted);">Medida (cm):</span>
           <div class="cm-input-group">
@@ -929,15 +926,6 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 6px;">
-          <span style="font-size: 0.74rem; color: var(--text-muted);">Estilo QR:</span>
-          <select id="plaqueGlobalQrStyle" class="plaque-select" style="width: auto;">
-            <option value="classic">Clásico Nítido</option>
-            <option value="rounded">Redondeado Moderno</option>
-            <option value="dots">Puntos Suaves</option>
-          </select>
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 6px;">
           <span style="font-size: 0.74rem; color: var(--text-muted);">Calidad:</span>
           <select id="plaqueExportDpi" class="plaque-select" style="width: auto;">
             <option value="600" selected>Ultra-HD 600 DPI (Imprenta)</option>
@@ -947,12 +935,67 @@
 
         <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
           <input type="file" id="inputCustomQrLogo" accept="image/*" style="display: none;" />
-          <button type="button" class="btn btn-subtle btn-sm" id="btnUploadCustomQrLogo" title="Subir tu propio logo PNG/SVG para el centro de los códigos QR">
-            🖼️ Subir Logo QR
+          <button type="button" class="btn btn-subtle btn-sm" id="btnUploadCustomQrLogo" style="border-color: rgba(8, 208, 230, 0.35); color: var(--bc-cyan);" title="Subir tu propio logo PNG/SVG para el centro de los códigos QR">
+            🖼️ Subir Tu Logo QR
           </button>
           <select id="plaquePdfMode" class="plaque-select" style="width: auto; min-width: 195px;">
             <option value="sheet">PDF: Hoja con Guías de Corte</option>
             <option value="exact">PDF: 1:1 Tamaño Exacto en cm</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Barra 2: Personalizador Avanzado de QR Único -->
+      <div class="plaque-config-bar" style="margin-bottom: 20px; background: rgba(8, 101, 245, 0.05); border-color: rgba(8, 101, 245, 0.22);">
+        <span style="font-size: 0.75rem; font-weight: 700; color: var(--bc-cyan);">✨ Estilo Único del QR:</span>
+
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Trama:</span>
+          <select id="plaqueGlobalQrStyle" class="plaque-select" style="width: auto;">
+            <option value="classic">⬛ Cuadrados Nítidos</option>
+            <option value="rounded">🔲 Redondeado Moderno</option>
+            <option value="dots">⚫ Puntos Circulares</option>
+            <option value="liquid">💧 Barras Líquidas Fluido</option>
+            <option value="diamond">🔷 Diamantes / Rombos</option>
+            <option value="star">✨ Micro-Estrellas</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Ojos (Esquinas):</span>
+          <select id="plaqueGlobalQrEyeStyle" class="plaque-select" style="width: auto;">
+            <option value="square">Cuadrado Clásico</option>
+            <option value="rounded">Anillo Redondeado</option>
+            <option value="circle">Círculo Perfecto</option>
+            <option value="leaf">Hoja / Gota Boutique</option>
+            <option value="shield">Escudo / Diamante</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Color Ojos:</span>
+          <select id="plaqueGlobalEyeColorMode" class="plaque-select" style="width: auto;">
+            <option value="match">Igual al QR</option>
+            <option value="bc-blue">Azul BlueCode</option>
+            <option value="google-multi">Tricolor Google</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Escudo Logo:</span>
+          <select id="plaqueGlobalLogoShape" class="plaque-select" style="width: auto;">
+            <option value="rounded">Cuadrado Suave</option>
+            <option value="circle">Medallón Circular</option>
+            <option value="clean">Recorte Limpio</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Marco QR:</span>
+          <select id="plaqueGlobalFrameStyle" class="plaque-select" style="width: auto;">
+            <option value="none">Sin Marco Extra</option>
+            <option value="scan-bottom">Pastilla "ESCANÉAME"</option>
+            <option value="corners">4 Esquinas Visor</option>
           </select>
         </div>
       </div>
@@ -986,7 +1029,7 @@
             <select id="selectTag_google" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 6px;">
+          <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 6px;">
             <div class="plaque-field-group">
               <label><span>Logo Central del QR</span></label>
               <select id="qrLogo_google" class="plaque-select">
@@ -995,16 +1038,21 @@
                 <option value="menu">🍴 Logo Menú</option>
                 <option value="instagram">📸 Logo Instagram</option>
                 <option value="whatsapp">💬 Logo WhatsApp</option>
-                <option value="custom">🖼️ Logo Propio Subido</option>
+                <option value="wifi">📶 Logo Wi-Fi</option>
+                <option value="star">⭐ Estrella Dorada</option>
+                <option value="custom">🖼️ Tu Logo Subido</option>
                 <option value="none">⬜ Sin Logo (QR Limpio)</option>
               </select>
             </div>
             <div class="plaque-field-group">
-              <label><span>Color del QR</span></label>
+              <label><span>Color / Degradado QR</span></label>
               <select id="qrColor_google" class="plaque-select">
-                <option value="#111111" selected>⬛ Negro Puro</option>
-                <option value="#0865F5">🟦 Azul BlueCode</option>
-                <option value="#0F172A">🌑 Azul Noche</option>
+                <option value="solid:#111111" selected>⬛ Negro Puro</option>
+                <option value="grad-bc">🌊 Degradado BlueCode</option>
+                <option value="solid:#0865F5">🟦 Azul BlueCode</option>
+                <option value="grad-ig">🌅 Degradado Instagram</option>
+                <option value="grad-gold">🏆 Degradado Bronce</option>
+                <option value="solid:#0F172A">🌑 Azul Noche</option>
               </select>
             </div>
           </div>
@@ -1030,14 +1078,14 @@
           </div>
 
           <div class="plaque-card-actions">
-            <button type="button" class="btn btn-bc btn-sm" data-psd-motif="google" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
-              .PSD Capas
+            <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="google" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
+              📄 PDF Individual
             </button>
-            <button type="button" class="btn btn-subtle btn-sm" data-jsx-motif="google" title="Descargar Script .JSX de Photoshop con textos editables">
-              Script .JSX
+            <button type="button" class="btn btn-subtle btn-sm" data-psd-motif="google" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+              🎨 .PSD Capas
             </button>
             <button type="button" class="btn btn-subtle btn-sm" data-png-motif="google" title="Descargar imagen PNG en Ultra-HD">
-              PNG Ultra-HD
+              🖼️ PNG Ultra-HD
             </button>
           </div>
         </div>
@@ -1068,7 +1116,7 @@
             <select id="selectTag_menu" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 6px;">
+          <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 6px;">
             <div class="plaque-field-group">
               <label><span>Logo Central del QR</span></label>
               <select id="qrLogo_menu" class="plaque-select">
@@ -1077,16 +1125,20 @@
                 <option value="google">🌈 Logo Google 'G'</option>
                 <option value="instagram">📸 Logo Instagram</option>
                 <option value="whatsapp">💬 Logo WhatsApp</option>
-                <option value="custom">🖼️ Logo Propio Subido</option>
+                <option value="wifi">📶 Logo Wi-Fi</option>
+                <option value="star">⭐ Estrella Dorada</option>
+                <option value="custom">🖼️ Tu Logo Subido</option>
                 <option value="none">⬜ Sin Logo (QR Limpio)</option>
               </select>
             </div>
             <div class="plaque-field-group">
-              <label><span>Color del QR</span></label>
+              <label><span>Color / Degradado QR</span></label>
               <select id="qrColor_menu" class="plaque-select">
-                <option value="#1B1A1A" selected>⬛ Negro Carbón</option>
-                <option value="#0865F5">🟦 Azul BlueCode</option>
-                <option value="#0F172A">🌑 Azul Noche</option>
+                <option value="solid:#1B1A1A" selected>⬛ Negro Carbón</option>
+                <option value="grad-bc">🌊 Degradado BlueCode</option>
+                <option value="solid:#0865F5">🟦 Azul BlueCode</option>
+                <option value="grad-gold">🏆 Degradado Bronce</option>
+                <option value="solid:#0F172A">🌑 Azul Noche</option>
               </select>
             </div>
           </div>
@@ -1108,14 +1160,14 @@
           </div>
 
           <div class="plaque-card-actions">
-            <button type="button" class="btn btn-bc btn-sm" data-psd-motif="menu" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
-              .PSD Capas
+            <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="menu" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
+              📄 PDF Individual
             </button>
-            <button type="button" class="btn btn-subtle btn-sm" data-jsx-motif="menu" title="Descargar Script .JSX de Photoshop con textos editables">
-              Script .JSX
+            <button type="button" class="btn btn-subtle btn-sm" data-psd-motif="menu" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+              🎨 .PSD Capas
             </button>
             <button type="button" class="btn btn-subtle btn-sm" data-png-motif="menu" title="Descargar imagen PNG en Ultra-HD">
-              PNG Ultra-HD
+              🖼️ PNG Ultra-HD
             </button>
           </div>
         </div>
@@ -1146,7 +1198,7 @@
             <select id="selectTag_instagram" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 6px;">
+          <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 6px;">
             <div class="plaque-field-group">
               <label><span>Logo Central del QR</span></label>
               <select id="qrLogo_instagram" class="plaque-select">
@@ -1155,16 +1207,20 @@
                 <option value="google">🌈 Logo Google 'G'</option>
                 <option value="menu">🍴 Logo Menú</option>
                 <option value="whatsapp">💬 Logo WhatsApp</option>
-                <option value="custom">🖼️ Logo Propio Subido</option>
+                <option value="wifi">📶 Logo Wi-Fi</option>
+                <option value="star">⭐ Estrella Dorada</option>
+                <option value="custom">🖼️ Tu Logo Subido</option>
                 <option value="none">⬜ Sin Logo (QR Limpio)</option>
               </select>
             </div>
             <div class="plaque-field-group">
-              <label><span>Color del QR</span></label>
+              <label><span>Color / Degradado QR</span></label>
               <select id="qrColor_instagram" class="plaque-select">
-                <option value="#141414" selected>⬛ Negro Puro</option>
-                <option value="#0865F5">🟦 Azul BlueCode</option>
-                <option value="#D62976">🟪 Magenta IG</option>
+                <option value="solid:#141414" selected>⬛ Negro Puro</option>
+                <option value="grad-ig">🌅 Degradado Instagram</option>
+                <option value="grad-bc">🌊 Degradado BlueCode</option>
+                <option value="solid:#0865F5">🟦 Azul BlueCode</option>
+                <option value="solid:#D62976">🟪 Magenta IG</option>
               </select>
             </div>
           </div>
@@ -1186,14 +1242,14 @@
           </div>
 
           <div class="plaque-card-actions">
-            <button type="button" class="btn btn-bc btn-sm" data-psd-motif="instagram" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
-              .PSD Capas
+            <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="instagram" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
+              📄 PDF Individual
             </button>
-            <button type="button" class="btn btn-subtle btn-sm" data-jsx-motif="instagram" title="Descargar Script .JSX de Photoshop con textos editables">
-              Script .JSX
+            <button type="button" class="btn btn-subtle btn-sm" data-psd-motif="instagram" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+              🎨 .PSD Capas
             </button>
             <button type="button" class="btn btn-subtle btn-sm" data-png-motif="instagram" title="Descargar imagen PNG en Ultra-HD">
-              PNG Ultra-HD
+              🖼️ PNG Ultra-HD
             </button>
           </div>
         </div>
@@ -1386,43 +1442,77 @@
 
   <!-- Modal: QR Studio & Exportación Personalizable Ultra-HD -->
   <div class="modal-backdrop" id="qrModal">
-    <div class="modal-box" style="text-align: center; max-width: 460px;">
-      <h3 class="modal-title" id="qrModalTitle">Código QR Personalizado</h3>
-      <p class="modal-subtitle">Personaliza el logo central y estilo. Nivel H de corrección (100% escaneable sin fallos) en Ultra-HD 2048 px.</p>
+    <div class="modal-box" style="text-align: center; max-width: 500px;">
+      <h3 class="modal-title" id="qrModalTitle">Código QR Único & Personalizado</h3>
+      <p class="modal-subtitle">Personaliza trama, ojos, degradados, marco y logo central. Nivel H de corrección (100% escaneable sin fallos) en Ultra-HD 2048 px.</p>
 
       <div class="qr-export-preview" style="padding: 16px;">
         <div id="qrCanvasBox" style="display: flex; justify-content: center;"></div>
         <div class="qr-export-label" id="qrModalLabel"></div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 6px; text-align: left; margin-bottom: 12px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; text-align: left; margin-bottom: 12px;">
         <div class="plaque-field-group">
           <label><span>Logo Central</span></label>
           <select id="modalQrLogo" class="plaque-select">
-            <option value="auto" selected>🤖 Según página / BlueCode</option>
+            <option value="auto" selected>🤖 Auto / BlueCode</option>
             <option value="bluecode">🔹 Logo BlueCode</option>
             <option value="google">🌈 Google 'G'</option>
             <option value="instagram">📸 Instagram</option>
-            <option value="menu">🍴 Menú / Cubiertos</option>
+            <option value="menu">🍴 Menú</option>
             <option value="whatsapp">💬 WhatsApp</option>
-            <option value="custom">🖼️ Logo Propio</option>
+            <option value="wifi">📶 Wi-Fi</option>
+            <option value="star">⭐ Estrella</option>
+            <option value="custom">🖼️ Tu Logo</option>
             <option value="none">⬜ Sin Logo</option>
           </select>
         </div>
         <div class="plaque-field-group">
-          <label><span>Estilo Módulos</span></label>
+          <label><span>Trama Módulos</span></label>
           <select id="modalQrStyle" class="plaque-select">
-            <option value="classic" selected>Clásico Nítido</option>
-            <option value="rounded">Redondeado</option>
-            <option value="dots">Puntos</option>
+            <option value="classic" selected>⬛ Clásico Nítido</option>
+            <option value="rounded">🔲 Redondeado</option>
+            <option value="dots">⚫ Puntos</option>
+            <option value="liquid">💧 Barras Líquidas</option>
+            <option value="diamond">🔷 Diamantes</option>
+            <option value="star">✨ Estrellas</option>
           </select>
         </div>
         <div class="plaque-field-group">
-          <label><span>Color QR</span></label>
+          <label><span>Forma de Ojos</span></label>
+          <select id="modalQrEyeStyle" class="plaque-select">
+            <option value="square" selected>Cuadrado Clásico</option>
+            <option value="rounded">Anillo Redondeado</option>
+            <option value="circle">Círculo Perfecto</option>
+            <option value="leaf">Hoja / Gota</option>
+            <option value="shield">Escudo / Diamante</option>
+          </select>
+        </div>
+        <div class="plaque-field-group">
+          <label><span>Color / Degradado</span></label>
           <select id="modalQrColor" class="plaque-select">
-            <option value="#090b10" selected>⬛ Negro</option>
-            <option value="#0865F5">🟦 BlueCode</option>
-            <option value="#0F172A">🌑 Noche</option>
+            <option value="solid:#090b10" selected>⬛ Negro Puro</option>
+            <option value="grad-bc">🌊 Degradado BlueCode</option>
+            <option value="solid:#0865F5">🟦 Azul BlueCode</option>
+            <option value="grad-ig">🌅 Degradado IG</option>
+            <option value="grad-gold">🏆 Degradado Bronce</option>
+            <option value="solid:#0F172A">🌑 Azul Noche</option>
+          </select>
+        </div>
+        <div class="plaque-field-group">
+          <label><span>Color de Ojos</span></label>
+          <select id="modalQrEyeColorMode" class="plaque-select">
+            <option value="match" selected>Igual al QR</option>
+            <option value="bc-blue">Azul BlueCode</option>
+            <option value="google-multi">Tricolor Google</option>
+          </select>
+        </div>
+        <div class="plaque-field-group">
+          <label><span>Marco Exterior</span></label>
+          <select id="modalQrFrameStyle" class="plaque-select">
+            <option value="none" selected>Sin Marco</option>
+            <option value="scan-bottom">Pastilla "ESCANÉAME"</option>
+            <option value="corners">4 Esquinas Visor</option>
           </select>
         </div>
       </div>
@@ -1432,17 +1522,20 @@
       </div>
 
       <div class="export-options-grid">
-        <button type="button" class="btn btn-bc btn-sm" id="btnExportPngTagged">
-          PNG Ultra-HD + Etiqueta
+        <button type="button" class="btn btn-bc btn-sm" id="btnExportQrPdf" style="grid-column: span 2;">
+          📄 Exportar PDF Individual (Alta Calidad)
+        </button>
+        <button type="button" class="btn btn-subtle btn-sm" id="btnExportPngTagged">
+          🖼️ PNG Ultra-HD + Etiqueta
         </button>
         <button type="button" class="btn btn-subtle btn-sm" id="btnExportPngClean">
-          PNG Ultra-HD Limpio
+          🖼️ PNG Ultra-HD Limpio
         </button>
         <button type="button" class="btn btn-subtle btn-sm" id="btnExportSvg">
-          Vectorial SVG
+          📐 Vectorial SVG
         </button>
         <button type="button" class="btn btn-subtle btn-sm" id="btnCopyQrClip">
-          Copiar Imagen
+          📋 Copiar Imagen
         </button>
       </div>
 
@@ -2263,7 +2356,21 @@
       const qrModal = document.getElementById("qrModal");
       const modalQrLogo = document.getElementById("modalQrLogo");
       const modalQrStyle = document.getElementById("modalQrStyle");
+      const modalQrEyeStyle = document.getElementById("modalQrEyeStyle");
       const modalQrColor = document.getElementById("modalQrColor");
+      const modalQrEyeColorMode = document.getElementById("modalQrEyeColorMode");
+      const modalQrFrameStyle = document.getElementById("modalQrFrameStyle");
+
+      function parseQrColorSelection(val) {
+        const v = val || "solid:#090b10";
+        if (v.startsWith("solid:")) {
+          return { qrColorMode: "solid", qrColor: v.replace("solid:", "") };
+        }
+        if (v.startsWith("grad-")) {
+          return { qrColorMode: v, qrColor: "#0865F5" };
+        }
+        return { qrColorMode: "solid", qrColor: v };
+      }
 
       function resolveModalCenterLogo() {
         const val = modalQrLogo ? modalQrLogo.value : "auto";
@@ -2272,27 +2379,38 @@
         return val;
       }
 
+      function getModalQrDrawOpts() {
+        const cInfo = parseQrColorSelection(modalQrColor ? modalQrColor.value : "solid:#090b10");
+        return {
+          centerLogo: resolveModalCenterLogo(),
+          qrStyle: modalQrStyle ? modalQrStyle.value : "classic",
+          qrEyeStyle: modalQrEyeStyle ? modalQrEyeStyle.value : "square",
+          qrColorMode: cInfo.qrColorMode,
+          color: cInfo.qrColor,
+          eyeColorMode: modalQrEyeColorMode ? modalQrEyeColorMode.value : "match",
+          logoShape: "rounded",
+          frameStyle: modalQrFrameStyle ? modalQrFrameStyle.value : "none",
+          frameText: "ESCANÉAME"
+        };
+      }
+
       function renderModalQrPreview() {
         if (!activeQrItem) return;
         const fixedUrl = getFixedUrl(activeQrItem.slug);
         const box = document.getElementById("qrCanvasBox");
         box.innerHTML = "";
         const previewCanvas = document.createElement("canvas");
-        previewCanvas.width = 520;
-        previewCanvas.height = 520;
-        previewCanvas.style.width = "200px";
-        previewCanvas.style.height = "200px";
+        previewCanvas.width = 560;
+        previewCanvas.height = 560;
+        previewCanvas.style.width = "210px";
+        previewCanvas.style.height = "210px";
         previewCanvas.style.display = "block";
         const ctx = previewCanvas.getContext("2d");
         ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0, 0, 520, 520);
+        ctx.fillRect(0, 0, 560, 560);
 
         if (window.BlueCodePlaqueStudio && window.BlueCodePlaqueStudio.drawQrMatrix) {
-          window.BlueCodePlaqueStudio.drawQrMatrix(ctx, fixedUrl, 24, 24, 472, {
-            centerLogo: resolveModalCenterLogo(),
-            qrStyle: modalQrStyle ? modalQrStyle.value : "classic",
-            color: modalQrColor ? modalQrColor.value : "#090b10"
-          });
+          window.BlueCodePlaqueStudio.drawQrMatrix(ctx, fixedUrl, 28, 28, 504, getModalQrDrawOpts());
         }
         box.appendChild(previewCanvas);
       }
@@ -2307,9 +2425,9 @@
         qrModal.classList.add("open");
       }
 
-      if (modalQrLogo) modalQrLogo.addEventListener("change", renderModalQrPreview);
-      if (modalQrStyle) modalQrStyle.addEventListener("change", renderModalQrPreview);
-      if (modalQrColor) modalQrColor.addEventListener("change", renderModalQrPreview);
+      [modalQrLogo, modalQrStyle, modalQrEyeStyle, modalQrColor, modalQrEyeColorMode, modalQrFrameStyle].forEach(function (el) {
+        if (el) el.addEventListener("change", renderModalQrPreview);
+      });
 
       document.getElementById("btnSendModalQrToPlaque").addEventListener("click", function () {
         qrModal.classList.remove("open");
@@ -2337,11 +2455,7 @@
         const qrSize = size - margin * 2;
 
         if (window.BlueCodePlaqueStudio && window.BlueCodePlaqueStudio.drawQrMatrix) {
-          window.BlueCodePlaqueStudio.drawQrMatrix(ctx, fixedUrl, margin, margin, qrSize, {
-            centerLogo: resolveModalCenterLogo(),
-            qrStyle: modalQrStyle ? modalQrStyle.value : "classic",
-            color: modalQrColor ? modalQrColor.value : "#090b10"
-          });
+          window.BlueCodePlaqueStudio.drawQrMatrix(ctx, fixedUrl, margin, margin, qrSize, getModalQrDrawOpts());
         }
 
         if (withLabel) {
@@ -2353,6 +2467,14 @@
 
         return canvas;
       }
+
+      document.getElementById("btnExportQrPdf").addEventListener("click", function () {
+        const c = generateQrCanvas(true);
+        if (!c || !activeQrItem) return;
+        if (window.BlueCodePlaqueStudio && window.BlueCodePlaqueStudio.exportSingleQrCanvasToPdf) {
+          window.BlueCodePlaqueStudio.exportSingleQrCanvasToPdf(c, activeQrItem.slug, 8, showToast);
+        }
+      });
 
       document.getElementById("btnExportPngTagged").addEventListener("click", function () {
         const c = generateQrCanvas(true);
@@ -2567,51 +2689,46 @@
         const enabled = document.getElementById("chkMotif_" + motif).checked;
         const qty = Math.max(0, parseInt(document.getElementById("qtyMotif_" + motif).value, 10) || 0);
         const qrCenterLogo = document.getElementById("qrLogo_" + motif).value || "auto";
-        const qrColor = document.getElementById("qrColor_" + motif).value || "#111111";
-        const qrStyle = document.getElementById("plaqueGlobalQrStyle").value || "classic";
+        const rawColorVal = document.getElementById("qrColor_" + motif).value || "solid:#111111";
+        const cInfo = parseQrColorSelection(rawColorVal);
 
-        if (motif === "google") {
-          return {
-            motif: "google",
-            enabled: enabled,
-            qty: qty,
-            slug: slugVal.toUpperCase(),
-            qrUrl: qrUrl,
-            qrCenterLogo: qrCenterLogo,
-            qrColor: qrColor,
-            qrStyle: qrStyle,
-            titleLine1: document.getElementById("t1_google").value || "Valóranos",
-            titleLine2: document.getElementById("t2_google").value || "en",
-            titleLine3: document.getElementById("t3_google").value || "Google"
-          };
-        }
-        if (motif === "menu") {
-          return {
-            motif: "menu",
-            enabled: enabled,
-            qty: qty,
-            slug: slugVal.toUpperCase(),
-            qrUrl: qrUrl,
-            qrCenterLogo: qrCenterLogo,
-            qrColor: qrColor,
-            qrStyle: qrStyle,
-            titleMain: document.getElementById("t1_menu").value || "MENU",
-            subtitle: document.getElementById("t2_menu").value || "VIEW OUR MENU ONLINE",
-            arcText: "TAP YOUR PHONE"
-          };
-        }
-        return {
-          motif: "instagram",
+        const qrStyle = document.getElementById("plaqueGlobalQrStyle").value || "classic";
+        const qrEyeStyle = document.getElementById("plaqueGlobalQrEyeStyle").value || "square";
+        const eyeColorMode = document.getElementById("plaqueGlobalEyeColorMode").value || "match";
+        const logoShape = document.getElementById("plaqueGlobalLogoShape").value || "rounded";
+        const frameStyle = document.getElementById("plaqueGlobalFrameStyle").value || "none";
+
+        const baseCfg = {
+          motif: motif,
           enabled: enabled,
           qty: qty,
           slug: slugVal.toUpperCase(),
           qrUrl: qrUrl,
           qrCenterLogo: qrCenterLogo,
-          qrColor: qrColor,
+          qrColorMode: cInfo.qrColorMode,
+          qrColor: cInfo.qrColor,
           qrStyle: qrStyle,
-          titleScript: document.getElementById("t1_instagram").value || "Instagram",
-          subtitle: document.getElementById("t2_instagram").value || "¡Acerca tu móvil y síguenos!"
+          qrEyeStyle: qrEyeStyle,
+          eyeColorMode: eyeColorMode,
+          logoShape: logoShape,
+          frameStyle: frameStyle
         };
+
+        if (motif === "google") {
+          baseCfg.titleLine1 = document.getElementById("t1_google").value || "Valóranos";
+          baseCfg.titleLine2 = document.getElementById("t2_google").value || "en";
+          baseCfg.titleLine3 = document.getElementById("t3_google").value || "Google";
+          return baseCfg;
+        }
+        if (motif === "menu") {
+          baseCfg.titleMain = document.getElementById("t1_menu").value || "MENU";
+          baseCfg.subtitle = document.getElementById("t2_menu").value || "VIEW OUR MENU ONLINE";
+          baseCfg.arcText = "TAP YOUR PHONE";
+          return baseCfg;
+        }
+        baseCfg.titleScript = document.getElementById("t1_instagram").value || "Instagram";
+        baseCfg.subtitle = document.getElementById("t2_instagram").value || "¡Acerca tu móvil y síguenos!";
+        return baseCfg;
       }
 
       function getPlaqueDimensionsCm() {
@@ -2693,8 +2810,17 @@
         });
       });
 
-      document.getElementById("plaqueGlobalQrStyle").addEventListener("change", renderAllPlaquePreviews);
-      document.getElementById("plaqueExportDpi").addEventListener("change", renderAllPlaquePreviews);
+      [
+        "plaqueGlobalQrStyle",
+        "plaqueGlobalQrEyeStyle",
+        "plaqueGlobalEyeColorMode",
+        "plaqueGlobalLogoShape",
+        "plaqueGlobalFrameStyle",
+        "plaqueExportDpi"
+      ].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("change", renderAllPlaquePreviews);
+      });
 
       // Botones "+ Crear Tag" desde el Estudio de Placas
       document.querySelectorAll(".quick-new-tag-link").forEach(function (link) {
@@ -2729,7 +2855,26 @@
         });
       });
 
-      // Exportación Individual por Tarjeta (.PSD Multicapa, Script .JSX, PNG Ultra-HD)
+      // Exportación Individual por Tarjeta: PDF Individual, .PSD Multicapa, PNG Ultra-HD
+      document.querySelectorAll("[data-pdf-motif]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const motif = btn.getAttribute("data-pdf-motif");
+          const dims = getPlaqueDimensionsCm();
+          const cfg = getMotifConfig(motif);
+          const dpi = getSelectedExportDpi();
+          const fileName = "Placa_Individual_BlueCode_" + motif.toUpperCase() + "_" + dims.w + "x" + dims.h + "cm_" + dpi + "DPI.pdf";
+          window.BlueCodePlaqueStudio.exportPlaquesToPdf(
+            [{ motif: motif, cfg: cfg, copies: 1 }],
+            dims.w,
+            dims.h,
+            "exact",
+            showToast,
+            dpi,
+            fileName
+          );
+        });
+      });
+
       document.querySelectorAll("[data-psd-motif]").forEach(function (btn) {
         btn.addEventListener("click", function () {
           const motif = btn.getAttribute("data-psd-motif");
@@ -2737,22 +2882,6 @@
           const cfg = getMotifConfig(motif);
           const dpi = getSelectedExportDpi();
           window.BlueCodePlaqueStudio.exportLayeredPsdFile(motif, cfg, dims.w, dims.h, showToast, dpi);
-        });
-      });
-
-      document.querySelectorAll("[data-jsx-motif]").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          const motif = btn.getAttribute("data-jsx-motif");
-          const dims = getPlaqueDimensionsCm();
-          const cfg = getMotifConfig(motif);
-          const dpi = getSelectedExportDpi();
-          const jsxCode = window.BlueCodePlaqueStudio.generatePhotoshopJsx([cfg], dims.w, dims.h, dpi);
-          const blob = new Blob([jsxCode], { type: "text/javascript;charset=utf-8" });
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(blob);
-          a.download = "Placa_BlueCode_" + motif.toUpperCase() + "_" + dims.w + "x" + dims.h + "cm_" + dpi + "DPI.jsx";
-          a.click();
-          showToast("Script Photoshop (.JSX @ " + dpi + " DPI) descargado para " + motif.toUpperCase());
         });
       });
 
@@ -2774,7 +2903,7 @@
         });
       });
 
-      // Exportación Global: PDF de Impresión Ultra-HD
+      // Exportación Global: PDF de Impresión Ultra-HD (Selección Múltiple)
       document.getElementById("btnExportPlaquePdf").addEventListener("click", function () {
         const dims = getPlaqueDimensionsCm();
         const pdfMode = document.getElementById("plaquePdfMode").value;
@@ -2793,25 +2922,7 @@
         window.BlueCodePlaqueStudio.exportPlaquesToPdf(queue, dims.w, dims.h, pdfMode, showToast, dpi);
       });
 
-      // Exportación Global: Script Photoshop (.JSX) con todos los motivos activos
-      document.getElementById("btnExportPlaqueJsxAll").addEventListener("click", function () {
-        const dims = getPlaqueDimensionsCm();
-        const dpi = getSelectedExportDpi();
-        const activeConfigs = MOTIFS.map(getMotifConfig).filter(function (c) { return c.enabled && c.qty > 0; });
-        if (activeConfigs.length === 0) {
-          showToast("Activa al menos un motivo para generar el Script .JSX");
-          return;
-        }
-        const jsxCode = window.BlueCodePlaqueStudio.generatePhotoshopJsx(activeConfigs, dims.w, dims.h, dpi);
-        const blob = new Blob([jsxCode], { type: "text/javascript;charset=utf-8" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "Placas_BlueCode_" + activeConfigs.length + "Motivos_" + dims.w + "x" + dims.h + "cm_" + dpi + "DPI.jsx";
-        a.click();
-        showToast("Script Photoshop (.JSX @ " + dpi + " DPI) descargado.");
-      });
-
-      // Exportación Global: ZIP con todas las placas seleccionadas en PNG Ultra-HD + el Script .JSX incluido
+      // Exportación Global: ZIP con todas las placas seleccionadas en PNG Ultra-HD
       document.getElementById("btnExportPlaqueZipPng").addEventListener("click", async function () {
         const dims = getPlaqueDimensionsCm();
         const dpi = getSelectedExportDpi();
@@ -2832,15 +2943,12 @@
           zip.file("Placa_" + cfg.motif.toUpperCase() + "_" + dims.w + "x" + dims.h + "cm_" + dpi + "DPI.png", b64, { base64: true });
         });
 
-        const jsxCode = window.BlueCodePlaqueStudio.generatePhotoshopJsx(activeConfigs, dims.w, dims.h, dpi);
-        zip.file("Abrir_En_Photoshop_Editable_" + dims.w + "x" + dims.h + "cm_" + dpi + "DPI.jsx", jsxCode);
-
         const blob = await zip.generateAsync({ type: "blob" });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = "Pack_Placas_BlueCode_" + dims.w + "x" + dims.h + "cm_" + dpi + "DPI.zip";
         a.click();
-        showToast("¡Paquete ZIP de Placas " + dpi + " DPI + Script Photoshop descargado!");
+        showToast("¡Paquete ZIP de Placas " + dpi + " DPI descargado!");
       });
 
       // Re-renderizar cuando la fuente cursiva Grand Hotel termine de cargar

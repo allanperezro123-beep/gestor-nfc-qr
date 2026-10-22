@@ -12,7 +12,7 @@
     ],
     "headers": [
       {
-        "source": "/redirect.html",
+        "source": "/**",
         "headers": [
           {
             "key": "Cache-Control",
@@ -33,4 +33,3 @@
     ]
   }
 }
-

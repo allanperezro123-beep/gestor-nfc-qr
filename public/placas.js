@@ -1,12 +1,15 @@
 /**
- * BlueCode — Estudio Generador de Placas NFC & QR y Motor de QR Personalizado Ultra-HD
- * Renderizado vectorial en Canvas 2D a 300 / 600 DPI, exportación PDF a escala real en cm,
- * Script Editable para Adobe Photoshop (.JSX) y archivo .PSD multicapa.
+ * BlueCode — Estudio Generador de Placas NFC & QR y Motor de QR Único Personalizable (600 DPI Ultra-HD)
+ * - Logo BlueCode vectorial puro sin contornos blancos
+ * - Ilustración NFC unificada (estilo Menú) en las 3 tarjetas
+ * - Exportación PDF Individual y Masiva en cm reales (600 DPI)
+ * - Exportación .PSD Multicapa para Adobe Photoshop
+ * - Motor de QR Personalizable Avanzado (Patrones, Ojos, Degradados, Logos y Marcos, 100% escaneable Nivel H)
  */
 (function () {
   "use strict";
 
-  // Caminos vectoriales oficiales de logo_BC.svg (viewBox 0 0 600 354, recortado al área útil x:78..568, y:66..337)
+  // Caminos vectoriales oficiales de logo_BC.svg (viewBox 0 0 600 354, área útil x:78..568, y:66..337)
   const BC_PATHS = [
     "M 83 68 H 230 C 269 68 296 89 307 121 C 311 132 310 141 304 151 L 261 199 Q 258 202 261 206 L 304 254 C 311 264 310 274 306 285 C 294 313 268 327 230 327 H 83 Q 79 327 79 323 V 72 Q 79 68 83 68 Z M 141 118 Q 138 118 138 122 V 166 Q 138 170 142 170 H 222 C 240 170 251 160 251 144 C 251 128 240 118 222 118 Z M 142 218 Q 138 218 138 222 V 273 Q 138 277 142 277 H 226 C 244 277 256 266 256 247 C 256 229 244 218 226 218 Z",
     "M 254 202 L 344 100 C 365 76 385 66 412 66 H 564 Q 568 66 565 70 L 523 116 Q 520 119 515 119 H 416 C 398 119 385 126 372 140 L 318 201 Q 315 205 319 209 L 372 263 C 385 277 398 284 416 284 H 520 Q 524 284 527 288 L 565 333 Q 568 337 563 337 H 416 C 386 337 364 327 343 305 L 254 209 Q 251 205 254 202 Z",
@@ -14,7 +17,6 @@
     "M 487 145 Q 478 145 472 152 L 466 159 Q 460 165 466 171 L 494 205 L 466 239 Q 460 245 466 251 L 472 258 Q 478 265 487 265 Q 493 265 499 258 L 538 213 Q 545 205 538 197 L 499 152 Q 493 145 487 145 Z"
   ];
 
-  // Imagen personalizada subida por el usuario para el centro del QR (opcional)
   let customQrLogoImage = null;
 
   function setCustomQrLogoImage(imgElementOrNull) {
@@ -30,25 +32,38 @@
     return Math.round((cm / 2.54) * 300);
   }
 
-  // Helper para rectángulos redondeados
+  // Rectángulo con esquinas redondeadas individuales [tl, tr, br, bl] o radio único
   function roundRectPath(ctx, x, y, w, h, r) {
-    const rr = Math.min(r, w / 2, h / 2);
+    let tl, tr, br, bl;
+    if (Array.isArray(r)) {
+      const maxR = Math.min(w / 2, h / 2);
+      tl = Math.min(r[0] || 0, maxR);
+      tr = Math.min(r[1] || 0, maxR);
+      br = Math.min(r[2] || 0, maxR);
+      bl = Math.min(r[3] || 0, maxR);
+    } else {
+      const rr = Math.min(r || 0, w / 2, h / 2);
+      tl = tr = br = bl = rr;
+    }
     ctx.beginPath();
-    ctx.moveTo(x + rr, y);
-    ctx.arcTo(x + w, y, x + w, y + h, rr);
-    ctx.arcTo(x + w, y + h, x, y + h, rr);
-    ctx.arcTo(x, y + h, x, y, rr);
-    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.moveTo(x + tl, y);
+    ctx.lineTo(x + w - tr, y);
+    ctx.arcTo(x + w, y, x + w, y + tr, tr);
+    ctx.lineTo(x + w, y + h - br);
+    ctx.arcTo(x + w, y + h, x + w - br, y + h, br);
+    ctx.lineTo(x + bl, y + h);
+    ctx.arcTo(x, y + h, x, y + h - bl, bl);
+    ctx.lineTo(x, y + tl);
+    ctx.arcTo(x, y, x + tl, y, tl);
     ctx.closePath();
   }
 
   /**
    * Dibuja el logo vectorial oficial de BlueCode de forma 100% nítida,
-   * SIN contornos blancos gruesos ni bordes artificiales, recortado a su caja exacta (490 x 271).
+   * SIN ningún contorno blanco grueso ni bordes deformes.
    */
   function drawBlueCodeLogo(ctx, x, y, height, opts) {
     opts = opts || {};
-    // Caja exacta del glifo dentro de logo_BC.svg: x=[78..568] (w=490), y=[66..337] (h=271)
     const scale = height / 271;
     const width = 490 * scale;
 
@@ -79,8 +94,7 @@
   }
 
   /**
-   * Dibuja el bloque completo "Powered by [Logo BC] BlueCode" centrado y limpio,
-   * sin ningún borde blanco exagerado.
+   * Dibuja el pie "Powered by [Logo BC] BlueCode" limpio y proporcionado.
    */
   function drawPoweredByBlueCodeFooter(ctx, centerX, baselineY, opts) {
     opts = opts || {};
@@ -106,23 +120,6 @@
 
     let startX = centerX - totalW / 2;
 
-    // Si estamos sobre fondo de color (ej. placa Google), podemos poner una cápsula blanca limpia opcional
-    if (opts.pillBg) {
-      const padX = 22;
-      const padY = 10;
-      const pillH = Math.max(logoHeight, brandFontSize) + padY * 2;
-      const pillY = baselineY - brandFontSize * 0.82 - padY;
-      ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.12)";
-      ctx.shadowBlur = 8;
-      ctx.shadowOffsetY = 2;
-      roundRectPath(ctx, startX - padX, pillY, totalW + padX * 2, pillH, pillH / 2);
-      ctx.fillStyle = "#FFFFFF";
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // 1. "Powered by"
     ctx.fillStyle = prefixColor;
     ctx.font = "600 " + fontSize + "px 'Plus Jakarta Sans', Arial, sans-serif";
     ctx.textAlign = "left";
@@ -130,12 +127,10 @@
     ctx.fillText(prefixText, startX, baselineY);
     startX += pwWidth + gap1;
 
-    // 2. Logo vectorial BC (limpio, sin contornos blancos)
     const logoY = baselineY - logoHeight * 0.86;
     drawBlueCodeLogo(ctx, startX, logoY, logoHeight, { solidColor: logoSolid });
     startX += logoWidth + gap2;
 
-    // 3. "BlueCode"
     ctx.fillStyle = brandColor;
     ctx.font = "800 " + brandFontSize + "px 'Plus Jakarta Sans', Arial, sans-serif";
     ctx.fillText("BlueCode", startX, baselineY);
@@ -143,7 +138,7 @@
     ctx.restore();
   }
 
-  // Dibuja una estrella de 5 puntas con puntas ligeramente suavizadas
+  // Estrella de 5 puntas
   function drawStar(ctx, cx, cy, outerR, innerR, fillStyle) {
     ctx.save();
     ctx.beginPath();
@@ -166,9 +161,9 @@
   }
 
   /**
-   * ILUSTRACIÓN UNIFICADA NFC (Idéntica al diseño de Menu.png para las 3 tarjetas):
+   * ILUSTRACIÓN UNIFICADA NFC (Idéntica a la imagen de Menú para las 3 tarjetas):
    * - Óvalo abierto a la izquierda con 4 ondas curvas NFC en su interior
-   * - Smartphone inclinado (-9°) con altavoz y texto "NFC" en la pantalla
+   * - Smartphone inclinado (-9°) con altavoz y texto "NFC" en pantalla
    * - Mano en línea limpia sujetando el teléfono (4 dedos a la izquierda, pulgar + palma a la derecha y puño)
    */
   function drawUnifiedMenuNfcIllustration(ctx, cx, cy, scale, strokeColor) {
@@ -187,7 +182,7 @@
     ctx.ellipse(-62, 10, 114, 96, 0, (28 * Math.PI) / 180, (330 * Math.PI) / 180);
     ctx.stroke();
 
-    // 2. 4 ondas curvas NFC dentro del óvalo (creciendo de izquierda a derecha, igual a Menu.png)
+    // 2. 4 ondas curvas NFC dentro del óvalo
     const waveX = -114;
     const waveY = 10;
     const radii = [22, 42, 62, 82];
@@ -204,14 +199,13 @@
     ctx.translate(64, -22);
     ctx.rotate((-9 * Math.PI) / 180);
 
-    // Cuerpo del smartphone
     ctx.lineWidth = 8;
     roundRectPath(ctx, -44, -84, 88, 168, 15);
     ctx.fillStyle = "#FFFFFF";
     ctx.fill();
     ctx.stroke();
 
-    // Ranura del altavoz superior
+    // Altavoz superior
     ctx.beginPath();
     ctx.moveTo(-11, -69);
     ctx.lineTo(11, -69);
@@ -225,7 +219,7 @@
     ctx.textBaseline = "middle";
     ctx.fillText("NFC", 0, -34);
 
-    // 4 dedos redondeados sujetando el borde izquierdo del teléfono
+    // 4 dedos redondeados sujetando el borde izquierdo
     ctx.lineWidth = 7.5;
     const fingerY = [-18, 4, 26, 48];
     for (let f = 0; f < fingerY.length; f++) {
@@ -255,7 +249,7 @@
     ctx.lineWidth = 7.5;
     ctx.stroke();
 
-    // Puño de la manga en ángulo (esquina inferior derecha de la mano)
+    // Puño de la manga en ángulo
     ctx.beginPath();
     ctx.moveTo(86, 54);
     ctx.lineTo(112, 66);
@@ -272,7 +266,7 @@
   }
 
   // ============================================================================
-  // LOGOS CENTRALES PARA EL CÓDIGO QR (100% ESCANEABLES CON NIVEL 'H')
+  // ICONOS PARA EL CENTRO DEL CÓDIGO QR
   // ============================================================================
   function drawGoogleGIcon(ctx, cx, cy, r) {
     ctx.save();
@@ -345,7 +339,6 @@
     const s = size / 100;
     ctx.translate(cx, cy);
     ctx.scale(s, s);
-    // Mini tenedor y cuchara centrados
     roundRectPath(ctx, -20, -28, 4.5, 22, 2);
     ctx.fill();
     roundRectPath(ctx, -13, -28, 4.5, 22, 2);
@@ -367,22 +360,45 @@
 
   function drawWhatsappBadgeIcon(ctx, cx, cy, size) {
     ctx.save();
-    const r = size * 0.45;
+    const r = size * 0.46;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.fillStyle = "#25D366";
     ctx.fill();
 
     ctx.strokeStyle = "#FFFFFF";
-    ctx.lineWidth = size * 0.09;
+    ctx.lineWidth = size * 0.095;
     ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.arc(cx, cy, r * 0.48, 0.2 * Math.PI, 1.35 * Math.PI);
+    ctx.arc(cx, cy, r * 0.48, 0.15 * Math.PI, 1.38 * Math.PI);
     ctx.stroke();
     ctx.restore();
   }
 
-  // Comprueba si una celda (r, c) pertenece a uno de los 3 ojos buscadores (7x7) del QR
+  function drawWifiBadgeIcon(ctx, cx, cy, size) {
+    ctx.save();
+    const r = size * 0.46;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = "#0865F5";
+    ctx.fill();
+
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.lineWidth = size * 0.075;
+    ctx.lineCap = "round";
+    for (let i = 1; i <= 3; i++) {
+      ctx.beginPath();
+      ctx.arc(cx, cy + r * 0.35, i * r * 0.24, -Math.PI * 0.78, -Math.PI * 0.22);
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(cx, cy + r * 0.38, r * 0.09, 0, Math.PI * 2);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Comprueba si una celda (r, c) pertenece a uno de los 3 ojos buscadores (7x7)
   function isFinderPattern(r, c, count) {
     if (r < 7 && c < 7) return true;
     if (r < 7 && c >= count - 7) return true;
@@ -390,113 +406,319 @@
     return false;
   }
 
-  // Dibuja un ojo buscador personalizado (7x7 módulos) para estilos redondeados/puntos
-  function drawCustomFinderEye(ctx, x, y, cell, color, style) {
+  /**
+   * Dibuja uno de los 3 ojos buscadores (7x7 módulos) con formas únicas:
+   * - 'square': Cuadrado clásico
+   * - 'rounded': Esquinas redondeadas modernas
+   * - 'circle': Anillo circular perfecto + núcleo circular
+   * - 'leaf': Hoja / Gota asimétrica (esquina sup-izq e inf-der muy curvas)
+   * - 'shield': Escudo / Diamante redondeado
+   */
+  function drawCustomFinderEye(ctx, x, y, cell, fillStyle, eyeStyle) {
     const outerSize = 7 * cell;
     const innerOffset = 2 * cell;
     const innerSize = 3 * cell;
-    const radiusOuter = style === "classic" ? 0 : cell * 1.8;
-    const radiusInner = style === "classic" ? 0 : cell * 0.9;
 
     ctx.save();
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
+    ctx.strokeStyle = fillStyle;
+    ctx.fillStyle = fillStyle;
     ctx.lineWidth = cell;
 
-    // Anillo exterior 7x7 (trazo centrado a 0.5 celdas)
-    roundRectPath(ctx, x + cell * 0.5, y + cell * 0.5, outerSize - cell, outerSize - cell, radiusOuter);
-    ctx.stroke();
+    if (eyeStyle === "circle") {
+      const cx = x + outerSize / 2;
+      const cy = y + outerSize / 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, (outerSize - cell) / 2, 0, Math.PI * 2);
+      ctx.stroke();
 
-    // Núcleo interior 3x3
-    roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, radiusInner);
-    ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (eyeStyle === "leaf") {
+      // Forma de hoja/gota elegante
+      const rBig = cell * 2.6;
+      const rSmall = cell * 0.45;
+      roundRectPath(ctx, x + cell * 0.5, y + cell * 0.5, outerSize - cell, outerSize - cell, [rBig, rSmall, rBig, rSmall]);
+      ctx.stroke();
+
+      roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, [cell * 1.3, cell * 0.25, cell * 1.3, cell * 0.25]);
+      ctx.fill();
+    } else if (eyeStyle === "shield") {
+      const rTop = cell * 0.5;
+      const rBot = cell * 2.5;
+      roundRectPath(ctx, x + cell * 0.5, y + cell * 0.5, outerSize - cell, outerSize - cell, [rTop, rTop, rBot, rBot]);
+      ctx.stroke();
+
+      roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, [cell * 0.3, cell * 0.3, cell * 1.4, cell * 1.4]);
+      ctx.fill();
+    } else {
+      const radiusOuter = eyeStyle === "square" ? 0 : cell * 1.85;
+      const radiusInner = eyeStyle === "square" ? 0 : cell * 0.95;
+      roundRectPath(ctx, x + cell * 0.5, y + cell * 0.5, outerSize - cell, outerSize - cell, radiusOuter);
+      ctx.stroke();
+
+      roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, radiusInner);
+      ctx.fill();
+    }
+
     ctx.restore();
   }
 
   /**
-   * Dibuja un código QR de alta precisión y 100% escaneable.
-   * Garantiza lectura inmediata usando nivel 'H' (30% redundancia) y limpiando
-   * únicamente un máximo del 20% central cuando lleva logo (solo ~4% de los módulos).
+   *Construye el estilo de relleno (sólido o degradado de alto contraste) para los módulos del QR.
+   */
+  function buildQrFillStyle(ctx, x, y, size, opts) {
+    const mode = opts.qrColorMode || "solid";
+    if (mode === "grad-bc") {
+      const g = ctx.createLinearGradient(x, y, x + size, y + size);
+      g.addColorStop(0, "#052E7A");
+      g.addColorStop(0.5, "#0865F5");
+      g.addColorStop(1, "#0284A8");
+      return g;
+    }
+    if (mode === "grad-ig") {
+      const g = ctx.createLinearGradient(x, y + size, x + size, y);
+      g.addColorStop(0, "#B43E00");
+      g.addColorStop(0.5, "#C2185B");
+      g.addColorStop(1, "#6A1B9A");
+      return g;
+    }
+    if (mode === "grad-gold") {
+      const g = ctx.createLinearGradient(x, y, x + size, y + size);
+      g.addColorStop(0, "#451A03");
+      g.addColorStop(0.5, "#92400E");
+      g.addColorStop(1, "#3F2E05");
+      return g;
+    }
+    if (mode === "grad-custom") {
+      const g = ctx.createLinearGradient(x, y, x + size, y + size);
+      g.addColorStop(0, opts.color || "#0865F5");
+      g.addColorStop(1, opts.color2 || "#0F172A");
+      return g;
+    }
+    return opts.color || "#111111";
+  }
+
+  /**
+   * MOTOR AVANZADO DE CÓDIGO QR PERSONALIZADO Y 100% ESCANEABLE (NIVEL 'H')
+   * Soporta:
+   * - qrStyle: 'classic' | 'rounded' | 'dots' | 'liquid' | 'diamond' | 'star'
+   * - qrEyeStyle: 'square' | 'rounded' | 'circle' | 'leaf' | 'shield'
+   * - qrColorMode: 'solid' | 'grad-bc' | 'grad-ig' | 'grad-gold' | 'grad-custom'
+   * - eyeColorMode: 'match' | 'bc-blue' | 'google-multi' | 'custom'
+   * - centerLogo: 'bluecode' | 'google' | 'instagram' | 'menu' | 'whatsapp' | 'wifi' | 'star' | 'custom' | 'none'
+   * - logoShape: 'rounded' | 'circle' | 'clean'
+   * - frameStyle: 'none' | 'scan-bottom' | 'corners'
    */
   function drawQrMatrix(ctx, url, x, y, size, opts) {
     opts = opts || {};
     const logoType = opts.centerLogo && opts.centerLogo !== "none" ? opts.centerLogo : null;
-    // Siempre usamos Nivel H cuando hay logo para garantizar que jamás falle el escaneo
-    const ecLevel = "H";
-    const qr = window.qrcode(0, ecLevel);
+    const qr = window.qrcode(0, "H");
     qr.addData(url || "https://gestor-nfc-qr-2026.web.app");
     qr.make();
 
     const count = qr.getModuleCount();
-    const cell = size / count;
     const style = opts.qrStyle || "classic";
-    const fgColor = opts.color || "#111111";
+    const eyeStyle = opts.qrEyeStyle || (style === "classic" ? "square" : "rounded");
+    const logoShape = opts.logoShape || "rounded";
+    const frameStyle = opts.frameStyle || "none";
 
-    // Zona central despejada segura (máximo 20.5% del ancho = 4.2% del área total, ultra seguro para EC Level H)
-    const clearHalf = logoType ? count * 0.105 : 0;
-    const centerIdx = (count - 1) / 2;
+    // Si hay marco exterior decorativo (ej. scan-bottom o corners), ajustamos el área interior del QR
+    let qrX = x;
+    let qrY = y;
+    let qrSize = size;
 
     ctx.save();
     if (opts.bgWhite) {
-      roundRectPath(ctx, x - cell * 2, y - cell * 2, size + cell * 4, size + cell * 4, opts.bgRadius || 0);
+      roundRectPath(ctx, x - size * 0.04, y - size * 0.04, size * 1.08, size * 1.08, opts.bgRadius || 0);
       ctx.fillStyle = "#FFFFFF";
       ctx.fill();
     }
 
-    // Si el estilo es rounded o dots, dibujamos los 3 ojos buscadores con esquinas suaves
-    const useCustomEyes = style === "rounded" || style === "dots";
-    if (useCustomEyes) {
-      drawCustomFinderEye(ctx, x, y, cell, fgColor, style);
-      drawCustomFinderEye(ctx, x + (count - 7) * cell, y, cell, fgColor, style);
-      drawCustomFinderEye(ctx, x, y + (count - 7) * cell, cell, fgColor, style);
+    const mainFill = buildQrFillStyle(ctx, x, y, size, opts);
+
+    if (frameStyle === "scan-bottom") {
+      const pad = size * 0.055;
+      const bottomBarH = size * 0.13;
+      qrSize = size - pad * 2 - bottomBarH;
+      qrX = x + (size - qrSize) / 2;
+      qrY = y + pad;
+
+      // Marco redondeado con pastilla inferior "ESCANÉAME"
+      roundRectPath(ctx, x, y, size, size - bottomBarH * 0.35, size * 0.07);
+      ctx.strokeStyle = mainFill;
+      ctx.lineWidth = size * 0.022;
+      ctx.stroke();
+
+      const pillW = size * 0.68;
+      const pillH = bottomBarH * 0.88;
+      const pillX = x + (size - pillW) / 2;
+      const pillY = y + size - pillH;
+      roundRectPath(ctx, pillX, pillY, pillW, pillH, pillH / 2);
+      ctx.fillStyle = mainFill;
+      ctx.fill();
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "800 " + Math.round(pillH * 0.54) + "px 'Plus Jakarta Sans', Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(opts.frameText || "ESCANÉAME", x + size / 2, pillY + pillH / 2 + 1);
+    } else if (frameStyle === "corners") {
+      const pad = size * 0.06;
+      qrX = x + pad;
+      qrY = y + pad;
+      qrSize = size - pad * 2;
+      const cLen = size * 0.14;
+      ctx.strokeStyle = mainFill;
+      ctx.lineWidth = size * 0.024;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      // 4 esquinas
+      ctx.beginPath();
+      ctx.moveTo(x, y + cLen); ctx.lineTo(x, y); ctx.lineTo(x + cLen, y);
+      ctx.moveTo(x + size - cLen, y); ctx.lineTo(x + size, y); ctx.lineTo(x + size, y + cLen);
+      ctx.moveTo(x, y + size - cLen); ctx.lineTo(x, y + size); ctx.lineTo(x + cLen, y + size);
+      ctx.moveTo(x + size - cLen, y + size); ctx.lineTo(x + size, y + size); ctx.lineTo(x + size, y + size - cLen);
+      ctx.stroke();
     }
 
-    ctx.fillStyle = fgColor;
+    const cell = qrSize / count;
+    // Zona central despejada segura (máximo 20.5% del ancho = 4.2% del área total, 100% seguro en Nivel H)
+    const clearHalf = logoType ? count * 0.105 : 0;
+    const centerIdx = (count - 1) / 2;
+
+    function isSkipped(r, c) {
+      if (r < 0 || c < 0 || r >= count || c >= count) return true;
+      if (isFinderPattern(r, c, count)) return true;
+      if (logoType && Math.abs(r - centerIdx) <= clearHalf && Math.abs(c - centerIdx) <= clearHalf) return true;
+      return !qr.isDark(r, c);
+    }
+
+    // 1. Dibujar los 3 Ojos Buscadores con su forma y color elegido
+    const eyeColorMode = opts.eyeColorMode || "match";
+    let eyeTopLeft = mainFill;
+    let eyeTopRight = mainFill;
+    let eyeBottomLeft = mainFill;
+
+    if (eyeColorMode === "bc-blue") {
+      eyeTopLeft = eyeTopRight = eyeBottomLeft = "#0865F5";
+    } else if (eyeColorMode === "google-multi") {
+      eyeTopLeft = "#4285F4";
+      eyeTopRight = "#EA4335";
+      eyeBottomLeft = "#34A853";
+    } else if (eyeColorMode === "custom" && opts.eyeColor) {
+      eyeTopLeft = eyeTopRight = eyeBottomLeft = opts.eyeColor;
+    }
+
+    drawCustomFinderEye(ctx, qrX, qrY, cell, eyeTopLeft, eyeStyle);
+    drawCustomFinderEye(ctx, qrX + (count - 7) * cell, qrY, cell, eyeTopRight, eyeStyle);
+    drawCustomFinderEye(ctx, qrX, qrY + (count - 7) * cell, cell, eyeBottomLeft, eyeStyle);
+
+    // 2. Dibujar los módulos de datos con el patrón elegido
+    ctx.fillStyle = mainFill;
     for (let r = 0; r < count; r++) {
       for (let c = 0; c < count; c++) {
-        if (!qr.isDark(r, c)) continue;
-        if (useCustomEyes && isFinderPattern(r, c, count)) continue;
+        if (isSkipped(r, c)) continue;
 
-        if (logoType) {
-          if (Math.abs(r - centerIdx) <= clearHalf && Math.abs(c - centerIdx) <= clearHalf) {
-            continue;
-          }
-        }
-
-        const mx = x + c * cell;
-        const my = y + r * cell;
+        const mx = qrX + c * cell;
+        const my = qrY + r * cell;
 
         if (style === "dots") {
           ctx.beginPath();
-          ctx.arc(mx + cell / 2, my + cell / 2, cell * 0.44, 0, Math.PI * 2);
+          ctx.arc(mx + cell / 2, my + cell / 2, cell * 0.45, 0, Math.PI * 2);
           ctx.fill();
         } else if (style === "rounded") {
-          roundRectPath(ctx, mx + cell * 0.04, my + cell * 0.04, cell * 0.92, cell * 0.92, cell * 0.32);
+          roundRectPath(ctx, mx + cell * 0.04, my + cell * 0.04, cell * 0.92, cell * 0.92, cell * 0.34);
+          ctx.fill();
+        } else if (style === "liquid") {
+          // Barras verticales fluidas conectadas
+          const up = !isSkipped(r - 1, c);
+          const down = !isSkipped(r + 1, c);
+          const rad = cell * 0.44;
+          const rTL = up ? 0 : rad;
+          const rTR = up ? 0 : rad;
+          const rBR = down ? 0 : rad;
+          const rBL = down ? 0 : rad;
+          roundRectPath(
+            ctx,
+            mx + cell * 0.07,
+            my - (up ? 0.3 : 0),
+            cell * 0.86,
+            cell + (up ? 0.3 : 0) + (down ? 0.3 : 0),
+            [rTL, rTR, rBR, rBL]
+          );
+          ctx.fill();
+        } else if (style === "diamond") {
+          const cx = mx + cell / 2;
+          const cy = my + cell / 2;
+          const hr = cell * 0.52;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - hr);
+          ctx.lineTo(cx + hr, cy);
+          ctx.lineTo(cx, cy + hr);
+          ctx.lineTo(cx - hr, cy);
+          ctx.closePath();
+          ctx.fill();
+        } else if (style === "star") {
+          const cx = mx + cell / 2;
+          const cy = my + cell / 2;
+          const or = cell * 0.54;
+          const ir = cell * 0.24;
+          ctx.beginPath();
+          for (let k = 0; k < 8; k++) {
+            const ang = (k * Math.PI) / 4;
+            const rad = k % 2 === 0 ? or : ir;
+            const px = cx + Math.cos(ang) * rad;
+            const py = cy + Math.sin(ang) * rad;
+            if (k === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
           ctx.fill();
         } else {
-          // Clásico ultra nítido sin costuras
+          // Clásico ultra nítido
           ctx.fillRect(mx, my, cell + 0.35, cell + 0.35);
         }
       }
     }
 
-    // Dibujar el logo central elegido dentro de su escudo blanco protector
+    // 3. Dibujar el Logo Central dentro de su escudo protector
     if (logoType) {
-      const boxSize = size * 0.215;
-      const bx = x + (size - boxSize) / 2;
-      const by = y + (size - boxSize) / 2;
-
-      // Fondo blanco protector con borde sutil para aislar el logo de los módulos del QR
-      ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.08)";
-      ctx.shadowBlur = boxSize * 0.08;
-      roundRectPath(ctx, bx, by, boxSize, boxSize, boxSize * 0.22);
-      ctx.fillStyle = "#FFFFFF";
-      ctx.fill();
-      ctx.restore();
-
+      const boxSize = qrSize * 0.215;
+      const bx = qrX + (qrSize - boxSize) / 2;
+      const by = qrY + (qrSize - boxSize) / 2;
       const cx = bx + boxSize / 2;
       const cy = by + boxSize / 2;
+
+      ctx.save();
+      if (logoShape === "circle") {
+        ctx.beginPath();
+        ctx.arc(cx, cy, boxSize * 0.54, 0, Math.PI * 2);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, boxSize * 0.5, 0, Math.PI * 2);
+        ctx.strokeStyle = mainFill;
+        ctx.lineWidth = boxSize * 0.045;
+        ctx.stroke();
+      } else if (logoShape === "rounded") {
+        ctx.shadowColor = "rgba(0,0,0,0.08)";
+        ctx.shadowBlur = boxSize * 0.08;
+        roundRectPath(ctx, bx, by, boxSize, boxSize, boxSize * 0.24);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+
+        roundRectPath(ctx, bx + boxSize * 0.03, by + boxSize * 0.03, boxSize * 0.94, boxSize * 0.94, boxSize * 0.21);
+        ctx.strokeStyle = "rgba(0,0,0,0.08)";
+        ctx.lineWidth = boxSize * 0.03;
+        ctx.stroke();
+      } else {
+        roundRectPath(ctx, bx, by, boxSize, boxSize, boxSize * 0.16);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+      }
+      ctx.restore();
 
       if (logoType === "bluecode") {
         const logoH = boxSize * 0.46;
@@ -505,16 +727,26 @@
       } else if (logoType === "google") {
         drawGoogleGIcon(ctx, cx, cy, boxSize * 0.34);
       } else if (logoType === "instagram") {
-        drawInstagramBadgeIcon(ctx, cx, cy, boxSize * 0.88);
+        drawInstagramBadgeIcon(ctx, cx, cy, boxSize * 0.86);
       } else if (logoType === "menu") {
-        drawMenuBadgeIcon(ctx, cx, cy, boxSize * 0.88);
+        drawMenuBadgeIcon(ctx, cx, cy, boxSize * 0.86);
       } else if (logoType === "whatsapp") {
-        drawWhatsappBadgeIcon(ctx, cx, cy, boxSize * 0.88);
+        drawWhatsappBadgeIcon(ctx, cx, cy, boxSize * 0.86);
+      } else if (logoType === "wifi") {
+        drawWifiBadgeIcon(ctx, cx, cy, boxSize * 0.86);
+      } else if (logoType === "star") {
+        drawStar(ctx, cx, cy, boxSize * 0.38, boxSize * 0.18, "#F59E0B");
       } else if (logoType === "custom" && customQrLogoImage) {
         ctx.save();
         const pad = boxSize * 0.12;
-        roundRectPath(ctx, bx + pad, by + pad, boxSize - pad * 2, boxSize - pad * 2, boxSize * 0.14);
-        ctx.clip();
+        if (logoShape === "circle") {
+          ctx.beginPath();
+          ctx.arc(cx, cy, (boxSize - pad * 2) / 2, 0, Math.PI * 2);
+          ctx.clip();
+        } else {
+          roundRectPath(ctx, bx + pad, by + pad, boxSize - pad * 2, boxSize - pad * 2, boxSize * 0.14);
+          ctx.clip();
+        }
         ctx.drawImage(customQrLogoImage, bx + pad, by + pad, boxSize - pad * 2, boxSize - pad * 2);
         ctx.restore();
       }
@@ -546,7 +778,6 @@
     ctx.restore();
   }
 
-  // Resuelve qué logo central usar según la configuración de la placa
   function resolvePlaqueQrLogo(motif, data) {
     const requested = data.qrCenterLogo || "auto";
     if (requested === "none") return null;
@@ -557,8 +788,24 @@
     return requested;
   }
 
+  function buildQrOptionsFromData(motif, data, defaultColor) {
+    return {
+      centerLogo: resolvePlaqueQrLogo(motif, data),
+      qrStyle: data.qrStyle || "classic",
+      qrEyeStyle: data.qrEyeStyle || "square",
+      qrColorMode: data.qrColorMode || "solid",
+      color: data.qrColor || defaultColor || "#111111",
+      color2: data.qrColor2 || "#0865F5",
+      eyeColorMode: data.eyeColorMode || "match",
+      eyeColor: data.eyeColor || "#0865F5",
+      logoShape: data.logoShape || "rounded",
+      frameStyle: data.frameStyle || "none",
+      frameText: data.frameText || "ESCANÉAME"
+    };
+  }
+
   // ============================================================================
-  // 1. RENDERIZADOR PLACA GOOGLE REVIEW (Con NFC estilo Menú y Logo BC nítido)
+  // 1. RENDERIZADOR PLACA GOOGLE REVIEW
   // ============================================================================
   function renderGooglePlaque(ctx, W, H, data, layerFilter) {
     const S = W / 1000;
@@ -578,7 +825,6 @@
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, 1000, 1000);
 
-      // Segmento Rojo Izquierdo
       ctx.beginPath();
       ctx.moveTo(0, 340);
       ctx.lineTo(122, 515);
@@ -587,7 +833,6 @@
       ctx.fillStyle = "#EA4335";
       ctx.fill();
 
-      // Segmento Amarillo Inferior-Izquierdo (en L)
       ctx.beginPath();
       ctx.moveTo(0, 540);
       ctx.lineTo(122, 515);
@@ -599,7 +844,6 @@
       ctx.fillStyle = "#FBBC05";
       ctx.fill();
 
-      // Segmento Verde Inferior-Derecho
       ctx.beginPath();
       ctx.moveTo(465, 888);
       ctx.lineTo(880, 888);
@@ -609,7 +853,6 @@
       ctx.fillStyle = "#34A853";
       ctx.fill();
 
-      // Segmento Azul Derecho
       ctx.beginPath();
       ctx.moveTo(878, 422);
       ctx.lineTo(1000, 396);
@@ -620,12 +863,10 @@
       ctx.fillStyle = "#4285F4";
       ctx.fill();
 
-      // Tarjeta blanca interior
       roundRectPath(ctx, 118, 40, 764, 850, 36);
       ctx.fillStyle = "#FFFFFF";
       ctx.fill();
 
-      // Bisel exterior
       roundRectPath(ctx, 2, 2, 996, 996, 75);
       ctx.strokeStyle = "rgba(0,0,0,0.08)";
       ctx.lineWidth = 4;
@@ -633,7 +874,6 @@
     }
 
     if (showIcons) {
-      // Anillo superior de 4 colores de Google (cx=500, cy=252, r=194)
       const cx = 500, cy = 252, r = 194;
       ctx.save();
       ctx.lineWidth = 22;
@@ -660,13 +900,12 @@
       ctx.stroke();
       ctx.restore();
 
-      // 5 Estrellas doradas
       const starX = [392, 446, 500, 554, 608];
       for (let i = 0; i < starX.length; i++) {
         drawStar(ctx, starX[i], 508, 21, 10, "#FBC02D");
       }
 
-      // Ilustración NFC unificada (mismo diseño limpio que la tarjeta de Menú)
+      // Ilustración NFC unificada (mismo diseño que la tarjeta de Menú)
       drawUnifiedMenuNfcIllustration(ctx, 326, 706, 0.88, "#181818");
     }
 
@@ -716,15 +955,17 @@
 
     if (showQr) {
       const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
-      drawQrMatrix(ctx, targetUrl, 565, 560, 250, {
-        centerLogo: resolvePlaqueQrLogo("google", data),
-        qrStyle: data.qrStyle || "classic",
-        color: data.qrColor || "#111111"
-      });
+      drawQrMatrix(
+        ctx,
+        targetUrl,
+        565,
+        560,
+        250,
+        buildQrOptionsFromData("google", data, "#111111")
+      );
     }
 
     if (showBrand) {
-      // Footer limpio sin contorno blanco feo: "Powered by" sobre el amarillo y cápsula/logo limpio sobre el verde
       ctx.save();
       ctx.fillStyle = "#181818";
       ctx.font = "700 26px 'Plus Jakarta Sans', Arial, sans-serif";
@@ -732,7 +973,6 @@
       ctx.textBaseline = "alphabetic";
       ctx.fillText("Powered by", 448, 954);
 
-      // Cápsula blanca suave en el lado verde para que el logo BlueCode en su gradiente original luzca 100% nítido y sin bordes deformes
       roundRectPath(ctx, 476, 913, 252, 58, 29);
       ctx.fillStyle = "#FFFFFF";
       ctx.fill();
@@ -750,7 +990,7 @@
   }
 
   // ============================================================================
-  // 2. RENDERIZADOR PLACA INSTAGRAM (Con NFC estilo Menú y Logo BC nítido)
+  // 2. RENDERIZADOR PLACA INSTAGRAM
   // ============================================================================
   function renderInstagramPlaque(ctx, W, H, data, layerFilter) {
     const S = W / 1000;
@@ -776,7 +1016,6 @@
       ctx.fillStyle = igBorderGrad;
       ctx.fillRect(0, 0, 1000, 1000);
 
-      // Brillo acrílico superior derecho
       ctx.save();
       ctx.beginPath();
       ctx.moveTo(860, 32);
@@ -787,12 +1026,10 @@
       ctx.stroke();
       ctx.restore();
 
-      // Tarjeta blanca interior
       roundRectPath(ctx, 56, 56, 888, 888, 62);
       ctx.fillStyle = "#FFFFFF";
       ctx.fill();
 
-      // Marco fino negro interior con abertura inferior central
       ctx.save();
       ctx.strokeStyle = "#181818";
       ctx.lineWidth = 5.5;
@@ -806,7 +1043,6 @@
     }
 
     if (showIcons) {
-      // Ícono central de cámara de Instagram
       ctx.save();
       const camGrad = ctx.createLinearGradient(408, 352, 592, 168);
       camGrad.addColorStop(0, "#FEDA75");
@@ -828,7 +1064,6 @@
       ctx.fillStyle = camGrad;
       ctx.fill();
 
-      // 3 Ondas rosas a la izquierda y 3 a la derecha
       ctx.strokeStyle = "#E11D74";
       ctx.lineWidth = 11;
       ctx.lineCap = "round";
@@ -843,7 +1078,7 @@
       }
       ctx.restore();
 
-      // Ilustración NFC unificada (mismo diseño limpio que la tarjeta de Menú)
+      // Ilustración NFC unificada (mismo diseño que la tarjeta de Menú)
       drawUnifiedMenuNfcIllustration(ctx, 332, 682, 0.86, "#141414");
     }
 
@@ -862,11 +1097,14 @@
 
     if (showQr) {
       const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
-      drawQrMatrix(ctx, targetUrl, 558, 548, 240, {
-        centerLogo: resolvePlaqueQrLogo("instagram", data),
-        qrStyle: data.qrStyle || "classic",
-        color: data.qrColor || "#141414"
-      });
+      drawQrMatrix(
+        ctx,
+        targetUrl,
+        558,
+        548,
+        240,
+        buildQrOptionsFromData("instagram", data, "#141414")
+      );
     }
 
     if (showBrand) {
@@ -876,7 +1114,6 @@
       ctx.font = "600 18px 'Plus Jakarta Sans', Arial, sans-serif";
       ctx.fillText("Powered by", 500, 842);
 
-      // Logo BC + BlueCode centrado en el hueco inferior
       const logoH = 34;
       const logoW = (490 / 271) * logoH;
       ctx.font = "800 31px 'Plus Jakarta Sans', Arial, sans-serif";
@@ -902,7 +1139,7 @@
   }
 
   // ============================================================================
-  // 3. RENDERIZADOR PLACA MENÚ (Idéntico al 100% a Menu.png con Logo BC nítido)
+  // 3. RENDERIZADOR PLACA MENÚ
   // ============================================================================
   function renderMenuPlaque(ctx, W, H, data, layerFilter) {
     const S = W / 1000;
@@ -922,7 +1159,6 @@
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, 1000, 1000);
 
-      // Franja celeste suave debajo de la curva oscura (#DCE8F3)
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.lineTo(1000, 0);
@@ -932,7 +1168,6 @@
       ctx.fillStyle = "#DCE8F3";
       ctx.fill();
 
-      // Cabecera superior negra/carbón con curva suave
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.lineTo(1000, 0);
@@ -949,7 +1184,6 @@
     }
 
     if (showIcons) {
-      // Ícono superior de Tenedor y Cuchara blancos
       ctx.save();
       ctx.fillStyle = "#FFFFFF";
 
@@ -983,7 +1217,6 @@
       ctx.fill();
       ctx.restore();
 
-      // Ilustración NFC unificada (diseño original de Menu.png)
       drawUnifiedMenuNfcIllustration(ctx, 338, 732, 0.96, "#1B1A1A");
     }
 
@@ -998,7 +1231,6 @@
       ctx.font = "400 34px 'Plus Jakarta Sans', Arial, sans-serif";
       ctx.fillText(data.subtitle || data.menuSubtitle || "VIEW OUR MENU ONLINE", 500, 386);
 
-      // Texto curvo "TAP YOUR PHONE" sobre la ilustración NFC
       drawArcText(
         ctx,
         data.arcText || data.menuTapText || "TAP YOUR PHONE",
@@ -1012,14 +1244,12 @@
         "#1B1A1A"
       );
 
-      // "OR" / "SCAN QR" sobre el QR derecho
       ctx.fillStyle = "#1B1A1A";
       ctx.font = "500 26px 'Plus Jakarta Sans', Arial, sans-serif";
       ctx.fillText("OR", 760, 542);
       ctx.font = "800 30px 'Plus Jakarta Sans', Arial, sans-serif";
       ctx.fillText("SCAN QR", 760, 578);
 
-      // Código ID debajo del QR
       ctx.fillStyle = "#333333";
       ctx.font = "600 21px 'JetBrains Mono', monospace";
       ctx.fillText((data.slug || "TAG-ID").toUpperCase(), 760, 868);
@@ -1042,11 +1272,14 @@
       ctx.lineWidth = 3;
       ctx.stroke();
 
-      drawQrMatrix(ctx, targetUrl, 662, 616, 196, {
-        centerLogo: resolvePlaqueQrLogo("menu", data),
-        qrStyle: data.qrStyle || "classic",
-        color: data.qrColor || "#1B1A1A"
-      });
+      drawQrMatrix(
+        ctx,
+        targetUrl,
+        662,
+        616,
+        196,
+        buildQrOptionsFromData("menu", data, "#1B1A1A")
+      );
     }
 
     if (showBrand) {
@@ -1061,7 +1294,6 @@
     ctx.restore();
   }
 
-  // Función unificada de dibujo por tipo con suavizado de máxima calidad
   function renderPlaqueToCanvas(canvas, motif, widthPx, heightPx, data, layerFilter) {
     canvas.width = widthPx;
     canvas.height = heightPx;
@@ -1080,243 +1312,15 @@
   }
 
   // ============================================================================
-  // GENERADOR DE SCRIPT EDITABLE PARA ADOBE PHOTOSHOP (.JSX a 300/600 DPI)
-  // ============================================================================
-  function generatePhotoshopJsx(configs, widthCm, heightCm, customDpi) {
-    const dpi = customDpi || 300;
-    const W = Math.round((widthCm / 2.54) * dpi);
-    const H = Math.round((heightCm / 2.54) * dpi);
-
-    const serializedConfigs = configs.map(function (c) {
-      const targetUrl = c.qrUrl || c.url || "https://gestor-nfc-qr-2026.web.app";
-      const logoType = resolvePlaqueQrLogo(c.motif, c);
-      const qr = window.qrcode(0, "H");
-      qr.addData(targetUrl);
-      qr.make();
-      const count = qr.getModuleCount();
-      const clearHalf = logoType ? count * 0.105 : 0;
-      const centerIdx = (count - 1) / 2;
-
-      const rows = [];
-      for (let r = 0; r < count; r++) {
-        let bits = "";
-        for (let col = 0; col < count; col++) {
-          if (logoType && Math.abs(r - centerIdx) <= clearHalf && Math.abs(col - centerIdx) <= clearHalf) {
-            bits += "0";
-            continue;
-          }
-          bits += qr.isDark(r, col) ? "1" : "0";
-        }
-        rows.push(bits);
-      }
-      return {
-        motif: c.motif,
-        slug: c.slug || "TAG",
-        url: targetUrl,
-        qrColor: (c.qrColor || "#111111").replace("#", ""),
-        qrRows: rows,
-        googleLine1: c.titleLine1 || c.googleLine1 || "Valóranos",
-        googleLine2: c.titleLine2 || c.googleLine2 || "en",
-        googleLine3: c.titleLine3 || "Google",
-        igTitle: c.titleScript || c.igTitle || "Instagram",
-        igSubtitle: c.subtitle || c.igSubtitle || "¡Acerca tu móvil y síguenos!",
-        menuTitle: c.titleMain || c.menuTitle || "MENU",
-        menuSubtitle: c.subtitle || c.menuSubtitle || "VIEW OUR MENU ONLINE",
-        menuTapText: c.arcText || c.menuTapText || "TAP YOUR PHONE"
-      };
-    });
-
-    return `// ============================================================================
-// Script Editable para Adobe Photoshop — Generador Oficial BlueCode NFC & QR
-// Dimensiones físicas: ${widthCm} x ${heightCm} cm @ ${dpi} DPI (${W} x ${H} px)
-// Instrucciones en Photoshop: Archivo > Secuencias de comandos > Examinar...
-// ============================================================================
-#target photoshop
-app.bringToFront();
-
-function hexToRGB(hex) {
-    var c = new SolidColor();
-    c.rgb.hexValue = hex.replace("#", "");
-    return c;
-}
-
-function createPolygonLayer(parent, name, pointsPx, hexColor) {
-    var doc = app.activeDocument;
-    var layer = parent.artLayers.add();
-    layer.name = name;
-    doc.selection.select(pointsPx);
-    doc.selection.fill(hexToRGB(hexColor));
-    doc.selection.deselect();
-    return layer;
-}
-
-function createRectLayer(parent, name, x1, y1, x2, y2, hexColor) {
-    return createPolygonLayer(parent, name, [[x1, y1], [x2, y1], [x2, y2], [x1, y2]], hexColor);
-}
-
-function createTextLayer(parent, name, content, xPx, yPx, sizePt, hexColor, isBold, align) {
-    var layer = parent.artLayers.add();
-    layer.kind = LayerKind.TEXT;
-    layer.name = name;
-    var ti = layer.textItem;
-    ti.contents = content;
-    ti.font = isBold ? "Arial-BoldMT" : "ArialMT";
-    ti.size = new UnitValue(sizePt, "pt");
-    ti.color = hexToRGB(hexColor);
-    ti.justification = align || Justification.CENTER;
-    ti.position = [new UnitValue(xPx, "px"), new UnitValue(yPx, "px")];
-    return layer;
-}
-
-function drawQrLayer(parent, name, qrRows, boxX, boxY, boxSize, hexColor) {
-    var doc = app.activeDocument;
-    var layer = parent.artLayers.add();
-    layer.name = name;
-    var count = qrRows.length;
-    var cell = boxSize / count;
-    var color = hexToRGB(hexColor);
-
-    for (var r = 0; r < count; r++) {
-        var rowStr = qrRows[r];
-        var c = 0;
-        while (c < count) {
-            if (rowStr.charAt(c) === "1") {
-                var startC = c;
-                while (c < count && rowStr.charAt(c) === "1") { c++; }
-                var x1 = Math.round(boxX + startC * cell);
-                var x2 = Math.round(boxX + c * cell);
-                var y1 = Math.round(boxY + r * cell);
-                var y2 = Math.round(boxY + (r + 1) * cell);
-                doc.selection.select([[x1, y1], [x2, y1], [x2, y2], [x1, y2]]);
-                doc.selection.fill(color);
-            } else {
-                c++;
-            }
-        }
-    }
-    doc.selection.deselect();
-    return layer;
-}
-
-function buildPlaqueDocument(cfg, W, H, scalePt) {
-    var sX = function(v) { return Math.round((v / 1000) * W); };
-    var sY = function(v) { return Math.round((v / 1000) * H); };
-    var sPt = function(pt) { return Math.round(pt * scalePt * 10) / 10; };
-
-    var docName = "Placa_BlueCode_" + cfg.motif.toUpperCase() + "_" + cfg.slug + "_${widthCm}x${heightCm}cm";
-    var doc = app.documents.add(W, H, ${dpi}, docName, NewDocumentMode.RGB, DocumentFill.WHITE);
-
-    var grpMarco = doc.layerSets.add();
-    grpMarco.name = "1_Marco_y_Fondo";
-
-    var grpGraficos = doc.layerSets.add();
-    grpGraficos.name = "2_Iconos_NFC_Unificado";
-
-    var grpQR = doc.layerSets.add();
-    grpQR.name = "3_Codigo_QR_Dinamico";
-
-    var grpBrand = doc.layerSets.add();
-    grpBrand.name = "4_Powered_By_BlueCode";
-
-    var grpTextos = doc.layerSets.add();
-    grpTextos.name = "5_Textos_Editables";
-
-    if (cfg.motif === "google") {
-        createPolygonLayer(grpMarco, "Segmento_Izq_Rojo", [[0, sY(340)], [sX(122), sY(515)], [0, sY(540)]], "#EA4335");
-        createPolygonLayer(grpMarco, "Segmento_Inf_Izq_Amarillo", [[0, sY(540)], [sX(122), sY(515)], [sX(122), sY(888)], [sX(465), sY(888)], [sX(465), sY(1000)], [0, sY(1000)]], "#FBBC05");
-        createPolygonLayer(grpMarco, "Segmento_Inf_Der_Verde", [[sX(465), sY(888)], [sX(880), sY(888)], [sX(975), sY(1000)], [sX(465), sY(1000)]], "#34A853");
-        createPolygonLayer(grpMarco, "Segmento_Der_Azul", [[sX(878), sY(422)], [sX(1000), sY(396)], [sX(1000), sY(1000)], [sX(975), sY(1000)], [sX(878), sY(888)]], "#4285F4");
-        createRectLayer(grpMarco, "Interior_Blanco", sX(118), sY(40), sX(882), sY(888), "#FFFFFF");
-
-        createRectLayer(grpGraficos, "Guia_NFC_Unificado", sX(180), sY(580), sX(460), sY(825), "#F8FAFC");
-        createRectLayer(grpQR, "Fondo_Guia_QR", sX(560), sY(555), sX(820), sY(815), "#FFFFFF");
-        drawQrLayer(grpQR, "QR_Generado_" + cfg.slug, cfg.qrRows, sX(565), sY(560), sX(250), cfg.qrColor);
-
-        createTextLayer(grpBrand, "Powered_By", "Powered by", sX(440), sY(954), sPt(12), "#181818", true, Justification.RIGHT);
-        createRectLayer(grpBrand, "Capsula_Blanca_BC", sX(476), sY(915), sX(728), sY(970), "#FFFFFF");
-        createRectLayer(grpBrand, "Logo_BC_Icon", sX(494), sY(924), sX(558), sY(960), "#0865F5");
-        createTextLayer(grpBrand, "BlueCode_Brand", "BlueCode", sX(568), sY(953), sPt(14), "#0F172A", true, Justification.LEFT);
-
-        createTextLayer(grpTextos, "Titulo_Valoranos", cfg.googleLine1, sX(500), sY(195), sPt(22), "#202124", true);
-        createTextLayer(grpTextos, "Subtitulo_En", cfg.googleLine2, sX(500), sY(249), sPt(20), "#202124", true);
-        createTextLayer(grpTextos, "Texto_Google", cfg.googleLine3, sX(500), sY(329), sPt(34), "#4285F4", true);
-        createTextLayer(grpTextos, "Estrellas_5", "★ ★ ★ ★ ★", sX(500), sY(514), sPt(28), "#FBC02D", true);
-        createTextLayer(grpTextos, "Texto_NFC", "NFC", sX(382), sY(656), sPt(12), "#181818", true);
-    } else if (cfg.motif === "instagram") {
-        createRectLayer(grpMarco, "Marco_Superior_Rosa_Naranja", 0, 0, W, sY(500), "#FF0069");
-        createRectLayer(grpMarco, "Marco_Inferior_Magenta_Violeta", 0, sY(500), W, H, "#A334FA");
-        createRectLayer(grpMarco, "Tarjeta_Blanca_Interior", sX(56), sY(56), sX(944), sY(944), "#FFFFFF");
-        createRectLayer(grpMarco, "Linea_Marco_Negro", sX(114), sY(114), sX(886), sY(880), "#181818");
-        createRectLayer(grpMarco, "Fondo_Interior_Blanco", sX(120), sY(120), sX(880), sY(874), "#FFFFFF");
-
-        createRectLayer(grpGraficos, "Icono_Camara_Instagram", sX(412), sY(172), sX(588), sY(348), "#E1306C");
-        createRectLayer(grpGraficos, "Guia_NFC_Unificado", sX(185), sY(565), sX(465), sY(795), "#F8FAFC");
-        drawQrLayer(grpQR, "QR_Generado_" + cfg.slug, cfg.qrRows, sX(558), sY(548), sX(240), cfg.qrColor);
-
-        createRectLayer(grpBrand, "Hueco_Inferior_Blanco", sX(345), sY(840), sX(655), sY(915), "#FFFFFF");
-        createTextLayer(grpBrand, "Powered_By", "Powered by", sX(500), sY(842), sPt(9), "#555555", false);
-        createRectLayer(grpBrand, "Logo_BC_Icon", sX(395), sY(853), sX(456), sY(887), "#0865F5");
-        createTextLayer(grpBrand, "BlueCode_Brand", "BlueCode", sX(466), sY(881), sPt(15), "#111111", true, Justification.LEFT);
-
-        createTextLayer(grpTextos, "Titulo_Instagram", cfg.igTitle, sX(500), sY(446), sPt(34), "#141414", true);
-        createTextLayer(grpTextos, "Subtitulo_Siguenos", cfg.igSubtitle, sX(500), sY(504), sPt(15), "#141414", false);
-        createTextLayer(grpTextos, "Texto_NFC", "NFC", sX(385), sY(635), sPt(12), "#141414", true);
-    } else {
-        createRectLayer(grpMarco, "Fondo_Blanco", 0, 0, W, H, "#FFFFFF");
-        createPolygonLayer(grpMarco, "Banda_Celeste_Curva", [[0, 0], [W, 0], [W, sY(492)], [sX(520), sY(445)], [0, sY(542)]], "#DCE8F3");
-        createPolygonLayer(grpMarco, "Cabecera_Negra_Menu", [[0, 0], [W, 0], [W, sY(472)], [sX(520), sY(425)], [0, sY(520)]], "#1B1A1A");
-
-        createRectLayer(grpGraficos, "Icono_Cubiertos_Blanco", sX(442), sY(42), sX(560), sY(200), "#FFFFFF");
-        createRectLayer(grpGraficos, "Guia_NFC_Unificado", sX(170), sY(615), sX(510), sY(850), "#F8FAFC");
-        createRectLayer(grpQR, "Tarjeta_QR_Blanca", sX(644), sY(598), sX(876), sY(830), "#FFFFFF");
-        drawQrLayer(grpQR, "QR_Generado_" + cfg.slug, cfg.qrRows, sX(662), sY(616), sX(196), cfg.qrColor);
-
-        createTextLayer(grpBrand, "Powered_By", "powered by", sX(460), sY(954), sPt(13), "#222222", false, Justification.RIGHT);
-        createRectLayer(grpBrand, "Logo_BC_Icon", sX(475), sY(924), sX(535), sY(957), "#0865F5");
-        createTextLayer(grpBrand, "BlueCode_Brand", "BlueCode", sX(545), sY(954), sPt(14), "#111111", true, Justification.LEFT);
-
-        createTextLayer(grpTextos, "Titulo_MENU", cfg.menuTitle, sX(500), sY(322), sPt(56), "#FFFFFF", true);
-        createTextLayer(grpTextos, "Subtitulo_VIEW_ONLINE", cfg.menuSubtitle, sX(500), sY(386), sPt(15), "#FFFFFF", false);
-        createTextLayer(grpTextos, "Texto_TAP_YOUR_PHONE", cfg.menuTapText, sX(342), sY(585), sPt(15), "#1B1A1A", true);
-        createTextLayer(grpTextos, "Texto_OR", "OR", sX(760), sY(542), sPt(12), "#1B1A1A", false);
-        createTextLayer(grpTextos, "Texto_SCAN_QR", "SCAN QR", sX(760), sY(578), sPt(14), "#1B1A1A", true);
-        createTextLayer(grpTextos, "Texto_ID_Slug", cfg.slug.toUpperCase(), sX(760), sY(868), sPt(10), "#333333", false);
-    }
-}
-
-function main() {
-    var oldRuler = app.preferences.rulerUnits;
-    var oldType = app.preferences.typeUnits;
-    app.preferences.rulerUnits = Units.PIXELS;
-    app.preferences.typeUnits = TypeUnits.POINTS;
-
-    var W = ${W};
-    var H = ${H};
-    var scalePt = ${widthCm} / 10.0;
-    var configs = ${JSON.stringify(serializedConfigs, null, 2)};
-
-    for (var i = 0; i < configs.length; i++) {
-        buildPlaqueDocument(configs[i], W, H, scalePt);
-    }
-
-    app.preferences.rulerUnits = oldRuler;
-    app.preferences.typeUnits = oldType;
-    alert("¡Listo! Se generaron " + configs.length + " documento(s) editables BlueCode (${widthCm}x${heightCm} cm @ ${dpi} DPI).");
-}
-
-main();
-`;
-  }
-
-  // ============================================================================
   // EXPORTADOR DIRECTO A ARCHIVO .PSD MULTICAPA EN ALTA RESOLUCIÓN
   // ============================================================================
   function exportLayeredPsdFile(motif, cfg, widthCm, heightCm, notifyFn, customDpi) {
     if (!window.agPsd || !window.agPsd.writePsd) {
-      if (notifyFn) notifyFn("Librería PSD aún cargando, intenta en 1 segundo.");
+      if (notifyFn) notifyFn("Cargando motor Photoshop (.PSD), intenta de nuevo en 1 segundo.");
       return false;
     }
-    const dpi = customDpi || 300;
+    // Para PSD usamos 300 DPI por defecto para que el archivo binario sea ágil de abrir en Photoshop
+    const dpi = customDpi ? Math.min(customDpi, 300) : 300;
     const W = Math.round((widthCm / 2.54) * dpi);
     const H = Math.round((heightCm / 2.54) * dpi);
 
@@ -1356,30 +1360,27 @@ main();
     const blob = new Blob([buffer], { type: "application/octet-stream" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "Placa_BlueCode_" + motif.toUpperCase() + "_" + (cfg.slug || "TAG") + "_" + widthCm + "x" + heightCm + "cm_" + dpi + "DPI.psd";
+    a.download = "Placa_BlueCode_" + motif.toUpperCase() + "_" + (cfg.slug || "TAG") + "_" + widthCm + "x" + heightCm + "cm.psd";
     a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
-    if (notifyFn) notifyFn("Archivo Photoshop .PSD multicapa (" + W + "×" + H + " px) descargado.");
+    if (notifyFn) notifyFn("Archivo Photoshop .PSD multicapa (" + widthCm + "×" + heightCm + " cm) descargado.");
     return true;
   }
 
   // ============================================================================
-  // EXPORTADOR A PDF DE IMPRESIÓN EN ULTRA ALTA CALIDAD (HASTA 600 DPI)
+  // EXPORTADOR A PDF INDIVIDUAL O MASIVO EN ULTRA ALTA CALIDAD (600 DPI)
   // ============================================================================
-  function exportPlaquesToPdf(queueItems, widthCm, heightCm, pdfMode, notifyFn, customDpi) {
+  function exportPlaquesToPdf(queueItems, widthCm, heightCm, pdfMode, notifyFn, customDpi, customFileName) {
     if (!window.jspdf || !window.jspdf.jsPDF) {
       alert("La librería PDF aún está cargando. Intenta en 1 segundo.");
       return;
     }
     const { jsPDF } = window.jspdf;
     const dpi = customDpi || 600;
-    // Hasta 2800x2800 px por placa para calidad fotográfica de imprenta sin pérdida
     const pxW = Math.min(2800, Math.round((widthCm / 2.54) * dpi));
     const pxH = Math.min(2800, Math.round((heightCm / 2.54) * dpi));
 
     const workCanvas = document.createElement("canvas");
-
-    // Normalizar elementos de la cola (soporta tanto {motif, cfg} como objetos directos con .copies)
     const expanded = [];
     const cacheByMotif = {};
 
@@ -1388,7 +1389,24 @@ main();
       const motif = raw.motif;
       const cfg = raw.cfg || raw;
       const copies = raw.copies || 1;
-      const cacheKey = motif + "_" + (cfg.slug || "") + "_" + (cfg.qrUrl || cfg.url || "") + "_" + (cfg.qrCenterLogo || "") + "_" + (cfg.qrStyle || "") + "_" + (cfg.qrColor || "");
+      const cacheKey = JSON.stringify({
+        m: motif,
+        s: cfg.slug,
+        u: cfg.qrUrl || cfg.url,
+        l: cfg.qrCenterLogo,
+        st: cfg.qrStyle,
+        ey: cfg.qrEyeStyle,
+        cm: cfg.qrColorMode,
+        c1: cfg.qrColor,
+        c2: cfg.qrColor2,
+        ec: cfg.eyeColorMode,
+        ecv: cfg.eyeColor,
+        ls: cfg.logoShape,
+        fs: cfg.frameStyle,
+        t1: cfg.titleLine1 || cfg.titleMain || cfg.titleScript,
+        t2: cfg.titleLine2 || cfg.subtitle,
+        t3: cfg.titleLine3
+      });
 
       if (!cacheByMotif[cacheKey]) {
         renderPlaqueToCanvas(workCanvas, motif, pxW, pxH, cfg, "all");
@@ -1425,8 +1443,9 @@ main();
         doc.addImage(expanded[i].imgData, "PNG", 0, 0, widthCm, heightCm);
       }
 
-      doc.save("Placas_BlueCode_" + widthCm + "x" + heightCm + "cm_" + dpi + "DPI_EscalaReal.pdf");
-      if (notifyFn) notifyFn("¡PDF Ultra-HD 1:1 (" + widthCm + "×" + heightCm + " cm @ " + dpi + " DPI) descargado!");
+      const outName = customFileName || ("Placas_BlueCode_" + widthCm + "x" + heightCm + "cm_" + dpi + "DPI_1a1.pdf");
+      doc.save(outName);
+      if (notifyFn) notifyFn("¡PDF Ultra-HD (" + widthCm + "×" + heightCm + " cm @ " + dpi + " DPI) descargado!");
       return;
     }
 
@@ -1476,7 +1495,6 @@ main();
 
       doc.addImage(expanded[idx].imgData, "PNG", x, y, widthCm, heightCm);
 
-      // Guías de corte de precisión
       doc.setDrawColor(130, 130, 130);
       doc.setLineWidth(0.02);
       const cmLen = 0.25;
@@ -1490,11 +1508,31 @@ main();
       doc.line(x + widthCm, y + heightCm, x + widthCm, y + heightCm + cmLen);
     }
 
-    doc.save("Placas_BlueCode_HojaImpresion_" + widthCm + "x" + heightCm + "cm_" + dpi + "DPI.pdf");
-    if (notifyFn) notifyFn("¡PDF Ultra-HD con guías (" + expanded.length + " placas @ " + dpi + " DPI) descargado!");
+    const outName = customFileName || ("Placas_BlueCode_HojaImpresion_" + widthCm + "x" + heightCm + "cm_" + dpi + "DPI.pdf");
+    doc.save(outName);
+    if (notifyFn) notifyFn("¡PDF Ultra-HD (" + expanded.length + " placa(s) @ " + dpi + " DPI) descargado!");
   }
 
-  // Exponer API global para index.html
+  // Exporta un único código QR personalizado a un PDF individual (listo para imprenta)
+  function exportSingleQrCanvasToPdf(qrCanvas, slug, sizeCm, notifyFn) {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert("La librería PDF aún está cargando.");
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const cm = sizeCm || 8;
+    const doc = new jsPDF({
+      orientation: "p",
+      unit: "cm",
+      format: [cm, cm],
+      compress: true
+    });
+    const imgData = qrCanvas.toDataURL("image/png", 1.0);
+    doc.addImage(imgData, "PNG", 0, 0, cm, cm);
+    doc.save("QR_Individual_BlueCode_" + (slug || "TAG") + "_" + cm + "x" + cm + "cm.pdf");
+    if (notifyFn) notifyFn("¡PDF Individual del QR (" + cm + "×" + cm + " cm) descargado!");
+  }
+
   window.BlueCodePlaqueStudio = {
     cmToPx: cmToPx,
     cmToPx300: cmToPx300,
@@ -1502,8 +1540,8 @@ main();
     drawQrMatrix: drawQrMatrix,
     setCustomQrLogoImage: setCustomQrLogoImage,
     renderPlaqueToCanvas: renderPlaqueToCanvas,
-    generatePhotoshopJsx: generatePhotoshopJsx,
     exportLayeredPsdFile: exportLayeredPsdFile,
-    exportPlaquesToPdf: exportPlaquesToPdf
+    exportPlaquesToPdf: exportPlaquesToPdf,
+    exportSingleQrCanvasToPdf: exportSingleQrCanvasToPdf
   };
 })();
