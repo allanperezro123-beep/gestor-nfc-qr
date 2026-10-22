@@ -1097,7 +1097,7 @@
             📋 Enlaces & QR
           </button>
           <button type="button" class="view-tab-btn" id="tabViewPlaques">
-            🪧 Estudio de Placas (Google · Menú · IG)
+            🪧 Estudio de Placas (6 Plantillas)
           </button>
         </div>
 
@@ -1252,6 +1252,7 @@
         <div style="display: flex; align-items: center; gap: 5px;">
           <span style="font-size: 0.72rem; color: var(--text-muted);">Trama:</span>
           <select id="plaqueGlobalQrStyle" class="plaque-select" style="width: auto;">
+            <option value="auto" selected>✨ Original de Plantilla</option>
             <option value="classic">⬛ Cuadrados Nítidos</option>
             <option value="rounded">🔲 Redondeado Moderno</option>
             <option value="dots">⚫ Puntos Circulares</option>
@@ -1264,6 +1265,7 @@
         <div style="display: flex; align-items: center; gap: 5px;">
           <span style="font-size: 0.72rem; color: var(--text-muted);">Ojos (Esquinas):</span>
           <select id="plaqueGlobalQrEyeStyle" class="plaque-select" style="width: auto;">
+            <option value="auto" selected>✨ Original de Plantilla</option>
             <option value="square">Cuadrado Clásico</option>
             <option value="rounded">Anillo Redondeado</option>
             <option value="circle">Círculo Perfecto</option>
@@ -1380,6 +1382,7 @@
               <select id="qrLogo_google" class="plaque-select">
                 <option value="google" selected>🌈 Logo Google 'G'</option>
                 <option value="bluecode">🔹 Logo BlueCode</option>
+                <option value="burger">🍔 Logo Hamburguesa</option>
                 <option value="menu">🍴 Logo Menú</option>
                 <option value="instagram">📸 Logo Instagram</option>
                 <option value="whatsapp">💬 Logo WhatsApp</option>
@@ -1528,6 +1531,7 @@
               <select id="qrLogo_menu" class="plaque-select">
                 <option value="bluecode" selected>🔹 Logo BlueCode</option>
                 <option value="menu">🍴 Logo Menú / Cubiertos</option>
+                <option value="burger">🍔 Logo Hamburguesa</option>
                 <option value="google">🌈 Logo Google 'G'</option>
                 <option value="instagram">📸 Logo Instagram</option>
                 <option value="whatsapp">💬 Logo WhatsApp</option>
@@ -1671,6 +1675,7 @@
               <select id="qrLogo_instagram" class="plaque-select">
                 <option value="bluecode" selected>🔹 Logo BlueCode</option>
                 <option value="instagram">📸 Logo Instagram</option>
+                <option value="burger">🍔 Logo Hamburguesa</option>
                 <option value="google">🌈 Logo Google 'G'</option>
                 <option value="menu">🍴 Logo Menú</option>
                 <option value="whatsapp">💬 Logo WhatsApp</option>
@@ -1732,6 +1737,438 @@
               🎨 .PSD Capas
             </button>
             <button type="button" class="btn btn-subtle btn-sm" data-png-motif="instagram" title="Descargar imagen PNG en Ultra-HD">
+              🖼️ PNG Ultra-HD
+            </button>
+          </div>
+        </div>
+
+        <!-- MOTIVO 4: BLUE CODE CORPORATIVO -->
+        <div class="plaque-card selected-motif" id="cardMotif_bluecode">
+          <div class="plaque-card-top">
+            <label class="plaque-card-title" style="cursor: pointer;">
+              <input type="checkbox" id="chkMotif_bluecode" checked style="accent-color: var(--bc-blue); width: 16px; height: 16px;" />
+              <span>🔹 BlueCode Oficial</span>
+            </label>
+            <div class="qty-badge-control" title="Cantidad de copias a imprimir en el PDF">
+              <span>Copias:</span>
+              <input type="number" id="qtyMotif_bluecode" value="1" min="0" max="100" />
+            </div>
+          </div>
+
+          <div class="plaque-canvas-wrap">
+            <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="bluecode" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
+            <canvas id="canvasMotif_bluecode" width="1200" height="1200"></canvas>
+            <span class="plaque-size-pill" id="pillSize_bluecode">10 × 10 cm · 600 DPI</span>
+          </div>
+
+          <!-- Barra de Ajuste de Elemento (Mover / Escalar / Centrar) -->
+          <div class="elem-adjust-bar">
+            <span style="color: var(--bc-cyan); font-weight: 700;">✥</span>
+            <select id="elemSelect_bluecode" title="Elemento a ajustar">
+              <option value="qr" selected>Código QR</option>
+              <option value="nfc">Ilustración NFC</option>
+              <option value="title">Título BLUE CODE</option>
+              <option value="hero">Logo BlueCode</option>
+              <option value="brand">Sello BlueCode</option>
+            </select>
+            <input type="range" id="elemScale_bluecode" min="0.55" max="1.65" step="0.03" value="1" title="Escalar elemento seleccionado" />
+            <span id="elemScaleVal_bluecode" style="font-family: var(--mono); width: 34px; text-align: right; color: var(--bc-cyan);">100%</span>
+            <button type="button" class="btn-center-elem" data-center-motif="bluecode" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
+          </div>
+
+          <!-- Barra de Colores de Fondo y Elementos -->
+          <div class="plaque-color-strip">
+            <div class="plaque-color-top">
+              <select id="palettePreset_bluecode" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                <option value="original" selected>🎨 Tema Original</option>
+                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                <option value="bc-tech">💠 BlueCode Tech</option>
+                <option value="cream-boutique">🥂 Crema Boutique</option>
+                <option value="minimal-bw">⚪ Blanco & Negro</option>
+              </select>
+              <button type="button" class="btn-sync-colors" data-sync-colors-motif="bluecode" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+            </div>
+            <div class="color-chip-group">
+              <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
+                <input type="color" id="bgColor_bluecode" value="#FFFFFF" />
+                <span>Fondo</span>
+              </label>
+              <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
+                <input type="color" id="textColor_bluecode" value="#181818" />
+                <span>Texto/NFC</span>
+              </label>
+              <label class="color-swatch-chip" title="Color de la cabecera curva superior">
+                <input type="color" id="accentColor_bluecode" value="#060A14" />
+                <span>Cabecera</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="plaque-field-group">
+            <label>
+              <span>Tag / QR Dinámico Asignado</span>
+              <a href="javascript:void(0)" class="quick-new-tag-link" data-motif="bluecode" style="color: var(--bc-cyan); text-decoration: none;">+ Crear Tag</a>
+            </label>
+            <select id="selectTag_bluecode" class="plaque-select"></select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Logo Central del QR</span></label>
+              <select id="qrLogo_bluecode" class="plaque-select">
+                <option value="none" selected>⬜ Sin Logo (Original)</option>
+                <option value="bluecode">🔹 Logo BlueCode</option>
+                <option value="burger">🍔 Logo Hamburguesa</option>
+                <option value="menu">🍴 Logo Menú</option>
+                <option value="google">🌈 Logo Google 'G'</option>
+                <option value="instagram">📸 Logo Instagram</option>
+                <option value="whatsapp">💬 Logo WhatsApp</option>
+                <option value="wifi">📶 Logo Wi-Fi</option>
+                <option value="star">⭐ Estrella Dorada</option>
+                <option value="custom">🖼️ Tu Logo Subido</option>
+              </select>
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Color / Degradado QR</span></label>
+              <select id="qrColor_bluecode" class="plaque-select">
+                <option value="solid:#111111" selected>⬛ Negro Puro</option>
+                <option value="grad-bc">🌊 Degradado BlueCode</option>
+                <option value="solid:#0865F5">🟦 Azul BlueCode</option>
+                <option value="grad-gold">🏆 Degradado Bronce</option>
+                <option value="solid:#0F172A">🌑 Azul Noche</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Modo QR Clean vs QR con Texto -->
+          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Modo QR (Clean / Texto)</span></label>
+              <select id="qrCaptionMode_bluecode" class="plaque-select">
+                <option value="bottom-text" selected>🏷️ Original (Scan QR code)</option>
+                <option value="bottom-text-id">🆔 Completo (Texto + ID)</option>
+                <option value="clean">🧼 QR Clean (Solo QR)</option>
+              </select>
+            </div>
+            <div class="plaque-field-group" id="wrapCaptionText_bluecode">
+              <label><span>Texto del QR</span></label>
+              <input type="text" id="qrCaptionText_bluecode" class="plaque-input" value="Scan QR code" placeholder="Ej: Scan QR code" />
+            </div>
+          </div>
+
+          <div class="plaque-field-group">
+            <label><span>URL o Link del QR (Editable)</span></label>
+            <input type="text" id="customUrl_bluecode" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Palabra 1 (Blanco)</span></label>
+              <input type="text" id="t1_bluecode" class="plaque-input" value="BLUE" />
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Palabra 2 (Azul)</span></label>
+              <input type="text" id="t2_bluecode" class="plaque-input" value="CODE" />
+            </div>
+          </div>
+
+          <div class="plaque-card-actions">
+            <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="bluecode" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
+              📄 PDF Individual
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-psd-motif="bluecode" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+              🎨 .PSD Capas
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-png-motif="bluecode" title="Descargar imagen PNG en Ultra-HD">
+              🖼️ PNG Ultra-HD
+            </button>
+          </div>
+        </div>
+
+        <!-- MOTIVO 5: COMIDA 1 (BURGER & CO. ROJO) -->
+        <div class="plaque-card selected-motif" id="cardMotif_comida1">
+          <div class="plaque-card-top">
+            <label class="plaque-card-title" style="cursor: pointer;">
+              <input type="checkbox" id="chkMotif_comida1" checked style="accent-color: var(--bc-blue); width: 16px; height: 16px;" />
+              <span>🍔 Comida 1 — Burger Rojo</span>
+            </label>
+            <div class="qty-badge-control" title="Cantidad de copias a imprimir en el PDF">
+              <span>Copias:</span>
+              <input type="number" id="qtyMotif_comida1" value="1" min="0" max="100" />
+            </div>
+          </div>
+
+          <div class="plaque-canvas-wrap">
+            <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="comida1" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
+            <canvas id="canvasMotif_comida1" width="1200" height="1200"></canvas>
+            <span class="plaque-size-pill" id="pillSize_comida1">10 × 10 cm · 600 DPI</span>
+          </div>
+
+          <!-- Barra de Ajuste de Elemento (Mover / Escalar / Centrar) -->
+          <div class="elem-adjust-bar">
+            <span style="color: var(--bc-cyan); font-weight: 700;">✥</span>
+            <select id="elemSelect_comida1" title="Elemento a ajustar">
+              <option value="qr" selected>Código QR</option>
+              <option value="nfc">Ilustración NFC</option>
+              <option value="title">Título BURGER & CO.</option>
+              <option value="hero">Icono Burger & Fries</option>
+              <option value="brand">Sello BlueCode</option>
+            </select>
+            <input type="range" id="elemScale_comida1" min="0.55" max="1.65" step="0.03" value="1" title="Escalar elemento seleccionado" />
+            <span id="elemScaleVal_comida1" style="font-family: var(--mono); width: 34px; text-align: right; color: var(--bc-cyan);">100%</span>
+            <button type="button" class="btn-center-elem" data-center-motif="comida1" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
+          </div>
+
+          <!-- Barra de Colores de Fondo y Elementos -->
+          <div class="plaque-color-strip">
+            <div class="plaque-color-top">
+              <select id="palettePreset_comida1" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                <option value="original" selected>🎨 Arte Original Ilustrado</option>
+                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                <option value="bc-tech">💠 BlueCode Tech</option>
+                <option value="cream-boutique">🥂 Crema Boutique</option>
+                <option value="minimal-bw">⚪ Blanco & Negro</option>
+              </select>
+              <button type="button" class="btn-sync-colors" data-sync-colors-motif="comida1" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+            </div>
+            <div class="color-chip-group">
+              <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
+                <input type="color" id="bgColor_comida1" value="#FFFFFF" />
+                <span>Fondo</span>
+              </label>
+              <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
+                <input type="color" id="textColor_comida1" value="#1B1A1A" />
+                <span>Texto/NFC</span>
+              </label>
+              <label class="color-swatch-chip" title="Color de la cabecera curva superior">
+                <input type="color" id="accentColor_comida1" value="#C8102E" />
+                <span>Cabecera</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="plaque-field-group">
+            <label>
+              <span>Tag / QR Dinámico Asignado</span>
+              <a href="javascript:void(0)" class="quick-new-tag-link" data-motif="comida1" style="color: var(--bc-cyan); text-decoration: none;">+ Crear Tag</a>
+            </label>
+            <select id="selectTag_comida1" class="plaque-select"></select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Logo Central del QR</span></label>
+              <select id="qrLogo_comida1" class="plaque-select">
+                <option value="burger" selected>🍔 Logo Hamburguesa</option>
+                <option value="bluecode">🔹 Logo BlueCode</option>
+                <option value="menu">🍴 Logo Cubiertos</option>
+                <option value="google">🌈 Logo Google 'G'</option>
+                <option value="instagram">📸 Logo Instagram</option>
+                <option value="whatsapp">💬 Logo WhatsApp</option>
+                <option value="wifi">📶 Logo Wi-Fi</option>
+                <option value="star">⭐ Estrella Dorada</option>
+                <option value="custom">🖼️ Tu Logo Subido</option>
+                <option value="none">⬜ Sin Logo (QR Limpio)</option>
+              </select>
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Color / Degradado QR</span></label>
+              <select id="qrColor_comida1" class="plaque-select">
+                <option value="solid:#843511" selected>🟫 Café Burger Original</option>
+                <option value="solid:#C8102E">🟥 Rojo Intenso</option>
+                <option value="solid:#1B1A1A">⬛ Negro Carbón</option>
+                <option value="grad-bc">🌊 Degradado BlueCode</option>
+                <option value="grad-gold">🏆 Degradado Bronce</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Modo QR Clean vs QR con Texto -->
+          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Modo QR (Clean / Texto)</span></label>
+              <select id="qrCaptionMode_comida1" class="plaque-select">
+                <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
+                <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
+                <option value="clean">🧼 QR Clean (Solo QR)</option>
+              </select>
+            </div>
+            <div class="plaque-field-group" id="wrapCaptionText_comida1">
+              <label><span>Texto del QR</span></label>
+              <input type="text" id="qrCaptionText_comida1" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
+            </div>
+          </div>
+
+          <div class="plaque-field-group">
+            <label><span>URL o Link del QR (Editable)</span></label>
+            <input type="text" id="customUrl_comida1" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Título Principal</span></label>
+              <input type="text" id="t1_comida1" class="plaque-input" value="BURGER & CO." />
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Subtítulo</span></label>
+              <input type="text" id="t2_comida1" class="plaque-input" value="Sabor al instante" />
+            </div>
+          </div>
+
+          <div class="plaque-card-actions">
+            <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="comida1" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
+              📄 PDF Individual
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-psd-motif="comida1" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+              🎨 .PSD Capas
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-png-motif="comida1" title="Descargar imagen PNG en Ultra-HD">
+              🖼️ PNG Ultra-HD
+            </button>
+          </div>
+        </div>
+
+        <!-- MOTIVO 6: COMIDA 2 (BURGER & CO. GOURMET DARK) -->
+        <div class="plaque-card selected-motif" id="cardMotif_comida2">
+          <div class="plaque-card-top">
+            <label class="plaque-card-title" style="cursor: pointer;">
+              <input type="checkbox" id="chkMotif_comida2" checked style="accent-color: var(--bc-blue); width: 16px; height: 16px;" />
+              <span>🍕 Comida 2 — Gourmet Dark</span>
+            </label>
+            <div class="qty-badge-control" title="Cantidad de copias a imprimir en el PDF">
+              <span>Copias:</span>
+              <input type="number" id="qtyMotif_comida2" value="1" min="0" max="100" />
+            </div>
+          </div>
+
+          <div class="plaque-canvas-wrap">
+            <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="comida2" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
+            <canvas id="canvasMotif_comida2" width="1200" height="1200"></canvas>
+            <span class="plaque-size-pill" id="pillSize_comida2">10 × 10 cm · 600 DPI</span>
+          </div>
+
+          <!-- Barra de Ajuste de Elemento (Mover / Escalar / Centrar) -->
+          <div class="elem-adjust-bar">
+            <span style="color: var(--bc-cyan); font-weight: 700;">✥</span>
+            <select id="elemSelect_comida2" title="Elemento a ajustar">
+              <option value="qr" selected>Código QR</option>
+              <option value="nfc">Ilustración NFC</option>
+              <option value="title">Título BURGER & CO.</option>
+              <option value="hero">Icono Burger & Fries</option>
+              <option value="brand">Sello BlueCode</option>
+            </select>
+            <input type="range" id="elemScale_comida2" min="0.55" max="1.65" step="0.03" value="1" title="Escalar elemento seleccionado" />
+            <span id="elemScaleVal_comida2" style="font-family: var(--mono); width: 34px; text-align: right; color: var(--bc-cyan);">100%</span>
+            <button type="button" class="btn-center-elem" data-center-motif="comida2" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
+          </div>
+
+          <!-- Barra de Colores de Fondo y Elementos -->
+          <div class="plaque-color-strip">
+            <div class="plaque-color-top">
+              <select id="palettePreset_comida2" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                <option value="original" selected>🎨 Arte Original Ilustrado</option>
+                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                <option value="bc-tech">💠 BlueCode Tech</option>
+                <option value="cream-boutique">🥂 Crema Boutique</option>
+                <option value="minimal-bw">⚪ Blanco & Negro</option>
+              </select>
+              <button type="button" class="btn-sync-colors" data-sync-colors-motif="comida2" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+            </div>
+            <div class="color-chip-group">
+              <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
+                <input type="color" id="bgColor_comida2" value="#FFFFFF" />
+                <span>Fondo</span>
+              </label>
+              <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
+                <input type="color" id="textColor_comida2" value="#1B1A1A" />
+                <span>Texto/NFC</span>
+              </label>
+              <label class="color-swatch-chip" title="Color de la cabecera curva superior">
+                <input type="color" id="accentColor_comida2" value="#1E1E1E" />
+                <span>Cabecera</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="plaque-field-group">
+            <label>
+              <span>Tag / QR Dinámico Asignado</span>
+              <a href="javascript:void(0)" class="quick-new-tag-link" data-motif="comida2" style="color: var(--bc-cyan); text-decoration: none;">+ Crear Tag</a>
+            </label>
+            <select id="selectTag_comida2" class="plaque-select"></select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Logo Central del QR</span></label>
+              <select id="qrLogo_comida2" class="plaque-select">
+                <option value="burger" selected>🍔 Logo Hamburguesa</option>
+                <option value="bluecode">🔹 Logo BlueCode</option>
+                <option value="menu">🍴 Logo Cubiertos</option>
+                <option value="google">🌈 Logo Google 'G'</option>
+                <option value="instagram">📸 Logo Instagram</option>
+                <option value="whatsapp">💬 Logo WhatsApp</option>
+                <option value="wifi">📶 Logo Wi-Fi</option>
+                <option value="star">⭐ Estrella Dorada</option>
+                <option value="custom">🖼️ Tu Logo Subido</option>
+                <option value="none">⬜ Sin Logo (QR Limpio)</option>
+              </select>
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Color / Degradado QR</span></label>
+              <select id="qrColor_comida2" class="plaque-select">
+                <option value="solid:#843511" selected>🟫 Café Burger Original</option>
+                <option value="solid:#1B1A1A">⬛ Negro Carbón</option>
+                <option value="solid:#C8102E">🟥 Rojo Intenso</option>
+                <option value="grad-bc">🌊 Degradado BlueCode</option>
+                <option value="grad-gold">🏆 Degradado Bronce</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Modo QR Clean vs QR con Texto -->
+          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Modo QR (Clean / Texto)</span></label>
+              <select id="qrCaptionMode_comida2" class="plaque-select">
+                <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
+                <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
+                <option value="clean">🧼 QR Clean (Solo QR)</option>
+              </select>
+            </div>
+            <div class="plaque-field-group" id="wrapCaptionText_comida2">
+              <label><span>Texto del QR</span></label>
+              <input type="text" id="qrCaptionText_comida2" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
+            </div>
+          </div>
+
+          <div class="plaque-field-group">
+            <label><span>URL o Link del QR (Editable)</span></label>
+            <input type="text" id="customUrl_comida2" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div class="plaque-field-group">
+              <label><span>Título Principal</span></label>
+              <input type="text" id="t1_comida2" class="plaque-input" value="BURGER & CO." />
+            </div>
+            <div class="plaque-field-group">
+              <label><span>Subtítulo</span></label>
+              <input type="text" id="t2_comida2" class="plaque-input" value="Sabor al instante" />
+            </div>
+          </div>
+
+          <div class="plaque-card-actions">
+            <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="comida2" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
+              📄 PDF Individual
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-psd-motif="comida2" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+              🎨 .PSD Capas
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" data-png-motif="comida2" title="Descargar imagen PNG en Ultra-HD">
               🖼️ PNG Ultra-HD
             </button>
           </div>
@@ -1940,6 +2377,7 @@
           <select id="modalQrLogo" class="plaque-select">
             <option value="auto" selected>🤖 Auto / BlueCode</option>
             <option value="bluecode">🔹 Logo BlueCode</option>
+            <option value="burger">🍔 Hamburguesa</option>
             <option value="google">🌈 Google 'G'</option>
             <option value="instagram">📸 Instagram</option>
             <option value="menu">🍴 Menú</option>
@@ -3115,9 +3553,9 @@
       });
 
       // ==========================================================
-      // CONTROLADOR DEL ESTUDIO DE PLACAS (GOOGLE · MENÚ · IG)
+      // CONTROLADOR DEL ESTUDIO DE PLACAS (6 PLANTILLAS OFICIALES)
       // ==========================================================
-      const MOTIFS = ["google", "menu", "instagram"];
+      const MOTIFS = ["google", "menu", "instagram", "bluecode", "comida1", "comida2"];
       const tabViewLinks = document.getElementById("tabViewLinks");
       const tabViewPlaques = document.getElementById("tabViewPlaques");
       const linksViewWrapper = document.getElementById("linksViewWrapper");
@@ -3137,25 +3575,37 @@
       const layoutState = {
         google: createDefaultLayout(),
         menu: createDefaultLayout(),
-        instagram: createDefaultLayout()
+        instagram: createDefaultLayout(),
+        bluecode: createDefaultLayout(),
+        comida1: createDefaultLayout(),
+        comida2: createDefaultLayout()
       };
 
       const activeGroupState = {
         google: null,
         menu: null,
-        instagram: null
+        instagram: null,
+        bluecode: null,
+        comida1: null,
+        comida2: null
       };
 
       const DEFAULT_COLORS = {
         google: { bg: "#FFFFFF", text: "#202124", accent: "#FBC02D", borderStyle: "original" },
         menu: { bg: "#FFFFFF", text: "#1B1A1A", accent: "#1B1A1A", borderStyle: "original" },
-        instagram: { bg: "#FFFFFF", text: "#141414", accent: "#E11D74", borderStyle: "original" }
+        instagram: { bg: "#FFFFFF", text: "#141414", accent: "#E11D74", borderStyle: "original" },
+        bluecode: { bg: "#FFFFFF", text: "#181818", accent: "#060A14", borderStyle: "original" },
+        comida1: { bg: "#FFFFFF", text: "#1B1A1A", accent: "#C8102E", borderStyle: "original" },
+        comida2: { bg: "#FFFFFF", text: "#1B1A1A", accent: "#1E1E1E", borderStyle: "original" }
       };
 
       const borderStyleState = {
         google: "original",
         menu: "original",
-        instagram: "original"
+        instagram: "original",
+        bluecode: "original",
+        comida1: "original",
+        comida2: "original"
       };
 
       function syncCaptionFieldVisibility(motif) {
@@ -3339,6 +3789,8 @@
               if (m === "google") return s.includes("google") || s.includes("rese") || s.includes("review");
               if (m === "menu") return s.includes("menu") || s.includes("menú") || s.includes("mesa") || s.includes("carta");
               if (m === "instagram") return s.includes("insta") || s.includes("ig");
+              if (m === "bluecode") return s.includes("blue") || s.includes("web") || s.includes("contacto");
+              if (m === "comida1" || m === "comida2") return s.includes("burger") || s.includes("comida") || s.includes("menu") || s.includes("menú");
               return false;
             });
             const chosen = match || allItems[idx % allItems.length] || allItems[0];
@@ -3363,8 +3815,11 @@
         const rawColorVal = document.getElementById("qrColor_" + motif).value || "solid:#111111";
         const cInfo = parseQrColorSelection(rawColorVal);
 
-        const qrStyle = document.getElementById("plaqueGlobalQrStyle").value || "classic";
-        const qrEyeStyle = document.getElementById("plaqueGlobalQrEyeStyle").value || "square";
+        const globalStyleVal = document.getElementById("plaqueGlobalQrStyle").value || "auto";
+        const globalEyeVal = document.getElementById("plaqueGlobalQrEyeStyle").value || "auto";
+        const isFoodMotif = motif === "comida1" || motif === "comida2";
+        const qrStyle = globalStyleVal === "auto" ? (isFoodMotif ? "dots" : "classic") : globalStyleVal;
+        const qrEyeStyle = globalEyeVal === "auto" ? (isFoodMotif ? "circle" : "square") : globalEyeVal;
         const eyeColorMode = document.getElementById("plaqueGlobalEyeColorMode").value || "match";
         const logoShape = document.getElementById("plaqueGlobalLogoShape").value || "rounded";
         const frameStyle = document.getElementById("plaqueGlobalFrameStyle").value || "none";
@@ -3408,6 +3863,18 @@
         if (motif === "menu") {
           baseCfg.titleMain = document.getElementById("t1_menu").value || "MENU";
           baseCfg.subtitle = document.getElementById("t2_menu").value || "VIEW OUR MENU ONLINE";
+          baseCfg.arcText = "TAP YOUR PHONE";
+          return baseCfg;
+        }
+        if (motif === "bluecode") {
+          baseCfg.titleMain = document.getElementById("t1_bluecode").value || "BLUE";
+          baseCfg.subtitle = document.getElementById("t2_bluecode").value || "CODE";
+          baseCfg.arcText = "Tap your phone";
+          return baseCfg;
+        }
+        if (motif === "comida1" || motif === "comida2") {
+          baseCfg.titleMain = document.getElementById("t1_" + motif).value || "BURGER & CO.";
+          baseCfg.subtitle = document.getElementById("t2_" + motif).value || "Sabor al instante";
           baseCfg.arcText = "TAP YOUR PHONE";
           return baseCfg;
         }
@@ -3636,7 +4103,7 @@
         if (txtColIn) txtColIn.addEventListener("input", function () { renderSinglePlaquePreview(m); });
         if (accColIn) {
           accColIn.addEventListener("input", function () {
-            if (m === "instagram") borderStyleState[m] = "accent";
+            if (m === "instagram" || m === "comida1" || m === "comida2") borderStyleState[m] = "accent";
             renderSinglePlaquePreview(m);
           });
         }
@@ -3750,6 +4217,12 @@
           } else if (motif === "menu") {
             newName.value = "Menú Principal";
             newSlug.value = "menu-digital";
+          } else if (motif === "bluecode") {
+            newName.value = "BlueCode Oficial";
+            newSlug.value = "bluecode-oficial";
+          } else if (motif === "comida1" || motif === "comida2") {
+            newName.value = "Burger & Co. Menú";
+            newSlug.value = "burger-and-co";
           } else {
             newName.value = "Síguenos en Instagram";
             newSlug.value = "instagram";
@@ -3868,9 +4341,14 @@
         showToast("¡Paquete ZIP de Placas " + dpi + " DPI descargado!");
       });
 
-      // Re-renderizar cuando la fuente cursiva Grand Hotel termine de cargar
+      // Re-renderizar cuando la fuente cursiva Grand Hotel o los artes ilustrados terminen de cargar
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(function () {
+          renderAllPlaquePreviews();
+        });
+      }
+      if (window.BlueCodePlaqueStudio && window.BlueCodePlaqueStudio.onAssetsLoaded) {
+        window.BlueCodePlaqueStudio.onAssetsLoaded(function () {
           renderAllPlaquePreviews();
         });
       }

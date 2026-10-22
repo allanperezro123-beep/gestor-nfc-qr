@@ -40,10 +40,56 @@
       { id: "hero", label: "Icono Instagram", x: 265, y: 145, w: 470, h: 225, cx: 500, cy: 260 },
       { id: "title", label: "Título y Subtítulo", x: 170, y: 375, w: 660, h: 150, cx: 500, cy: 455 },
       { id: "brand", label: "Sello BlueCode", x: 310, y: 820, w: 380, h: 95, cx: 500, cy: 868 }
+    ],
+    bluecode: [
+      { id: "qr", label: "Código QR", x: 585, y: 545, w: 280, h: 340, cx: 725, cy: 715 },
+      { id: "nfc", label: "Ilustración NFC", x: 145, y: 535, w: 335, h: 335, cx: 310, cy: 730 },
+      { id: "hero", label: "Logo BlueCode", x: 130, y: 205, w: 215, h: 145, cx: 238, cy: 275 },
+      { id: "title", label: "Título BLUE CODE", x: 350, y: 205, w: 530, h: 145, cx: 615, cy: 275 },
+      { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 948 }
+    ],
+    comida1: [
+      { id: "qr", label: "Código QR", x: 620, y: 515, w: 280, h: 365, cx: 760, cy: 714 },
+      { id: "nfc", label: "Ilustración NFC", x: 145, y: 540, w: 370, h: 330, cx: 338, cy: 720 },
+      { id: "hero", label: "Icono Burger & Fries", x: 375, y: 40, w: 250, h: 195, cx: 500, cy: 138 },
+      { id: "title", label: "Título BURGER & CO.", x: 110, y: 225, w: 780, h: 195, cx: 500, cy: 320 },
+      { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 945 }
+    ],
+    comida2: [
+      { id: "qr", label: "Código QR", x: 620, y: 515, w: 280, h: 365, cx: 760, cy: 714 },
+      { id: "nfc", label: "Ilustración NFC", x: 145, y: 540, w: 370, h: 330, cx: 338, cy: 720 },
+      { id: "hero", label: "Icono Burger & Fries", x: 375, y: 40, w: 250, h: 195, cx: 500, cy: 138 },
+      { id: "title", label: "Título BURGER & CO.", x: 110, y: 225, w: 780, h: 195, cx: 500, cy: 320 },
+      { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 945 }
     ]
   };
 
   let customQrLogoImage = null;
+  let onAssetsReadyCallback = null;
+
+  const headerAssets = {
+    comida1: typeof Image !== "undefined" ? new Image() : null,
+    comida2: typeof Image !== "undefined" ? new Image() : null
+  };
+
+  function notifyAssetsReady() {
+    if (typeof onAssetsReadyCallback === "function") {
+      onAssetsReadyCallback();
+    }
+  }
+
+  if (headerAssets.comida1) {
+    headerAssets.comida1.onload = notifyAssetsReady;
+    headerAssets.comida1.src = "/header_comida1.png";
+  }
+  if (headerAssets.comida2) {
+    headerAssets.comida2.onload = notifyAssetsReady;
+    headerAssets.comida2.src = "/header_comida2.png";
+  }
+
+  function setOnAssetsLoaded(fn) {
+    onAssetsReadyCallback = fn;
+  }
 
   function setCustomQrLogoImage(imgElementOrNull) {
     customQrLogoImage = imgElementOrNull || null;
@@ -484,6 +530,132 @@
     ctx.restore();
   }
 
+  function drawBurgerBadgeIcon(ctx, cx, cy, size, fillCol) {
+    ctx.save();
+    const s = size / 100;
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    ctx.fillStyle = fillCol || "#843511";
+    ctx.strokeStyle = fillCol || "#843511";
+
+    // Pan superior (domo)
+    ctx.beginPath();
+    ctx.arc(0, -4, 34, Math.PI, 0, false);
+    ctx.closePath();
+    ctx.fill();
+
+    // Semillas de sésamo blancas en el pan superior
+    ctx.fillStyle = "#FFFFFF";
+    const seeds = [[-13, -21], [0, -25], [13, -21], [-6, -13], [7, -13]];
+    for (let i = 0; i < seeds.length; i++) {
+      ctx.beginPath();
+      ctx.arc(seeds[i][0], seeds[i][1], 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Lechuga / queso ondulado
+    ctx.beginPath();
+    ctx.moveTo(-36, 3);
+    ctx.quadraticCurveTo(-24, -2, -18, 4);
+    ctx.quadraticCurveTo(-12, 9, -6, 3);
+    ctx.quadraticCurveTo(0, -2, 6, 4);
+    ctx.quadraticCurveTo(12, 10, 18, 4);
+    ctx.quadraticCurveTo(24, -2, 36, 3);
+    ctx.lineWidth = 5.5;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
+    // Carne (patty)
+    ctx.fillStyle = fillCol || "#843511";
+    roundRectPath(ctx, -35, 10, 70, 11, 5.5);
+    ctx.fill();
+
+    // Pan inferior
+    roundRectPath(ctx, -32, 24, 64, 11, [3, 3, 7, 7]);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // Icono vectorial grande de Hamburguesa + Papas Fritas para el encabezado de Comida 1 y 2
+  function drawBurgerFriesHeroIcon(ctx, cx, cy, color) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = color || "#FFFFFF";
+    ctx.strokeStyle = color || "#FFFFFF";
+    ctx.shadowColor = "rgba(0,0,0,0.28)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 4;
+
+    // --- HAMBURGUESA IZQUIERDA (x: -115 a +10) ---
+    // Domo pan superior
+    ctx.beginPath();
+    ctx.arc(-52, -18, 62, Math.PI, 0, false);
+    ctx.closePath();
+    ctx.fill();
+
+    // Semillas (recortadas en color oscuro)
+    ctx.save();
+    ctx.shadowColor = "transparent";
+    ctx.fillStyle = "#221818";
+    const hSeeds = [[-76, -52], [-52, -60], [-28, -52], [-64, -36], [-40, -36]];
+    for (let i = 0; i < hSeeds.length; i++) {
+      ctx.beginPath();
+      ctx.arc(hSeeds[i][0], hSeeds[i][1], 4.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Lechuga ondulada
+    ctx.beginPath();
+    ctx.moveTo(-114, -4);
+    ctx.quadraticCurveTo(-98, -12, -82, -2);
+    ctx.quadraticCurveTo(-66, 8, -52, -3);
+    ctx.quadraticCurveTo(-36, -12, -20, -2);
+    ctx.quadraticCurveTo(-6, 8, 8, -3);
+    ctx.lineWidth = 10;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
+    // Carne
+    roundRectPath(ctx, -114, 12, 124, 20, 10);
+    ctx.fill();
+
+    // Pan inferior
+    roundRectPath(ctx, -110, 40, 118, 24, [4, 4, 14, 14]);
+    ctx.fill();
+
+    // --- PAPAS FRITAS DERECHA (x: +16 a +115) ---
+    const fries = [
+      { x: 24, y: -62, w: 11, h: 48, rot: -0.14 },
+      { x: 40, y: -76, w: 11, h: 58, rot: -0.06 },
+      { x: 56, y: -84, w: 12, h: 64, rot: 0 },
+      { x: 73, y: -76, w: 11, h: 58, rot: 0.06 },
+      { x: 89, y: -62, w: 11, h: 48, rot: 0.14 }
+    ];
+    for (let f = 0; f < fries.length; f++) {
+      ctx.save();
+      ctx.translate(fries[f].x + fries[f].w / 2, fries[f].y + fries[f].h);
+      ctx.rotate(fries[f].rot);
+      roundRectPath(ctx, -fries[f].w / 2, -fries[f].h, fries[f].w, fries[f].h, 4);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Caja de papas fritas
+    ctx.beginPath();
+    ctx.moveTo(14, -20);
+    ctx.lineTo(36, -20);
+    ctx.quadraticCurveTo(64, 4, 92, -20);
+    ctx.lineTo(114, -20);
+    ctx.lineTo(104, 62);
+    ctx.quadraticCurveTo(64, 54, 24, 62);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
   // Comprueba si una celda (r, c) pertenece a uno de los 3 ojos buscadores (7x7)
   function isFinderPattern(r, c, count) {
     if (r < 7 && c < 7) return true;
@@ -829,6 +1001,8 @@
         drawWhatsappBadgeIcon(ctx, cx, cy, boxSize * 0.86);
       } else if (logoType === "wifi") {
         drawWifiBadgeIcon(ctx, cx, cy, boxSize * 0.86);
+      } else if (logoType === "burger") {
+        drawBurgerBadgeIcon(ctx, cx, cy, boxSize * 0.84, typeof mainFill === "string" ? mainFill : "#843511");
       } else if (logoType === "star") {
         drawStar(ctx, cx, cy, boxSize * 0.38, boxSize * 0.18, "#F59E0B");
       } else if (logoType === "custom" && customQrLogoImage) {
@@ -878,6 +1052,7 @@
     if (requested === "none") return null;
     if (requested === "auto") {
       if (motif === "google") return "google";
+      if (motif === "comida1" || motif === "comida2") return "burger";
       return "bluecode";
     }
     return requested;
@@ -1570,6 +1745,400 @@
     ctx.restore();
   }
 
+  // ============================================================================
+  // 4. RENDERIZADOR PLACA BLUE CODE CORPORATIVO (Blue Code.png)
+  // ============================================================================
+  function renderBlueCodePlaque(ctx, W, H, data, layerFilter) {
+    const S = W / 1000;
+    ctx.save();
+    ctx.scale(S, S);
+
+    const showBg = !layerFilter || layerFilter === "all" || layerFilter === "bg";
+    const showIcons = !layerFilter || layerFilter === "all" || layerFilter === "icons";
+    const showText = !layerFilter || layerFilter === "all" || layerFilter === "text";
+    const showBrand = !layerFilter || layerFilter === "all" || layerFilter === "brand";
+    const showQr = !layerFilter || layerFilter === "all" || layerFilter === "qr";
+
+    const bgColor = data.bgColor || "#FFFFFF";
+    const textColor = data.textColor || "#181818";
+    const accentColor = data.accentColor || "#060A14";
+    const waveStrokeColor = data.waveSubColor || "#0865F5";
+    const darkBg = isHexDark(bgColor);
+    const darkHeader = isHexDark(accentColor);
+    const headerPrimaryColor = darkHeader ? "#FFFFFF" : "#0F172A";
+
+    roundRectPath(ctx, 0, 0, 1000, 1000, 82);
+    ctx.clip();
+
+    if (showBg) {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, 1000, 1000);
+
+      // Encabezado oscuro con onda S corporativa
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(1000, 0);
+      ctx.lineTo(1000, 495);
+      ctx.bezierCurveTo(660, 535, 350, 430, 0, 598);
+      ctx.closePath();
+      ctx.fillStyle = accentColor;
+      ctx.fill();
+
+      // Brillo radial azul sutil en esquina superior izquierda (idéntico a Blue Code.png)
+      if (darkHeader) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(1000, 0);
+        ctx.lineTo(1000, 495);
+        ctx.bezierCurveTo(660, 535, 350, 430, 0, 598);
+        ctx.closePath();
+        ctx.clip();
+
+        const glow = ctx.createRadialGradient(180, 110, 20, 220, 180, 540);
+        glow.addColorStop(0, "rgba(8, 101, 245, 0.25)");
+        glow.addColorStop(0.55, "rgba(8, 124, 245, 0.08)");
+        glow.addColorStop(1, "rgba(6, 10, 20, 0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, 1000, 620);
+        ctx.restore();
+      }
+
+      // Línea luminosa azul en la curva S
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(-10, 599);
+      ctx.bezierCurveTo(350, 431, 660, 536, 1010, 496);
+      const waveGrad = ctx.createLinearGradient(0, 500, 1000, 500);
+      waveGrad.addColorStop(0, "#0550C8");
+      waveGrad.addColorStop(0.5, waveStrokeColor);
+      waveGrad.addColorStop(1, "#0696EE");
+      ctx.strokeStyle = data.borderStyle === "accent" ? accentColor : waveGrad;
+      ctx.lineWidth = 10;
+      ctx.shadowColor = "rgba(8, 101, 245, 0.52)";
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.restore();
+
+      roundRectPath(ctx, 2, 2, 996, 996, 80);
+      ctx.strokeStyle = darkBg ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+
+    if (showIcons) {
+      // Grupo HERO: Logo oficial BC en el encabezado
+      withGroupTransform(ctx, data, "hero", 238, 275, function () {
+        drawBlueCodeLogo(ctx, 134, 219, 112);
+      });
+
+      // Grupo NFC: Ilustración teléfono y mano + arco "Tap your phone"
+      withGroupTransform(ctx, data, "nfc", 310, 730, function () {
+        drawUnifiedMenuNfcIllustration(ctx, 306, 748, 0.90, textColor, darkBg ? bgColor : "#FFFFFF");
+        drawArcText(
+          ctx,
+          data.arcText || "Tap your phone",
+          0,
+          310,
+          810,
+          224,
+          (-124 * Math.PI) / 180,
+          (-56 * Math.PI) / 180,
+          31,
+          textColor
+        );
+      });
+    }
+
+    if (showText) {
+      // Grupo TITLE: "BLUE CODE" en una sola línea (o 2 líneas si el subtítulo es largo)
+      withGroupTransform(ctx, data, "title", 615, 275, function () {
+        ctx.save();
+        const w1 = (data.titleMain || "BLUE").trim();
+        const w2 = (data.subtitle || "CODE").trim();
+
+        if (w1.length + w2.length <= 13) {
+          ctx.font = "800 94px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.textBaseline = "alphabetic";
+          const w1Width = ctx.measureText(w1).width;
+          const w2Width = w2 ? ctx.measureText(w2).width : 0;
+          const spaceW = w2 ? 22 : 0;
+          const totalW = w1Width + spaceW + w2Width;
+          const startX = Math.max(352, 622 - totalW / 2);
+
+          ctx.textAlign = "left";
+          ctx.fillStyle = headerPrimaryColor;
+          ctx.fillText(w1, startX, 309);
+
+          if (w2) {
+            ctx.fillStyle = "#0865F5";
+            ctx.fillText(w2, startX + w1Width + spaceW, 309);
+          }
+        } else {
+          ctx.textAlign = "center";
+          ctx.fillStyle = headerPrimaryColor;
+          ctx.font = "800 78px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillText(w1, 620, 275);
+
+          ctx.fillStyle = "#087CF5";
+          ctx.font = "700 34px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillText(w2, 620, 332);
+        }
+        ctx.restore();
+      });
+    }
+
+    if (showQr) {
+      withGroupTransform(ctx, data, "qr", 725, 715, function () {
+        const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
+        const captionMode = data.qrCaptionMode || "bottom-text";
+        const isClean = captionMode === "clean";
+        const hasId = captionMode === "bottom-text-id";
+        const qrSize = isClean ? 256 : (hasId ? 228 : 244);
+        const qrX = 725 - qrSize / 2;
+        const qrY = isClean ? 592 : 596;
+
+        const qrOpts = buildQrOptionsFromData("bluecode", data, "#111111", darkBg || data.qrBoxCard);
+        if (!data.frameStyle || data.frameStyle === "none") {
+          qrOpts.frameStyle = "corners";
+        }
+
+        drawQrMatrix(ctx, targetUrl, qrX, qrY, qrSize, qrOpts);
+
+        if (!isClean) {
+          ctx.save();
+          ctx.fillStyle = textColor;
+          ctx.textAlign = "center";
+          ctx.font = "500 38px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillText("or", 506, 735);
+
+          ctx.font = "500 31px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillText(data.qrCaptionText || "Scan QR code", 725, 572);
+
+          if (hasId) {
+            ctx.globalAlpha = 0.82;
+            ctx.font = "600 20px 'JetBrains Mono', monospace";
+            ctx.fillText((data.slug || "TAG-ID").toUpperCase(), 725, qrY + qrSize + 30);
+          }
+          ctx.restore();
+        }
+      });
+    }
+
+    if (showBrand) {
+      withGroupTransform(ctx, data, "brand", 500, 948, function () {
+        drawPoweredByBlueCodeFooter(ctx, 500, 956, {
+          lowercase: true,
+          fontSize: 25,
+          brandFontSize: 28,
+          logoHeight: 30,
+          prefixColor: darkBg ? "rgba(255,255,255,0.78)" : "#333333",
+          brandColor: darkBg ? "#FFFFFF" : "#0F172A"
+        });
+      });
+    }
+
+    if (!layerFilter || layerFilter === "all") {
+      drawSelectionOverlayIfActive(ctx, "bluecode", data);
+    }
+
+    ctx.restore();
+  }
+
+  // ============================================================================
+  // 5 & 6. RENDERIZADOR PLACAS COMIDA 1 Y COMIDA 2 (BURGER & CO.)
+  // ============================================================================
+  function renderComidaPlaque(ctx, W, H, data, layerFilter, variant) {
+    const S = W / 1000;
+    ctx.save();
+    ctx.scale(S, S);
+
+    const showBg = !layerFilter || layerFilter === "all" || layerFilter === "bg";
+    const showIcons = !layerFilter || layerFilter === "all" || layerFilter === "icons";
+    const showText = !layerFilter || layerFilter === "all" || layerFilter === "text";
+    const showBrand = !layerFilter || layerFilter === "all" || layerFilter === "brand";
+    const showQr = !layerFilter || layerFilter === "all" || layerFilter === "qr";
+
+    const isComida2 = variant === "comida2";
+    const defaultAccent = isComida2 ? "#1E1E1E" : "#C8102E";
+    const bgColor = data.bgColor || "#FFFFFF";
+    const textColor = data.textColor || "#1B1A1A";
+    const accentColor = data.accentColor || defaultAccent;
+    const peachWaveColor = "#FAD9C8";
+    const darkBg = isHexDark(bgColor);
+    const darkHeader = isHexDark(accentColor);
+    const headerContentColor = darkHeader ? "#FFFFFF" : "#111827";
+
+    const titleMain = (data.titleMain || "BURGER & CO.").trim();
+    const subtitle = (data.subtitle || "Sabor al instante").trim();
+    const heroOff = getGroupOffset(data, "hero");
+    const titleOff = getGroupOffset(data, "title");
+    const headerImg = isComida2 ? headerAssets.comida2 : headerAssets.comida1;
+    const hasLoadedImg = Boolean(headerImg && headerImg.complete && headerImg.naturalWidth > 0);
+
+    // Si el usuario mantiene el título/subtítulo original y el estilo original, usamos el arte ilustrado 100% original
+    const useOriginalArtwork =
+      hasLoadedImg &&
+      data.borderStyle !== "accent" &&
+      titleMain.toUpperCase() === "BURGER & CO." &&
+      subtitle.toLowerCase() === "sabor al instante" &&
+      heroOff.x === 0 && heroOff.y === 0 && heroOff.scale === 1 &&
+      titleOff.x === 0 && titleOff.y === 0 && titleOff.scale === 1;
+
+    roundRectPath(ctx, 0, 0, 1000, 1000, 82);
+    ctx.clip();
+
+    if (showBg) {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, 1000, 1000);
+
+      if (useOriginalArtwork) {
+        ctx.drawImage(headerImg, 0, 0, 1000, 550);
+      } else {
+        // Sub-onda color durazno (#FAD9C8)
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(1000, 0);
+        ctx.lineTo(1000, 492);
+        ctx.bezierCurveTo(760, 505, 520, 365, 0, 542);
+        ctx.closePath();
+        ctx.fillStyle = peachWaveColor;
+        ctx.fill();
+
+        // Onda principal (Rojo Burger o Negro Gourmet o color personalizado)
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(1000, 0);
+        ctx.lineTo(1000, 472);
+        ctx.bezierCurveTo(760, 485, 520, 342, 0, 520);
+        ctx.closePath();
+        ctx.fillStyle = accentColor;
+        ctx.fill();
+      }
+
+      roundRectPath(ctx, 2, 2, 996, 996, 80);
+      ctx.strokeStyle = darkBg ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+
+    if (showIcons) {
+      if (!useOriginalArtwork) {
+        withGroupTransform(ctx, data, "hero", 500, 138, function () {
+          drawBurgerFriesHeroIcon(ctx, 500, 132, headerContentColor);
+        });
+      }
+
+      withGroupTransform(ctx, data, "nfc", 338, 720, function () {
+        drawUnifiedMenuNfcIllustration(ctx, 338, 732, 0.96, textColor, darkBg ? bgColor : "#FFFFFF");
+        drawArcText(
+          ctx,
+          data.arcText || "TAP YOUR PHONE",
+          3,
+          342,
+          795,
+          228,
+          (-126 * Math.PI) / 180,
+          (-54 * Math.PI) / 180,
+          33,
+          textColor
+        );
+      });
+    }
+
+    if (showText && !useOriginalArtwork) {
+      withGroupTransform(ctx, data, "title", 500, 320, function () {
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.fillStyle = headerContentColor;
+        ctx.shadowColor = "rgba(0,0,0,0.45)";
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 5;
+
+        const fontSizeMain = titleMain.length > 14 ? 76 : 96;
+        ctx.font = "800 " + fontSizeMain + "px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillText(titleMain, 500, 320);
+
+        ctx.font = "500 38px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillText(subtitle, 500, 386);
+        ctx.restore();
+      });
+    }
+
+    if (showQr) {
+      withGroupTransform(ctx, data, "qr", 760, 714, function () {
+        const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app";
+        const captionMode = data.qrCaptionMode || "bottom-text-id";
+        const isClean = captionMode === "clean";
+        const boxSize = isClean ? 248 : 232;
+        const boxX = 760 - boxSize / 2;
+        const boxY = isClean ? 580 : 598;
+        const qrPad = 18;
+        const qrSize = boxSize - qrPad * 2;
+
+        ctx.save();
+        ctx.shadowColor = "rgba(132, 53, 17, 0.12)";
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 4;
+        roundRectPath(ctx, boxX, boxY, boxSize, boxSize, 18);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+        ctx.restore();
+
+        roundRectPath(ctx, boxX, boxY, boxSize, boxSize, 18);
+        ctx.strokeStyle = "#F5D0C5";
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+
+        drawQrMatrix(
+          ctx,
+          targetUrl,
+          boxX + qrPad,
+          boxY + qrPad,
+          qrSize,
+          buildQrOptionsFromData(variant, data, "#843511", false)
+        );
+
+        if (!isClean) {
+          ctx.save();
+          ctx.textAlign = "center";
+          ctx.fillStyle = textColor;
+          ctx.font = "500 25px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillText("OR", 760, 542);
+          ctx.font = "800 29px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillText((data.qrCaptionText || "SCAN QR").toUpperCase(), 760, 578);
+
+          if (captionMode === "bottom-text-id") {
+            ctx.fillStyle = textColor;
+            ctx.globalAlpha = 0.85;
+            ctx.font = "600 21px 'JetBrains Mono', monospace";
+            ctx.fillText((data.slug || "BURGER-AND-CO").toUpperCase(), 760, 868);
+          }
+          ctx.restore();
+        }
+      });
+    }
+
+    if (showBrand) {
+      withGroupTransform(ctx, data, "brand", 500, 945, function () {
+        drawPoweredByBlueCodeFooter(ctx, 500, 954, {
+          lowercase: true,
+          fontSize: 27,
+          brandFontSize: 30,
+          logoHeight: 33,
+          prefixColor: darkBg ? "rgba(255,255,255,0.78)" : "#222222",
+          brandColor: darkBg ? "#FFFFFF" : "#0F172A"
+        });
+      });
+    }
+
+    if (!layerFilter || layerFilter === "all") {
+      drawSelectionOverlayIfActive(ctx, variant, data);
+    }
+
+    ctx.restore();
+  }
+
   function renderPlaqueToCanvas(canvas, motif, widthPx, heightPx, data, layerFilter) {
     canvas.width = widthPx;
     canvas.height = heightPx;
@@ -1582,6 +2151,10 @@
       renderGooglePlaque(ctx, widthPx, heightPx, data, layerFilter);
     } else if (motif === "instagram") {
       renderInstagramPlaque(ctx, widthPx, heightPx, data, layerFilter);
+    } else if (motif === "bluecode") {
+      renderBlueCodePlaque(ctx, widthPx, heightPx, data, layerFilter);
+    } else if (motif === "comida1" || motif === "comida2") {
+      renderComidaPlaque(ctx, widthPx, heightPx, data, layerFilter, motif);
     } else {
       renderMenuPlaque(ctx, widthPx, heightPx, data, layerFilter);
     }
@@ -1798,6 +2371,7 @@
     drawBlueCodeLogo: drawBlueCodeLogo,
     drawQrMatrix: drawQrMatrix,
     setCustomQrLogoImage: setCustomQrLogoImage,
+    onAssetsLoaded: setOnAssetsLoaded,
     getTransformedHitBoxes: getTransformedHitBoxes,
     renderPlaqueToCanvas: renderPlaqueToCanvas,
     exportLayeredPsdFile: exportLayeredPsdFile,
