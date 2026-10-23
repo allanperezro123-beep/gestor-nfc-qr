@@ -38,74 +38,83 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
     body {
       background-color: var(--bg);
       color: var(--text);
       font-family: var(--font);
       min-height: 100vh;
-      line-height: 1.5;
+      line-height: 1.45;
       -webkit-font-smoothing: antialiased;
-      padding-bottom: 96px;
+      padding-bottom: 92px;
     }
 
     .container {
       max-width: 1320px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 20px;
+      width: 100%;
     }
 
     /* Header Minimalista BlueCode */
     header {
-      background: rgba(8, 9, 13, 0.9);
+      background: rgba(8, 9, 13, 0.92);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 40;
-      padding: 12px 0;
+      padding: 9px 0;
     }
     .header-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
+      gap: 10px;
       flex-wrap: wrap;
     }
     .brand-link {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 9px;
       text-decoration: none;
       color: inherit;
+      min-width: 0;
     }
     .brand-logo-img {
-      height: 24px;
+      height: 22px;
       width: auto;
       display: block;
+      flex-shrink: 0;
     }
     .brand-title {
-      font-size: 0.98rem;
+      font-size: 0.94rem;
       font-weight: 700;
       letter-spacing: -0.01em;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      white-space: nowrap;
     }
     .brand-pill {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       background: rgba(8, 208, 230, 0.1);
       color: var(--bc-cyan);
       border: 1px solid rgba(8, 208, 230, 0.25);
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 4px;
+      white-space: nowrap;
     }
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
@@ -114,17 +123,18 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
+      gap: 6px;
       font-family: var(--font);
-      font-size: 0.83rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      padding: 8px 14px;
+      padding: 7px 12px;
       border-radius: 6px;
       border: 1px solid transparent;
       cursor: pointer;
       transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
       text-decoration: none;
       white-space: nowrap;
+      min-width: 0;
     }
     .btn:active { transform: translateY(1px); }
     .btn-bc {
@@ -148,41 +158,41 @@
       color: #fca5a5;
     }
     .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
-    .btn-sm { padding: 5px 10px; font-size: 0.77rem; }
+    .btn-sm { padding: 5px 9px; font-size: 0.74rem; }
 
     /* Barra Superior de Estadísticas y Filtros Rápidos */
     .stats-filter-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      margin: 20px 0 12px;
+      gap: 10px;
+      margin: 14px 0 10px;
       flex-wrap: wrap;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 9px;
-      padding: 10px 16px;
+      padding: 8px 14px;
     }
     .kpi-pills-row {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
     }
     .kpi-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
+      gap: 5px;
+      font-size: 0.75rem;
       color: var(--text-muted);
     }
     .kpi-badge strong {
       font-family: var(--mono);
-      font-size: 0.86rem;
+      font-size: 0.82rem;
       color: var(--text);
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
-      padding: 1px 7px;
+      padding: 1px 6px;
       border-radius: 5px;
     }
     .filter-pills-group {
@@ -199,12 +209,13 @@
       border: none;
       color: var(--text-muted);
       font-family: var(--font);
-      font-size: 0.74rem;
+      font-size: 0.73rem;
       font-weight: 600;
       padding: 4px 10px;
       border-radius: 5px;
       cursor: pointer;
       transition: all 0.15s ease;
+      text-align: center;
     }
     .filter-pill-btn:hover { color: var(--text); }
     .filter-pill-btn.active {
@@ -217,15 +228,15 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      margin: 12px 0 14px;
+      gap: 10px;
+      margin: 10px 0 12px;
       flex-wrap: wrap;
     }
     .search-box {
       position: relative;
-      flex: 1;
+      flex: 1 1 240px;
       max-width: 380px;
-      min-width: 220px;
+      min-width: 0;
     }
     .search-box svg {
       position: absolute;
@@ -239,10 +250,10 @@
       width: 100%;
       background: var(--surface);
       border: 1px solid var(--border);
-      padding: 8px 30px 8px 34px;
+      padding: 7px 30px 7px 32px;
       border-radius: 6px;
       color: var(--text);
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       outline: none;
       transition: border-color 0.15s ease;
     }
@@ -266,18 +277,18 @@
     .toolbar-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
     /* Tabla / Lista de Tags */
     .table-header {
       display: grid;
-      grid-template-columns: 36px 1.2fr 1.3fr 1.6fr 110px;
+      grid-template-columns: 32px 1.2fr 1.3fr 1.6fr 104px;
       align-items: center;
-      gap: 12px;
-      padding: 8px 16px;
-      font-size: 0.72rem;
+      gap: 10px;
+      padding: 7px 14px;
+      font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -291,8 +302,8 @@
     .tags-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-top: 8px;
+      gap: 7px;
+      margin-top: 6px;
     }
 
     /* Fila / Tarjeta Minimalista */
@@ -300,12 +311,13 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       display: grid;
-      grid-template-columns: 36px 1.2fr 1.3fr 1.6fr 110px;
+      grid-template-columns: 32px 1.2fr 1.3fr 1.6fr 104px;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       transition: border-color 0.15s ease, background-color 0.15s ease;
+      min-width: 0;
     }
     .tag-row:hover {
       background: var(--surface-hover);
@@ -321,8 +333,29 @@
 
     @media (max-width: 860px) {
       .tag-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: 22px minmax(0, 1fr) auto;
+        gap: 8px;
+        padding: 10px 12px;
+      }
+      .tag-row .custom-check {
+        grid-column: 1;
+        grid-row: 1;
+      }
+      .tag-row .cell-info {
+        grid-column: 2;
+        grid-row: 1;
+      }
+      .tag-row .cell-actions {
+        grid-column: 3;
+        grid-row: 1;
+      }
+      .tag-row .cell-fixed {
+        grid-column: 1 / -1;
+        grid-row: 2;
+      }
+      .tag-row .cell-dest {
+        grid-column: 1 / -1;
+        grid-row: 3;
       }
     }
 
@@ -349,11 +382,11 @@
     .tag-name-row {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       min-width: 0;
     }
     .tag-name-text {
-      font-size: 0.9rem;
+      font-size: 0.86rem;
       font-weight: 700;
       color: var(--text);
       overflow: hidden;
@@ -361,16 +394,20 @@
       white-space: nowrap;
     }
     .btn-rename-tag {
-      opacity: 0;
+      opacity: 0.35;
       transition: opacity 0.15s ease;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       padding: 2px 4px;
+      flex-shrink: 0;
     }
     .tag-row:hover .btn-rename-tag {
-      opacity: 0.85;
+      opacity: 0.9;
+    }
+    @media (hover: none), (max-width: 860px) {
+      .btn-rename-tag { opacity: 0.75; }
     }
     .tag-meta-sub {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text-dim);
       display: flex;
       align-items: center;
@@ -378,7 +415,7 @@
       flex-wrap: wrap;
     }
     .badge-dest-type {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       padding: 1px 5px;
       border-radius: 3px;
       background: rgba(255, 255, 255, 0.05);
@@ -395,18 +432,20 @@
       gap: 6px;
       background: rgba(0, 0, 0, 0.3);
       border: 1px solid var(--border);
-      padding: 5px 8px;
+      padding: 4px 8px;
       border-radius: 5px;
       min-width: 0;
     }
     .fixed-link-display {
       font-family: var(--mono);
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       color: #93c5fd;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       cursor: pointer;
+      min-width: 0;
+      flex: 1;
     }
     .fixed-link-display:hover {
       text-decoration: underline;
@@ -415,7 +454,7 @@
     .fixed-actions {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       flex-shrink: 0;
     }
     .btn-icon {
@@ -427,6 +466,7 @@
       border-radius: 4px;
       display: flex;
       align-items: center;
+      justify-content: center;
     }
     .btn-icon:hover { color: #fff; background: rgba(255,255,255,0.08); }
 
@@ -442,8 +482,8 @@
       background: #090c12;
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #fff;
-      font-size: 0.82rem;
-      padding: 6px 10px;
+      font-size: 0.8rem;
+      padding: 5px 9px;
       border-radius: 5px;
       outline: none;
       min-width: 0;
@@ -457,13 +497,14 @@
       background: var(--surface-elevated);
       border: 1px solid var(--border);
       color: var(--text-muted);
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       font-weight: 600;
-      padding: 6px 10px;
+      padding: 5px 9px;
       border-radius: 5px;
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.15s ease;
+      flex-shrink: 0;
     }
     .btn-save-inline:hover,
     .btn-save-inline.dirty {
@@ -478,23 +519,27 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 4px;
+      gap: 3px;
     }
 
     /* Barra Flotante de Acciones Masivas */
     .bulk-bar {
       position: fixed;
-      bottom: 24px;
+      bottom: 14px;
       left: 50%;
-      transform: translateX(-50%) translateY(120px);
-      background: #11141e;
-      border: 1px solid rgba(8, 101, 245, 0.35);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-      padding: 10px 18px;
+      transform: translateX(-50%) translateY(140px);
+      width: calc(100vw - 20px);
+      max-width: 660px;
+      background: rgba(17, 20, 30, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(8, 101, 245, 0.4);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.65);
+      padding: 9px 12px;
       border-radius: 10px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
+      gap: 6px;
       z-index: 50;
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       flex-wrap: wrap;
@@ -503,12 +548,13 @@
       transform: translateX(-50%) translateY(0);
     }
     .bulk-count-badge {
-      font-size: 0.8rem;
+      font-size: 0.76rem;
       font-weight: 700;
       color: var(--bc-cyan);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      margin-right: 4px;
     }
 
     /* Modales */
@@ -521,7 +567,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 10px;
     }
     .modal-backdrop.open { display: flex; }
     .modal-box {
@@ -529,36 +575,45 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       width: 100%;
-      max-width: 520px;
-      max-height: calc(100vh - 32px);
+      max-width: 480px;
+      max-height: calc(100vh - 20px);
+      max-height: calc(100dvh - 20px);
       overflow-y: auto;
-      padding: 22px 24px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+      overflow-x: hidden;
+      padding: 16px 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
     }
-    .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-    .modal-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; }
+    .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 3px; }
+    .modal-subtitle { font-size: 0.74rem; color: var(--text-muted); margin-bottom: 10px; line-height: 1.35; }
 
-    .form-row { margin-bottom: 14px; }
+    .form-row { margin-bottom: 11px; }
     .form-row label {
       display: block;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 600;
       color: var(--text-muted);
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
     .form-control {
       width: 100%;
       background: #090b10;
       border: 1px solid var(--border);
       color: var(--text);
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       font-family: var(--font);
-      padding: 8px 12px;
+      padding: 7px 10px;
       border-radius: 6px;
       outline: none;
+      min-width: 0;
     }
     .form-control:focus { border-color: var(--bc-blue); }
-    .hint-text { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; }
+    .hint-text {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+    }
 
     /* Selector de Tipo de Destino con Tabs */
     .dest-type-tabs {
@@ -568,58 +623,79 @@
       padding: 4px;
       border-radius: 6px;
       border: 1px solid var(--border);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .type-tab {
       background: none;
       border: none;
       color: var(--text-muted);
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      padding: 5px 9px;
+      padding: 5px 8px;
       border-radius: 4px;
       cursor: pointer;
       white-space: nowrap;
+      flex-shrink: 0;
     }
     .type-tab.active {
       background: rgba(8, 101, 245, 0.2);
       color: #93c5fd;
     }
 
-    /* Modal QR Studio */
+    /* Modal QR Studio Compacto */
     .qr-export-preview {
       background: #ffffff;
-      padding: 16px;
+      padding: 10px 14px;
       border-radius: 8px;
-      display: inline-block;
-      margin: 10px auto 12px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 4px auto 8px;
+      max-width: 100%;
     }
     .qr-export-label {
       color: #0f172a;
       font-weight: 700;
-      font-size: 0.86rem;
+      font-size: 0.78rem;
       text-align: center;
-      margin-top: 6px;
+      margin-top: 4px;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .qr-modal-controls-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      text-align: left;
+      margin-bottom: 10px;
     }
     .export-options-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 8px;
-      margin-top: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .export-options-grid .btn-span-full {
+      grid-column: 1 / -1;
     }
 
     /* Toast */
     .toast {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      bottom: 18px;
+      right: 16px;
+      left: auto;
+      max-width: calc(100vw - 32px);
       background: #11141e;
       border: 1px solid rgba(8, 101, 245, 0.4);
       color: #fff;
-      padding: 10px 18px;
+      padding: 9px 14px;
       border-radius: 8px;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 600;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       z-index: 200;
@@ -639,35 +715,37 @@
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
     }
     #gateScreen.active { display: flex; }
 
     /* ==========================================================
-       ESTUDIO DE PLACAS (GOOGLE · MENÚ · INSTAGRAM)
+       ESTUDIO DE PLACAS (6 PLANTILLAS OFICIALES)
        ========================================================== */
     .view-switcher {
       display: inline-flex;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 3px;
-      gap: 4px;
+      border-radius: 7px;
+      padding: 2px;
+      gap: 3px;
     }
     .view-tab-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
       font-family: var(--font);
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 6px;
+      padding: 5px 10px;
+      border-radius: 5px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      gap: 5px;
       transition: all 0.16s ease;
+      white-space: nowrap;
     }
     .view-tab-btn:hover {
       color: var(--text);
@@ -675,12 +753,12 @@
     .view-tab-btn.active {
       background: var(--bc-gradient);
       color: #fff;
-      box-shadow: 0 2px 10px rgba(8, 101, 245, 0.3);
+      box-shadow: 0 2px 8px rgba(8, 101, 245, 0.3);
     }
 
     #plaqueStudioSection {
       display: none;
-      padding-top: 20px;
+      padding-top: 14px;
     }
     #plaqueStudioSection.active {
       display: block;
@@ -690,43 +768,43 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 16px 20px;
-      margin-bottom: 14px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 10px;
     }
 
     .plaque-config-bar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 12px;
+      gap: 8px 12px;
       background: var(--surface-elevated);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 10px 16px;
-      margin-bottom: 14px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
     }
 
     .cm-input-group {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 4px 10px;
+      padding: 3px 8px;
     }
     .cm-input-group input {
-      width: 52px;
+      width: 44px;
       background: transparent;
       border: none;
       color: var(--text);
       font-family: var(--mono);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
       text-align: center;
       outline: none;
@@ -736,8 +814,8 @@
       border: 1px solid var(--border);
       color: var(--text-muted);
       font-family: var(--mono);
-      font-size: 0.72rem;
-      padding: 4px 8px;
+      font-size: 0.7rem;
+      padding: 4px 7px;
       border-radius: 5px;
       cursor: pointer;
       transition: all 0.14s ease;
@@ -748,27 +826,67 @@
       background: rgba(8, 208, 230, 0.1);
     }
 
+    /* Filtro Rápido de Plantillas (Ideal para Móvil y Escritorio) */
+    .plaque-template-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 2px 10px;
+      scrollbar-width: none;
+    }
+    .plaque-template-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+    .motif-filter-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.73rem;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .motif-filter-pill:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+    .motif-filter-pill.active {
+      background: rgba(8, 101, 245, 0.2);
+      border-color: var(--bc-cyan);
+      color: #fff;
+    }
+
     .plaque-cards-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 28px;
+      gap: 14px;
+      margin-bottom: 24px;
     }
 
     .plaque-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 11px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 11px;
+      gap: 8px;
       transition: border-color 0.18s ease, box-shadow 0.18s ease;
       min-width: 0;
     }
+    .plaque-card.hidden-by-filter {
+      display: none !important;
+    }
     .plaque-card.selected-motif {
       border-color: rgba(8, 101, 245, 0.55);
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.32);
     }
     .plaque-card.disabled-motif {
       opacity: 0.55;
@@ -778,44 +896,50 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
+      min-width: 0;
     }
     .plaque-card-title {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       font-weight: 700;
-      font-size: 0.94rem;
+      font-size: 0.86rem;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .qty-badge-control {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 3px 8px;
-      font-size: 0.74rem;
+      padding: 2px 6px;
+      font-size: 0.7rem;
       color: var(--text-muted);
+      flex-shrink: 0;
     }
     .qty-badge-control input {
-      width: 42px;
+      width: 36px;
       background: transparent;
       border: none;
       color: var(--bc-cyan);
       font-family: var(--mono);
       font-weight: 700;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       text-align: center;
       outline: none;
     }
 
-    /* Padding superior e inferior amplio para que los botones/badges NUNCA tapen el canvas */
+    /* Vista previa de Placa: Compacta, centrada y sin tapar elementos */
     .plaque-canvas-wrap {
       background: radial-gradient(circle at center, #1b2030 0%, #0b0d14 100%);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 36px 16px 34px;
+      border-radius: 9px;
+      padding: 26px 10px 24px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -824,11 +948,11 @@
     }
     .plaque-canvas-wrap canvas {
       width: 100%;
-      max-width: 300px;
+      max-width: 235px;
       height: auto;
       aspect-ratio: 1 / 1;
-      border-radius: 10px;
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
+      border-radius: 9px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
       cursor: grab;
       touch-action: none;
       transition: box-shadow 0.15s ease;
@@ -838,29 +962,28 @@
     }
     .plaque-drag-hint {
       position: absolute;
-      top: 7px;
-      left: 10px;
-      background: rgba(8, 9, 13, 0.88);
-      border: 1px solid rgba(8, 208, 230, 0.28);
+      top: 5px;
+      left: 7px;
+      background: rgba(8, 9, 13, 0.85);
+      border: 1px solid rgba(8, 208, 230, 0.25);
       color: var(--bc-cyan);
-      font-size: 0.64rem;
+      font-size: 0.58rem;
       font-weight: 600;
-      padding: 2px 8px;
+      padding: 1px 6px;
       border-radius: 4px;
       pointer-events: none;
-      backdrop-filter: blur(4px);
     }
     .plaque-reset-btn {
       position: absolute;
-      top: 7px;
-      right: 10px;
+      top: 5px;
+      right: 7px;
       background: rgba(15, 17, 24, 0.9);
       border: 1px solid var(--border);
       color: var(--text-muted);
       font-family: var(--font);
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       font-weight: 600;
-      padding: 2px 8px;
+      padding: 1px 6px;
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -872,44 +995,45 @@
     }
     .plaque-size-pill {
       position: absolute;
-      bottom: 7px;
-      right: 10px;
-      background: rgba(8, 9, 13, 0.86);
+      bottom: 5px;
+      right: 7px;
+      background: rgba(8, 9, 13, 0.85);
       border: 1px solid var(--border);
       color: var(--text-muted);
       font-family: var(--mono);
-      font-size: 0.66rem;
-      padding: 2px 8px;
+      font-size: 0.58rem;
+      padding: 1px 6px;
       border-radius: 4px;
       pointer-events: none;
-      backdrop-filter: blur(4px);
     }
 
     .elem-adjust-bar {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: rgba(8, 101, 245, 0.06);
       border: 1px solid rgba(8, 101, 245, 0.22);
       border-radius: 7px;
-      padding: 6px 8px;
-      font-size: 0.71rem;
-      flex-wrap: wrap;
+      padding: 5px 7px;
+      font-size: 0.69rem;
+      min-width: 0;
     }
     .elem-adjust-bar select {
       background: var(--bg);
       border: 1px solid var(--border);
       color: var(--text);
       font-family: var(--font);
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 600;
-      padding: 3px 6px;
+      padding: 3px 5px;
       border-radius: 5px;
       outline: none;
+      max-width: 122px;
+      min-width: 0;
     }
     .elem-adjust-bar input[type="range"] {
       flex: 1;
-      min-width: 65px;
+      min-width: 45px;
       accent-color: var(--bc-cyan);
       cursor: pointer;
       height: 4px;
@@ -919,12 +1043,13 @@
       border: 1px solid var(--border);
       color: var(--text-muted);
       font-family: var(--font);
-      font-size: 0.66rem;
+      font-size: 0.64rem;
       font-weight: 600;
       padding: 2px 6px;
       border-radius: 4px;
       cursor: pointer;
       white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.14s ease;
     }
     .btn-center-elem:hover {
@@ -933,32 +1058,93 @@
       background: rgba(8, 208, 230, 0.12);
     }
 
+    /* Acordeón Desplegable de Personalización Avanzada por Tarjeta */
+    .plaque-custom-drawer {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .plaque-custom-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 7px 10px;
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: var(--bc-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      background: rgba(8, 101, 245, 0.05);
+      transition: background 0.15s ease;
+    }
+    .plaque-custom-drawer > summary::-webkit-details-marker {
+      display: none;
+    }
+    .plaque-custom-drawer > summary:hover {
+      background: rgba(8, 101, 245, 0.11);
+    }
+    .plaque-custom-drawer > summary::after {
+      content: "▾ Editar";
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .plaque-custom-drawer[open] > summary {
+      border-bottom: 1px solid var(--border);
+    }
+    .plaque-custom-drawer[open] > summary::after {
+      content: "▴ Ocultar";
+      color: var(--bc-cyan);
+    }
+    .plaque-drawer-body {
+      padding: 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Grids internos seguros contra desbordes */
+    .plaque-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .plaque-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
+    }
+
     .plaque-color-strip {
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 6px;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 10px;
+      border-radius: 7px;
+      padding: 7px 8px;
     }
     .plaque-color-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
+      gap: 5px;
+      min-width: 0;
     }
     .btn-sync-colors {
       background: rgba(8, 208, 230, 0.08);
       border: 1px solid rgba(8, 208, 230, 0.25);
       color: var(--bc-cyan);
       font-family: var(--font);
-      font-size: 0.66rem;
+      font-size: 0.64rem;
       font-weight: 600;
-      padding: 3px 7px;
+      padding: 3px 6px;
       border-radius: 5px;
       cursor: pointer;
       white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.15s ease;
     }
     .btn-sync-colors:hover {
@@ -967,23 +1153,27 @@
     }
     .color-chip-group {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
     }
     .color-swatch-chip {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-      font-size: 0.7rem;
+      gap: 4px;
+      font-size: 0.67rem;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
       background: var(--surface-elevated);
       border: 1px solid var(--border);
-      padding: 4px 6px;
+      padding: 4px 5px;
       border-radius: 5px;
       transition: all 0.14s ease;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .color-swatch-chip:hover {
       border-color: rgba(255, 255, 255, 0.25);
@@ -992,8 +1182,8 @@
     .color-swatch-chip input[type="color"] {
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border: none;
       border-radius: 3px;
       background: transparent;
@@ -1012,29 +1202,35 @@
     .plaque-field-group {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
       transition: opacity 0.18s ease;
+      min-width: 0;
     }
     .plaque-field-group.dimmed-field {
       opacity: 0.38;
       pointer-events: none;
     }
     .plaque-field-group label {
-      font-size: 0.72rem;
+      font-size: 0.69rem;
       font-weight: 600;
       color: var(--text-muted);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .plaque-select, .plaque-input {
       width: 100%;
+      min-width: 0;
       background: var(--bg);
       border: 1px solid var(--border);
       color: var(--text);
       font-family: var(--font);
-      font-size: 0.78rem;
-      padding: 7px 10px;
+      font-size: 0.75rem;
+      padding: 6px 8px;
       border-radius: 6px;
       outline: none;
       transition: border-color 0.15s ease;
@@ -1045,11 +1241,15 @@
 
     .plaque-card-actions {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
       margin-top: auto;
-      padding-top: 8px;
+      padding-top: 7px;
       border-top: 1px solid var(--border);
+    }
+    .plaque-card-actions .btn {
+      padding: 5px 4px;
+      font-size: 0.7rem;
     }
 
     @media (max-width: 1120px) {
@@ -1057,9 +1257,125 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
+
+    /* ==========================================================
+       OPTIMIZACIÓN MÓVIL INTEGRAL (TODO TIPO DE CELULAR)
+       ========================================================== */
     @media (max-width: 760px) {
+      .container {
+        padding: 0 12px;
+      }
+      header {
+        padding: 7px 0;
+      }
+      .header-inner {
+        gap: 7px;
+      }
+      .brand-title {
+        font-size: 0.86rem;
+      }
+      .brand-pill {
+        display: none;
+      }
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+        gap: 5px;
+      }
+      .view-switcher {
+        order: 2;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .view-tab-btn {
+        font-size: 0.73rem;
+        padding: 6px 8px;
+      }
+      .stats-filter-bar {
+        padding: 8px 10px;
+        gap: 8px;
+        margin: 10px 0 8px;
+      }
+      .kpi-pills-row {
+        width: 100%;
+        justify-content: space-between;
+        gap: 6px;
+      }
+      .kpi-badge {
+        font-size: 0.71rem;
+      }
+      .filter-pills-group {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .top-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .search-box {
+        max-width: 100%;
+        flex: 1 1 auto;
+      }
+      .toolbar-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        width: 100%;
+      }
+      .toolbar-actions .btn {
+        width: 100%;
+        font-size: 0.72rem;
+        padding: 6px 8px;
+      }
+      .plaque-studio-header {
+        padding: 10px 12px;
+        gap: 8px;
+      }
+      .plaque-studio-header h2 {
+        font-size: 0.92rem !important;
+      }
+      .plaque-studio-header p {
+        font-size: 0.72rem !important;
+      }
+      .plaque-config-bar {
+        padding: 8px 10px;
+        gap: 7px;
+      }
       .plaque-cards-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .plaque-canvas-wrap {
+        padding: 24px 8px 22px;
+      }
+      .plaque-canvas-wrap canvas {
+        max-width: 215px;
+      }
+      .qr-modal-controls-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .modal-box {
+        padding: 14px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .btn-hide-xs {
+        display: none;
+      }
+      .plaque-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .bulk-bar {
+        padding: 8px;
+        gap: 5px;
+      }
+      .bulk-bar .btn {
+        font-size: 0.68rem;
+        padding: 4px 7px;
       }
     }
   </style>
@@ -1097,21 +1413,21 @@
             📋 Enlaces & QR
           </button>
           <button type="button" class="view-tab-btn" id="tabViewPlaques">
-            🪧 Estudio de Placas (6 Plantillas)
+            🪧 Estudio de Placas <span class="btn-hide-xs">(6)</span>
           </button>
         </div>
 
         <button type="button" class="btn btn-subtle btn-sm" id="btnShareLink" title="Copiar enlace de acceso directo para el equipo">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="15" x2="12" y2="2"></line></svg>
-          Link del Equipo
+          Link<span class="btn-hide-xs"> Equipo</span>
         </button>
         <button type="button" class="btn btn-subtle btn-sm" id="btnOpenBulkModal" title="Crear varios tags en serie o por lista">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-          Lote Masivo
+          Lote<span class="btn-hide-xs"> Masivo</span>
         </button>
         <button type="button" class="btn btn-bc btn-sm" id="btnOpenNewModal">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          Nuevo Tag / QR
+          Nuevo<span class="btn-hide-xs"> Tag / QR</span>
         </button>
       </div>
     </div>
@@ -1181,20 +1497,20 @@
       </div>
     </div>
 
-    <!-- VISTA 2: ESTUDIO GENERADOR DE PLACAS (GOOGLE · MENÚ · INSTAGRAM) -->
+    <!-- VISTA 2: ESTUDIO GENERADOR DE PLACAS (6 PLANTILLAS) -->
     <section id="plaqueStudioSection">
       <div class="plaque-studio-header">
         <div>
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <span class="brand-pill">600 DPI Ultra-HD · Interactivo & Editable</span>
-            <h2 style="font-size: 1.05rem; font-weight: 700;">Estudio Generador de Placas NFC & QR — Powered by BlueCode</h2>
+          <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 3px;">
+            <span class="brand-pill">600 DPI · Editable</span>
+            <h2 style="font-size: 0.98rem; font-weight: 700;">Estudio Generador de Placas NFC & QR</h2>
           </div>
-          <p style="font-size: 0.78rem; color: var(--text-muted);">
-            <strong>¡Arrastra cualquier elemento directamente sobre la tarjeta para moverlo o usa la rueda del mouse para cambiar su tamaño!</strong> Personaliza colores de fondo, elementos, modo <strong>QR Clean o con Texto Abajo</strong> y exporta en PDF Individual, PDF Masivo, PNG o Photoshop (`.PSD`).
+          <p style="font-size: 0.74rem; color: var(--text-muted);">
+            <strong>Toca o arrastra cualquier elemento sobre la placa para moverlo.</strong> Usa el desplegable de cada tarjeta para personalizar colores, QR y textos.
           </p>
         </div>
 
-        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
           <button type="button" class="btn btn-bc btn-sm" id="btnExportPlaquePdf" title="Generar PDF con todas las placas y copias seleccionadas en centímetros exactos">
             📄 Exportar PDF Selección
           </button>
@@ -1205,77 +1521,77 @@
       </div>
 
       <!-- Barra 1: Medidas en cm, Modo de PDF y Calidad Ultra-HD -->
-      <div class="plaque-config-bar" style="margin-bottom: 10px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 0.76rem; font-weight: 600; color: var(--text-muted);">Medida (cm):</span>
+      <div class="plaque-config-bar" style="margin-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+          <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-muted);">Medida:</span>
           <div class="cm-input-group">
-            <span style="font-size: 0.7rem; color: var(--text-dim);">Ancho</span>
+            <span style="font-size: 0.68rem; color: var(--text-dim);">Ancho</span>
             <input type="number" id="plaqueWidthCm" value="10" min="4" max="50" step="0.5" />
-            <span style="font-size: 0.75rem; color: var(--text-dim);">×</span>
-            <span style="font-size: 0.7rem; color: var(--text-dim);">Alto</span>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">×</span>
+            <span style="font-size: 0.68rem; color: var(--text-dim);">Alto</span>
             <input type="number" id="plaqueHeightCm" value="10" min="4" max="50" step="0.5" />
-            <span style="font-size: 0.72rem; font-family: var(--mono); color: var(--bc-cyan);">cm</span>
+            <span style="font-size: 0.7rem; font-family: var(--mono); color: var(--bc-cyan);">cm</span>
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 5px;">
+        <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
           <button type="button" class="cm-preset-btn" data-w="8" data-h="8">8×8</button>
           <button type="button" class="cm-preset-btn active" data-w="10" data-h="10">10×10</button>
           <button type="button" class="cm-preset-btn" data-w="12" data-h="12">12×12</button>
           <button type="button" class="cm-preset-btn" data-w="15" data-h="15">15×15</button>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <span style="font-size: 0.74rem; color: var(--text-muted);">Calidad:</span>
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">DPI:</span>
           <select id="plaqueExportDpi" class="plaque-select" style="width: auto;">
-            <option value="600" selected>Ultra-HD 600 DPI (Imprenta)</option>
-            <option value="300">Alta 300 DPI (Estándar)</option>
+            <option value="600" selected>600 DPI (Imprenta)</option>
+            <option value="300">300 DPI (Estándar)</option>
           </select>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-left: auto;">
           <input type="file" id="inputCustomQrLogo" accept="image/*" style="display: none;" />
           <button type="button" class="btn btn-subtle btn-sm" id="btnUploadCustomQrLogo" style="border-color: rgba(8, 208, 230, 0.35); color: var(--bc-cyan);" title="Subir tu propio logo PNG/SVG para el centro de los códigos QR">
-            🖼️ Subir Tu Logo QR
+            🖼️ Subir Logo QR
           </button>
-          <select id="plaquePdfMode" class="plaque-select" style="width: auto; min-width: 195px;">
-            <option value="sheet">PDF: Hoja con Guías de Corte</option>
-            <option value="exact">PDF: 1:1 Tamaño Exacto en cm</option>
+          <select id="plaquePdfMode" class="plaque-select" style="width: auto;">
+            <option value="sheet">PDF: Con Guías de Corte</option>
+            <option value="exact">PDF: 1:1 Tamaño Exacto</option>
           </select>
         </div>
       </div>
 
       <!-- Barra 2: Personalizador Avanzado de QR Único -->
-      <div class="plaque-config-bar" style="margin-bottom: 18px; background: rgba(8, 101, 245, 0.05); border-color: rgba(8, 101, 245, 0.22);">
-        <span style="font-size: 0.75rem; font-weight: 700; color: var(--bc-cyan);">✨ Estilo Único del QR:</span>
+      <div class="plaque-config-bar" style="margin-bottom: 12px; background: rgba(8, 101, 245, 0.05); border-color: rgba(8, 101, 245, 0.22);">
+        <span style="font-size: 0.73rem; font-weight: 700; color: var(--bc-cyan);">✨ Estilo Global QR:</span>
 
-        <div style="display: flex; align-items: center; gap: 5px;">
-          <span style="font-size: 0.72rem; color: var(--text-muted);">Trama:</span>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Trama:</span>
           <select id="plaqueGlobalQrStyle" class="plaque-select" style="width: auto;">
-            <option value="auto" selected>✨ Original de Plantilla</option>
-            <option value="classic">⬛ Cuadrados Nítidos</option>
-            <option value="rounded">🔲 Redondeado Moderno</option>
-            <option value="dots">⚫ Puntos Circulares</option>
-            <option value="liquid">💧 Barras Líquidas Fluido</option>
-            <option value="diamond">🔷 Diamantes / Rombos</option>
-            <option value="star">✨ Micro-Estrellas</option>
+            <option value="auto" selected>✨ Original</option>
+            <option value="classic">⬛ Cuadrados</option>
+            <option value="rounded">🔲 Redondeado</option>
+            <option value="dots">⚫ Puntos</option>
+            <option value="liquid">💧 Líquido</option>
+            <option value="diamond">🔷 Rombos</option>
+            <option value="star">✨ Estrellas</option>
           </select>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 5px;">
-          <span style="font-size: 0.72rem; color: var(--text-muted);">Ojos (Esquinas):</span>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Ojos:</span>
           <select id="plaqueGlobalQrEyeStyle" class="plaque-select" style="width: auto;">
-            <option value="auto" selected>✨ Original de Plantilla</option>
-            <option value="square">Cuadrado Clásico</option>
-            <option value="rounded">Anillo Redondeado</option>
-            <option value="circle">Círculo Perfecto</option>
-            <option value="leaf">Hoja / Gota Boutique</option>
-            <option value="shield">Escudo / Diamante</option>
+            <option value="auto" selected>✨ Original</option>
+            <option value="square">Cuadrado</option>
+            <option value="rounded">Redondeado</option>
+            <option value="circle">Círculo</option>
+            <option value="leaf">Hoja / Gota</option>
+            <option value="shield">Escudo</option>
           </select>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 5px;">
-          <span style="font-size: 0.72rem; color: var(--text-muted);">Color Ojos:</span>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Color Ojos:</span>
           <select id="plaqueGlobalEyeColorMode" class="plaque-select" style="width: auto;">
             <option value="match">Igual al QR</option>
             <option value="bc-blue">Azul BlueCode</option>
@@ -1283,26 +1599,37 @@
           </select>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 5px;">
-          <span style="font-size: 0.72rem; color: var(--text-muted);">Escudo Logo:</span>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Escudo:</span>
           <select id="plaqueGlobalLogoShape" class="plaque-select" style="width: auto;">
             <option value="rounded">Cuadrado Suave</option>
-            <option value="circle">Medallón Circular</option>
-            <option value="clean">Recorte Limpio</option>
+            <option value="circle">Circular</option>
+            <option value="clean">Limpio</option>
           </select>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 5px;">
-          <span style="font-size: 0.72rem; color: var(--text-muted);">Marco QR:</span>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Marco:</span>
           <select id="plaqueGlobalFrameStyle" class="plaque-select" style="width: auto;">
-            <option value="none">Sin Marco Extra</option>
-            <option value="scan-bottom">Pastilla "ESCANÉAME"</option>
-            <option value="corners">4 Esquinas Visor</option>
+            <option value="none">Sin Marco</option>
+            <option value="scan-bottom">"ESCANÉAME"</option>
+            <option value="corners">4 Esquinas</option>
           </select>
         </div>
       </div>
 
-      <!-- Grid de los 3 Motivos -->
+      <!-- Barra de Filtro Rápido por Plantilla (Ideal en móvil para ver 1 o todas) -->
+      <div class="plaque-template-filter-bar" id="plaqueTemplateFilterBar">
+        <button type="button" class="motif-filter-pill active" data-filter-motif="all">✨ Todas (6)</button>
+        <button type="button" class="motif-filter-pill" data-filter-motif="google">⭐ Google</button>
+        <button type="button" class="motif-filter-pill" data-filter-motif="menu">🍴 Menú</button>
+        <button type="button" class="motif-filter-pill" data-filter-motif="instagram">📸 Instagram</button>
+        <button type="button" class="motif-filter-pill" data-filter-motif="bluecode">🔹 BlueCode</button>
+        <button type="button" class="motif-filter-pill" data-filter-motif="comida1">🍔 Comida 1</button>
+        <button type="button" class="motif-filter-pill" data-filter-motif="comida2">🍕 Comida 2</button>
+      </div>
+
+      <!-- Grid de los 6 Motivos -->
       <div class="plaque-cards-grid">
 
         <!-- MOTIVO 1: GOOGLE REVIEW -->
@@ -1319,8 +1646,8 @@
           </div>
 
           <div class="plaque-canvas-wrap">
-            <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
-            <button type="button" class="plaque-reset-btn" data-reset-motif="google" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
+            <span class="plaque-drag-hint">✋ Arrastra · Rueda = Zoom</span>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="google" title="Restaurar todo el diseño original">↺ Resetear</button>
             <canvas id="canvasMotif_google" width="1200" height="1200"></canvas>
             <span class="plaque-size-pill" id="pillSize_google">10 × 10 cm · 600 DPI</span>
           </div>
@@ -1340,34 +1667,6 @@
             <button type="button" class="btn-center-elem" data-center-motif="google" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
           </div>
 
-          <!-- Barra de Colores de Fondo y Elementos -->
-          <div class="plaque-color-strip">
-            <div class="plaque-color-top">
-              <select id="palettePreset_google" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
-                <option value="original" selected>🎨 Tema Original</option>
-                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
-                <option value="bc-tech">💠 BlueCode Tech</option>
-                <option value="cream-boutique">🥂 Crema Boutique</option>
-                <option value="minimal-bw">⚪ Blanco & Negro</option>
-              </select>
-              <button type="button" class="btn-sync-colors" data-sync-colors-motif="google" title="Aplicar este tema y colores a las 3 placas">⚡ Aplicar a las 3</button>
-            </div>
-            <div class="color-chip-group">
-              <label class="color-swatch-chip" title="Color de fondo de la tarjeta">
-                <input type="color" id="bgColor_google" value="#FFFFFF" />
-                <span>Fondo</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                <input type="color" id="textColor_google" value="#202124" />
-                <span>Texto/NFC</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de estrellas y acentos">
-                <input type="color" id="accentColor_google" value="#FBC02D" />
-                <span>Estrellas</span>
-              </label>
-            </div>
-          </div>
-
           <div class="plaque-field-group">
             <label>
               <span>Tag / QR Dinámico Asignado</span>
@@ -1376,70 +1675,101 @@
             <select id="selectTag_google" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Logo Central del QR</span></label>
-              <select id="qrLogo_google" class="plaque-select">
-                <option value="google" selected>🌈 Logo Google 'G'</option>
-                <option value="bluecode">🔹 Logo BlueCode</option>
-                <option value="burger">🍔 Logo Hamburguesa</option>
-                <option value="menu">🍴 Logo Menú</option>
-                <option value="instagram">📸 Logo Instagram</option>
-                <option value="whatsapp">💬 Logo WhatsApp</option>
-                <option value="wifi">📶 Logo Wi-Fi</option>
-                <option value="star">⭐ Estrella Dorada</option>
-                <option value="custom">🖼️ Tu Logo Subido</option>
-                <option value="none">⬜ Sin Logo (QR Limpio)</option>
-              </select>
-            </div>
-            <div class="plaque-field-group">
-              <label><span>Color / Degradado QR</span></label>
-              <select id="qrColor_google" class="plaque-select">
-                <option value="solid:#111111" selected>⬛ Negro Puro</option>
-                <option value="grad-bc">🌊 Degradado BlueCode</option>
-                <option value="solid:#0865F5">🟦 Azul BlueCode</option>
-                <option value="grad-ig">🌅 Degradado Instagram</option>
-                <option value="grad-gold">🏆 Degradado Bronce</option>
-                <option value="solid:#0F172A">🌑 Azul Noche</option>
-              </select>
-            </div>
-          </div>
+          <details class="plaque-custom-drawer">
+            <summary>🎨 Personalizar Colores, QR y Textos</summary>
+            <div class="plaque-drawer-body">
+              <div class="plaque-color-strip">
+                <div class="plaque-color-top">
+                  <select id="palettePreset_google" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                    <option value="original" selected>🎨 Tema Original</option>
+                    <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                    <option value="bc-tech">💠 BlueCode Tech</option>
+                    <option value="cream-boutique">🥂 Crema Boutique</option>
+                    <option value="minimal-bw">⚪ Blanco & Negro</option>
+                  </select>
+                  <button type="button" class="btn-sync-colors" data-sync-colors-motif="google" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+                </div>
+                <div class="color-chip-group">
+                  <label class="color-swatch-chip" title="Color de fondo de la tarjeta">
+                    <input type="color" id="bgColor_google" value="#FFFFFF" />
+                    <span>Fondo</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
+                    <input type="color" id="textColor_google" value="#202124" />
+                    <span>Texto/NFC</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de estrellas y acentos">
+                    <input type="color" id="accentColor_google" value="#FBC02D" />
+                    <span>Estrellas</span>
+                  </label>
+                </div>
+              </div>
 
-          <!-- Modo QR Clean vs QR con Texto Abajo -->
-          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Modo QR (Clean / Texto)</span></label>
-              <select id="qrCaptionMode_google" class="plaque-select">
-                <option value="clean" selected>🧼 QR Clean (Solo QR)</option>
-                <option value="bottom-text">🏷️ QR + Texto Abajo</option>
-                <option value="bottom-text-id">🆔 QR + Texto + ID</option>
-              </select>
-            </div>
-            <div class="plaque-field-group dimmed-field" id="wrapCaptionText_google">
-              <label><span>Texto Abajo del QR</span></label>
-              <input type="text" id="qrCaptionText_google" class="plaque-input" value="SCAN QR CODE" placeholder="Ej: ESCANÉAME" />
-            </div>
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Logo Central del QR</span></label>
+                  <select id="qrLogo_google" class="plaque-select">
+                    <option value="google" selected>🌈 Logo Google 'G'</option>
+                    <option value="bluecode">🔹 Logo BlueCode</option>
+                    <option value="burger">🍔 Logo Hamburguesa</option>
+                    <option value="menu">🍴 Logo Menú</option>
+                    <option value="instagram">📸 Logo Instagram</option>
+                    <option value="whatsapp">💬 Logo WhatsApp</option>
+                    <option value="wifi">📶 Logo Wi-Fi</option>
+                    <option value="star">⭐ Estrella Dorada</option>
+                    <option value="custom">🖼️ Tu Logo Subido</option>
+                    <option value="none">⬜ Sin Logo (QR Limpio)</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Color / Degradado QR</span></label>
+                  <select id="qrColor_google" class="plaque-select">
+                    <option value="solid:#111111" selected>⬛ Negro Puro</option>
+                    <option value="grad-bc">🌊 Degradado BlueCode</option>
+                    <option value="solid:#0865F5">🟦 Azul BlueCode</option>
+                    <option value="grad-ig">🌅 Degradado Instagram</option>
+                    <option value="grad-gold">🏆 Degradado Bronce</option>
+                    <option value="solid:#0F172A">🌑 Azul Noche</option>
+                  </select>
+                </div>
+              </div>
 
-          <div class="plaque-field-group">
-            <label><span>URL o Link del QR (Editable)</span></label>
-            <input type="text" id="customUrl_google" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Modo QR (Clean / Texto)</span></label>
+                  <select id="qrCaptionMode_google" class="plaque-select">
+                    <option value="clean" selected>🧼 QR Clean (Solo QR)</option>
+                    <option value="bottom-text">🏷️ QR + Texto Abajo</option>
+                    <option value="bottom-text-id">🆔 QR + Texto + ID</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group dimmed-field" id="wrapCaptionText_google">
+                  <label><span>Texto Abajo del QR</span></label>
+                  <input type="text" id="qrCaptionText_google" class="plaque-input" value="SCAN QR CODE" placeholder="Ej: ESCANÉAME" />
+                </div>
+              </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Línea 1</span></label>
-              <input type="text" id="t1_google" class="plaque-input" value="Valóranos" />
+              <div class="plaque-field-group">
+                <label><span>URL o Link del QR (Editable)</span></label>
+                <input type="text" id="customUrl_google" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+              </div>
+
+              <div class="plaque-grid-3">
+                <div class="plaque-field-group">
+                  <label><span>Línea 1</span></label>
+                  <input type="text" id="t1_google" class="plaque-input" value="Valóranos" />
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Línea 2</span></label>
+                  <input type="text" id="t2_google" class="plaque-input" value="en" />
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Línea 3</span></label>
+                  <input type="text" id="t3_google" class="plaque-input" value="Google" />
+                </div>
+              </div>
             </div>
-            <div class="plaque-field-group">
-              <label><span>Línea 2</span></label>
-              <input type="text" id="t2_google" class="plaque-input" value="en" />
-            </div>
-            <div class="plaque-field-group">
-              <label><span>Línea 3</span></label>
-              <input type="text" id="t3_google" class="plaque-input" value="Google" />
-            </div>
-          </div>
+          </details>
 
           <div class="plaque-card-actions">
             <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="google" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
@@ -1468,8 +1798,8 @@
           </div>
 
           <div class="plaque-canvas-wrap">
-            <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
-            <button type="button" class="plaque-reset-btn" data-reset-motif="menu" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
+            <span class="plaque-drag-hint">✋ Arrastra · Rueda = Zoom</span>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="menu" title="Restaurar todo el diseño original">↺ Resetear</button>
             <canvas id="canvasMotif_menu" width="1200" height="1200"></canvas>
             <span class="plaque-size-pill" id="pillSize_menu">10 × 10 cm · 600 DPI</span>
           </div>
@@ -1489,34 +1819,6 @@
             <button type="button" class="btn-center-elem" data-center-motif="menu" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
           </div>
 
-          <!-- Barra de Colores de Fondo y Elementos -->
-          <div class="plaque-color-strip">
-            <div class="plaque-color-top">
-              <select id="palettePreset_menu" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
-                <option value="original" selected>🎨 Tema Original</option>
-                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
-                <option value="bc-tech">💠 BlueCode Tech</option>
-                <option value="cream-boutique">🥂 Crema Boutique</option>
-                <option value="minimal-bw">⚪ Blanco & Negro</option>
-              </select>
-              <button type="button" class="btn-sync-colors" data-sync-colors-motif="menu" title="Aplicar este tema y colores a las 3 placas">⚡ Aplicar a las 3</button>
-            </div>
-            <div class="color-chip-group">
-              <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
-                <input type="color" id="bgColor_menu" value="#FFFFFF" />
-                <span>Fondo</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                <input type="color" id="textColor_menu" value="#1B1A1A" />
-                <span>Texto/NFC</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de la cabecera curva superior">
-                <input type="color" id="accentColor_menu" value="#1B1A1A" />
-                <span>Cabecera</span>
-              </label>
-            </div>
-          </div>
-
           <div class="plaque-field-group">
             <label>
               <span>Tag / QR Dinámico Asignado</span>
@@ -1525,65 +1827,96 @@
             <select id="selectTag_menu" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Logo Central del QR</span></label>
-              <select id="qrLogo_menu" class="plaque-select">
-                <option value="bluecode" selected>🔹 Logo BlueCode</option>
-                <option value="menu">🍴 Logo Menú / Cubiertos</option>
-                <option value="burger">🍔 Logo Hamburguesa</option>
-                <option value="google">🌈 Logo Google 'G'</option>
-                <option value="instagram">📸 Logo Instagram</option>
-                <option value="whatsapp">💬 Logo WhatsApp</option>
-                <option value="wifi">📶 Logo Wi-Fi</option>
-                <option value="star">⭐ Estrella Dorada</option>
-                <option value="custom">🖼️ Tu Logo Subido</option>
-                <option value="none">⬜ Sin Logo (QR Limpio)</option>
-              </select>
-            </div>
-            <div class="plaque-field-group">
-              <label><span>Color / Degradado QR</span></label>
-              <select id="qrColor_menu" class="plaque-select">
-                <option value="solid:#1B1A1A" selected>⬛ Negro Carbón</option>
-                <option value="grad-bc">🌊 Degradado BlueCode</option>
-                <option value="solid:#0865F5">🟦 Azul BlueCode</option>
-                <option value="grad-gold">🏆 Degradado Bronce</option>
-                <option value="solid:#0F172A">🌑 Azul Noche</option>
-              </select>
-            </div>
-          </div>
+          <details class="plaque-custom-drawer">
+            <summary>🎨 Personalizar Colores, QR y Textos</summary>
+            <div class="plaque-drawer-body">
+              <div class="plaque-color-strip">
+                <div class="plaque-color-top">
+                  <select id="palettePreset_menu" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                    <option value="original" selected>🎨 Tema Original</option>
+                    <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                    <option value="bc-tech">💠 BlueCode Tech</option>
+                    <option value="cream-boutique">🥂 Crema Boutique</option>
+                    <option value="minimal-bw">⚪ Blanco & Negro</option>
+                  </select>
+                  <button type="button" class="btn-sync-colors" data-sync-colors-motif="menu" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+                </div>
+                <div class="color-chip-group">
+                  <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
+                    <input type="color" id="bgColor_menu" value="#FFFFFF" />
+                    <span>Fondo</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
+                    <input type="color" id="textColor_menu" value="#1B1A1A" />
+                    <span>Texto/NFC</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de la cabecera curva superior">
+                    <input type="color" id="accentColor_menu" value="#1B1A1A" />
+                    <span>Cabecera</span>
+                  </label>
+                </div>
+              </div>
 
-          <!-- Modo QR Clean vs QR con Texto Abajo -->
-          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Modo QR (Clean / Texto)</span></label>
-              <select id="qrCaptionMode_menu" class="plaque-select">
-                <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
-                <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
-                <option value="clean">🧼 QR Clean (Solo QR)</option>
-              </select>
-            </div>
-            <div class="plaque-field-group" id="wrapCaptionText_menu">
-              <label><span>Texto del QR</span></label>
-              <input type="text" id="qrCaptionText_menu" class="plaque-input" value="SCAN QR" placeholder="Ej: VER MENÚ" />
-            </div>
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Logo Central del QR</span></label>
+                  <select id="qrLogo_menu" class="plaque-select">
+                    <option value="bluecode" selected>🔹 Logo BlueCode</option>
+                    <option value="menu">🍴 Logo Menú / Cubiertos</option>
+                    <option value="burger">🍔 Logo Hamburguesa</option>
+                    <option value="google">🌈 Logo Google 'G'</option>
+                    <option value="instagram">📸 Logo Instagram</option>
+                    <option value="whatsapp">💬 Logo WhatsApp</option>
+                    <option value="wifi">📶 Logo Wi-Fi</option>
+                    <option value="star">⭐ Estrella Dorada</option>
+                    <option value="custom">🖼️ Tu Logo Subido</option>
+                    <option value="none">⬜ Sin Logo (QR Limpio)</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Color / Degradado QR</span></label>
+                  <select id="qrColor_menu" class="plaque-select">
+                    <option value="solid:#1B1A1A" selected>⬛ Negro Carbón</option>
+                    <option value="grad-bc">🌊 Degradado BlueCode</option>
+                    <option value="solid:#0865F5">🟦 Azul BlueCode</option>
+                    <option value="grad-gold">🏆 Degradado Bronce</option>
+                    <option value="solid:#0F172A">🌑 Azul Noche</option>
+                  </select>
+                </div>
+              </div>
 
-          <div class="plaque-field-group">
-            <label><span>URL o Link del QR (Editable)</span></label>
-            <input type="text" id="customUrl_menu" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Modo QR (Clean / Texto)</span></label>
+                  <select id="qrCaptionMode_menu" class="plaque-select">
+                    <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
+                    <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
+                    <option value="clean">🧼 QR Clean (Solo QR)</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group" id="wrapCaptionText_menu">
+                  <label><span>Texto del QR</span></label>
+                  <input type="text" id="qrCaptionText_menu" class="plaque-input" value="SCAN QR" placeholder="Ej: VER MENÚ" />
+                </div>
+              </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Título Principal</span></label>
-              <input type="text" id="t1_menu" class="plaque-input" value="MENU" />
+              <div class="plaque-field-group">
+                <label><span>URL o Link del QR (Editable)</span></label>
+                <input type="text" id="customUrl_menu" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+              </div>
+
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Título Principal</span></label>
+                  <input type="text" id="t1_menu" class="plaque-input" value="MENU" />
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Subtítulo</span></label>
+                  <input type="text" id="t2_menu" class="plaque-input" value="VIEW OUR MENU ONLINE" />
+                </div>
+              </div>
             </div>
-            <div class="plaque-field-group">
-              <label><span>Subtítulo</span></label>
-              <input type="text" id="t2_menu" class="plaque-input" value="VIEW OUR MENU ONLINE" />
-            </div>
-          </div>
+          </details>
 
           <div class="plaque-card-actions">
             <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="menu" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
@@ -1612,8 +1945,8 @@
           </div>
 
           <div class="plaque-canvas-wrap">
-            <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
-            <button type="button" class="plaque-reset-btn" data-reset-motif="instagram" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
+            <span class="plaque-drag-hint">✋ Arrastra · Rueda = Zoom</span>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="instagram" title="Restaurar todo el diseño original">↺ Resetear</button>
             <canvas id="canvasMotif_instagram" width="1200" height="1200"></canvas>
             <span class="plaque-size-pill" id="pillSize_instagram">10 × 10 cm · 600 DPI</span>
           </div>
@@ -1633,34 +1966,6 @@
             <button type="button" class="btn-center-elem" data-center-motif="instagram" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
           </div>
 
-          <!-- Barra de Colores de Fondo y Elementos -->
-          <div class="plaque-color-strip">
-            <div class="plaque-color-top">
-              <select id="palettePreset_instagram" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
-                <option value="original" selected>🎨 Tema Original</option>
-                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
-                <option value="bc-tech">💠 BlueCode Tech</option>
-                <option value="cream-boutique">🥂 Crema Boutique</option>
-                <option value="minimal-bw">⚪ Blanco & Negro</option>
-              </select>
-              <button type="button" class="btn-sync-colors" data-sync-colors-motif="instagram" title="Aplicar este tema y colores a las 3 placas">⚡ Aplicar a las 3</button>
-            </div>
-            <div class="color-chip-group">
-              <label class="color-swatch-chip" title="Color de fondo interior de la tarjeta">
-                <input type="color" id="bgColor_instagram" value="#FFFFFF" />
-                <span>Fondo</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de textos, marco interior e ilustración NFC">
-                <input type="color" id="textColor_instagram" value="#141414" />
-                <span>Texto/NFC</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de ondas laterales y acento">
-                <input type="color" id="accentColor_instagram" value="#E11D74" />
-                <span>Acento</span>
-              </label>
-            </div>
-          </div>
-
           <div class="plaque-field-group">
             <label>
               <span>Tag / QR Dinámico Asignado</span>
@@ -1669,65 +1974,96 @@
             <select id="selectTag_instagram" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Logo Central del QR</span></label>
-              <select id="qrLogo_instagram" class="plaque-select">
-                <option value="bluecode" selected>🔹 Logo BlueCode</option>
-                <option value="instagram">📸 Logo Instagram</option>
-                <option value="burger">🍔 Logo Hamburguesa</option>
-                <option value="google">🌈 Logo Google 'G'</option>
-                <option value="menu">🍴 Logo Menú</option>
-                <option value="whatsapp">💬 Logo WhatsApp</option>
-                <option value="wifi">📶 Logo Wi-Fi</option>
-                <option value="star">⭐ Estrella Dorada</option>
-                <option value="custom">🖼️ Tu Logo Subido</option>
-                <option value="none">⬜ Sin Logo (QR Limpio)</option>
-              </select>
-            </div>
-            <div class="plaque-field-group">
-              <label><span>Color / Degradado QR</span></label>
-              <select id="qrColor_instagram" class="plaque-select">
-                <option value="solid:#141414" selected>⬛ Negro Puro</option>
-                <option value="grad-ig">🌅 Degradado Instagram</option>
-                <option value="grad-bc">🌊 Degradado BlueCode</option>
-                <option value="solid:#0865F5">🟦 Azul BlueCode</option>
-                <option value="solid:#D62976">🟪 Magenta IG</option>
-              </select>
-            </div>
-          </div>
+          <details class="plaque-custom-drawer">
+            <summary>🎨 Personalizar Colores, QR y Textos</summary>
+            <div class="plaque-drawer-body">
+              <div class="plaque-color-strip">
+                <div class="plaque-color-top">
+                  <select id="palettePreset_instagram" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                    <option value="original" selected>🎨 Tema Original</option>
+                    <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                    <option value="bc-tech">💠 BlueCode Tech</option>
+                    <option value="cream-boutique">🥂 Crema Boutique</option>
+                    <option value="minimal-bw">⚪ Blanco & Negro</option>
+                  </select>
+                  <button type="button" class="btn-sync-colors" data-sync-colors-motif="instagram" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+                </div>
+                <div class="color-chip-group">
+                  <label class="color-swatch-chip" title="Color de fondo interior de la tarjeta">
+                    <input type="color" id="bgColor_instagram" value="#FFFFFF" />
+                    <span>Fondo</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de textos, marco interior e ilustración NFC">
+                    <input type="color" id="textColor_instagram" value="#141414" />
+                    <span>Texto/NFC</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de ondas laterales y acento">
+                    <input type="color" id="accentColor_instagram" value="#E11D74" />
+                    <span>Acento</span>
+                  </label>
+                </div>
+              </div>
 
-          <!-- Modo QR Clean vs QR con Texto Abajo -->
-          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Modo QR (Clean / Texto)</span></label>
-              <select id="qrCaptionMode_instagram" class="plaque-select">
-                <option value="clean" selected>🧼 QR Clean (Solo QR)</option>
-                <option value="bottom-text">🏷️ QR + Texto Abajo</option>
-                <option value="bottom-text-id">🆔 QR + Texto + ID</option>
-              </select>
-            </div>
-            <div class="plaque-field-group dimmed-field" id="wrapCaptionText_instagram">
-              <label><span>Texto Abajo del QR</span></label>
-              <input type="text" id="qrCaptionText_instagram" class="plaque-input" value="SÍGUENOS" placeholder="Ej: ESCANÉAME" />
-            </div>
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Logo Central del QR</span></label>
+                  <select id="qrLogo_instagram" class="plaque-select">
+                    <option value="bluecode" selected>🔹 Logo BlueCode</option>
+                    <option value="instagram">📸 Logo Instagram</option>
+                    <option value="burger">🍔 Logo Hamburguesa</option>
+                    <option value="google">🌈 Logo Google 'G'</option>
+                    <option value="menu">🍴 Logo Menú</option>
+                    <option value="whatsapp">💬 Logo WhatsApp</option>
+                    <option value="wifi">📶 Logo Wi-Fi</option>
+                    <option value="star">⭐ Estrella Dorada</option>
+                    <option value="custom">🖼️ Tu Logo Subido</option>
+                    <option value="none">⬜ Sin Logo (QR Limpio)</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Color / Degradado QR</span></label>
+                  <select id="qrColor_instagram" class="plaque-select">
+                    <option value="solid:#141414" selected>⬛ Negro Puro</option>
+                    <option value="grad-ig">🌅 Degradado Instagram</option>
+                    <option value="grad-bc">🌊 Degradado BlueCode</option>
+                    <option value="solid:#0865F5">🟦 Azul BlueCode</option>
+                    <option value="solid:#D62976">🟪 Magenta IG</option>
+                  </select>
+                </div>
+              </div>
 
-          <div class="plaque-field-group">
-            <label><span>URL o Link del QR (Editable)</span></label>
-            <input type="text" id="customUrl_instagram" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Modo QR (Clean / Texto)</span></label>
+                  <select id="qrCaptionMode_instagram" class="plaque-select">
+                    <option value="clean" selected>🧼 QR Clean (Solo QR)</option>
+                    <option value="bottom-text">🏷️ QR + Texto Abajo</option>
+                    <option value="bottom-text-id">🆔 QR + Texto + ID</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group dimmed-field" id="wrapCaptionText_instagram">
+                  <label><span>Texto Abajo del QR</span></label>
+                  <input type="text" id="qrCaptionText_instagram" class="plaque-input" value="SÍGUENOS" placeholder="Ej: ESCANÉAME" />
+                </div>
+              </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Título Cursiva</span></label>
-              <input type="text" id="t1_instagram" class="plaque-input" value="Instagram" />
+              <div class="plaque-field-group">
+                <label><span>URL o Link del QR (Editable)</span></label>
+                <input type="text" id="customUrl_instagram" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+              </div>
+
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Título Cursiva</span></label>
+                  <input type="text" id="t1_instagram" class="plaque-input" value="Instagram" />
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Llamado a la acción</span></label>
+                  <input type="text" id="t2_instagram" class="plaque-input" value="¡Acerca tu móvil y síguenos!" />
+                </div>
+              </div>
             </div>
-            <div class="plaque-field-group">
-              <label><span>Llamado a la acción</span></label>
-              <input type="text" id="t2_instagram" class="plaque-input" value="¡Acerca tu móvil y síguenos!" />
-            </div>
-          </div>
+          </details>
 
           <div class="plaque-card-actions">
             <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="instagram" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
@@ -1756,8 +2092,8 @@
           </div>
 
           <div class="plaque-canvas-wrap">
-            <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
-            <button type="button" class="plaque-reset-btn" data-reset-motif="bluecode" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
+            <span class="plaque-drag-hint">✋ Arrastra · Rueda = Zoom</span>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="bluecode" title="Restaurar todo el diseño original">↺ Resetear</button>
             <canvas id="canvasMotif_bluecode" width="1200" height="1200"></canvas>
             <span class="plaque-size-pill" id="pillSize_bluecode">10 × 10 cm · 600 DPI</span>
           </div>
@@ -1777,34 +2113,6 @@
             <button type="button" class="btn-center-elem" data-center-motif="bluecode" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
           </div>
 
-          <!-- Barra de Colores de Fondo y Elementos -->
-          <div class="plaque-color-strip">
-            <div class="plaque-color-top">
-              <select id="palettePreset_bluecode" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
-                <option value="original" selected>🎨 Tema Original</option>
-                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
-                <option value="bc-tech">💠 BlueCode Tech</option>
-                <option value="cream-boutique">🥂 Crema Boutique</option>
-                <option value="minimal-bw">⚪ Blanco & Negro</option>
-              </select>
-              <button type="button" class="btn-sync-colors" data-sync-colors-motif="bluecode" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
-            </div>
-            <div class="color-chip-group">
-              <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
-                <input type="color" id="bgColor_bluecode" value="#FFFFFF" />
-                <span>Fondo</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                <input type="color" id="textColor_bluecode" value="#181818" />
-                <span>Texto/NFC</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de la cabecera curva superior">
-                <input type="color" id="accentColor_bluecode" value="#060A14" />
-                <span>Cabecera</span>
-              </label>
-            </div>
-          </div>
-
           <div class="plaque-field-group">
             <label>
               <span>Tag / QR Dinámico Asignado</span>
@@ -1813,65 +2121,96 @@
             <select id="selectTag_bluecode" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Logo Central del QR</span></label>
-              <select id="qrLogo_bluecode" class="plaque-select">
-                <option value="none" selected>⬜ Sin Logo (Original)</option>
-                <option value="bluecode">🔹 Logo BlueCode</option>
-                <option value="burger">🍔 Logo Hamburguesa</option>
-                <option value="menu">🍴 Logo Menú</option>
-                <option value="google">🌈 Logo Google 'G'</option>
-                <option value="instagram">📸 Logo Instagram</option>
-                <option value="whatsapp">💬 Logo WhatsApp</option>
-                <option value="wifi">📶 Logo Wi-Fi</option>
-                <option value="star">⭐ Estrella Dorada</option>
-                <option value="custom">🖼️ Tu Logo Subido</option>
-              </select>
-            </div>
-            <div class="plaque-field-group">
-              <label><span>Color / Degradado QR</span></label>
-              <select id="qrColor_bluecode" class="plaque-select">
-                <option value="solid:#111111" selected>⬛ Negro Puro</option>
-                <option value="grad-bc">🌊 Degradado BlueCode</option>
-                <option value="solid:#0865F5">🟦 Azul BlueCode</option>
-                <option value="grad-gold">🏆 Degradado Bronce</option>
-                <option value="solid:#0F172A">🌑 Azul Noche</option>
-              </select>
-            </div>
-          </div>
+          <details class="plaque-custom-drawer">
+            <summary>🎨 Personalizar Colores, QR y Textos</summary>
+            <div class="plaque-drawer-body">
+              <div class="plaque-color-strip">
+                <div class="plaque-color-top">
+                  <select id="palettePreset_bluecode" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                    <option value="original" selected>🎨 Tema Original</option>
+                    <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                    <option value="bc-tech">💠 BlueCode Tech</option>
+                    <option value="cream-boutique">🥂 Crema Boutique</option>
+                    <option value="minimal-bw">⚪ Blanco & Negro</option>
+                  </select>
+                  <button type="button" class="btn-sync-colors" data-sync-colors-motif="bluecode" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+                </div>
+                <div class="color-chip-group">
+                  <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
+                    <input type="color" id="bgColor_bluecode" value="#FFFFFF" />
+                    <span>Fondo</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
+                    <input type="color" id="textColor_bluecode" value="#181818" />
+                    <span>Texto/NFC</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de la cabecera curva superior">
+                    <input type="color" id="accentColor_bluecode" value="#060A14" />
+                    <span>Cabecera</span>
+                  </label>
+                </div>
+              </div>
 
-          <!-- Modo QR Clean vs QR con Texto -->
-          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Modo QR (Clean / Texto)</span></label>
-              <select id="qrCaptionMode_bluecode" class="plaque-select">
-                <option value="bottom-text" selected>🏷️ Original (Scan QR code)</option>
-                <option value="bottom-text-id">🆔 Completo (Texto + ID)</option>
-                <option value="clean">🧼 QR Clean (Solo QR)</option>
-              </select>
-            </div>
-            <div class="plaque-field-group" id="wrapCaptionText_bluecode">
-              <label><span>Texto del QR</span></label>
-              <input type="text" id="qrCaptionText_bluecode" class="plaque-input" value="Scan QR code" placeholder="Ej: Scan QR code" />
-            </div>
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Logo Central del QR</span></label>
+                  <select id="qrLogo_bluecode" class="plaque-select">
+                    <option value="none" selected>⬜ Sin Logo (Original)</option>
+                    <option value="bluecode">🔹 Logo BlueCode</option>
+                    <option value="burger">🍔 Logo Hamburguesa</option>
+                    <option value="menu">🍴 Logo Menú</option>
+                    <option value="google">🌈 Logo Google 'G'</option>
+                    <option value="instagram">📸 Logo Instagram</option>
+                    <option value="whatsapp">💬 Logo WhatsApp</option>
+                    <option value="wifi">📶 Logo Wi-Fi</option>
+                    <option value="star">⭐ Estrella Dorada</option>
+                    <option value="custom">🖼️ Tu Logo Subido</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Color / Degradado QR</span></label>
+                  <select id="qrColor_bluecode" class="plaque-select">
+                    <option value="solid:#111111" selected>⬛ Negro Puro</option>
+                    <option value="grad-bc">🌊 Degradado BlueCode</option>
+                    <option value="solid:#0865F5">🟦 Azul BlueCode</option>
+                    <option value="grad-gold">🏆 Degradado Bronce</option>
+                    <option value="solid:#0F172A">🌑 Azul Noche</option>
+                  </select>
+                </div>
+              </div>
 
-          <div class="plaque-field-group">
-            <label><span>URL o Link del QR (Editable)</span></label>
-            <input type="text" id="customUrl_bluecode" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Modo QR (Clean / Texto)</span></label>
+                  <select id="qrCaptionMode_bluecode" class="plaque-select">
+                    <option value="bottom-text" selected>🏷️ Original (Scan QR code)</option>
+                    <option value="bottom-text-id">🆔 Completo (Texto + ID)</option>
+                    <option value="clean">🧼 QR Clean (Solo QR)</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group" id="wrapCaptionText_bluecode">
+                  <label><span>Texto del QR</span></label>
+                  <input type="text" id="qrCaptionText_bluecode" class="plaque-input" value="Scan QR code" placeholder="Ej: Scan QR code" />
+                </div>
+              </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Palabra 1 (Blanco)</span></label>
-              <input type="text" id="t1_bluecode" class="plaque-input" value="BLUE" />
+              <div class="plaque-field-group">
+                <label><span>URL o Link del QR (Editable)</span></label>
+                <input type="text" id="customUrl_bluecode" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+              </div>
+
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Palabra 1 (Blanco)</span></label>
+                  <input type="text" id="t1_bluecode" class="plaque-input" value="BLUE" />
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Palabra 2 (Azul)</span></label>
+                  <input type="text" id="t2_bluecode" class="plaque-input" value="CODE" />
+                </div>
+              </div>
             </div>
-            <div class="plaque-field-group">
-              <label><span>Palabra 2 (Azul)</span></label>
-              <input type="text" id="t2_bluecode" class="plaque-input" value="CODE" />
-            </div>
-          </div>
+          </details>
 
           <div class="plaque-card-actions">
             <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="bluecode" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
@@ -1900,8 +2239,8 @@
           </div>
 
           <div class="plaque-canvas-wrap">
-            <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
-            <button type="button" class="plaque-reset-btn" data-reset-motif="comida1" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
+            <span class="plaque-drag-hint">✋ Arrastra · Rueda = Zoom</span>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="comida1" title="Restaurar todo el diseño original">↺ Resetear</button>
             <canvas id="canvasMotif_comida1" width="1200" height="1200"></canvas>
             <span class="plaque-size-pill" id="pillSize_comida1">10 × 10 cm · 600 DPI</span>
           </div>
@@ -1921,34 +2260,6 @@
             <button type="button" class="btn-center-elem" data-center-motif="comida1" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
           </div>
 
-          <!-- Barra de Colores de Fondo y Elementos -->
-          <div class="plaque-color-strip">
-            <div class="plaque-color-top">
-              <select id="palettePreset_comida1" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
-                <option value="original" selected>🎨 Arte Original Ilustrado</option>
-                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
-                <option value="bc-tech">💠 BlueCode Tech</option>
-                <option value="cream-boutique">🥂 Crema Boutique</option>
-                <option value="minimal-bw">⚪ Blanco & Negro</option>
-              </select>
-              <button type="button" class="btn-sync-colors" data-sync-colors-motif="comida1" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
-            </div>
-            <div class="color-chip-group">
-              <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
-                <input type="color" id="bgColor_comida1" value="#FFFFFF" />
-                <span>Fondo</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                <input type="color" id="textColor_comida1" value="#1B1A1A" />
-                <span>Texto/NFC</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de la cabecera curva superior">
-                <input type="color" id="accentColor_comida1" value="#C8102E" />
-                <span>Cabecera</span>
-              </label>
-            </div>
-          </div>
-
           <div class="plaque-field-group">
             <label>
               <span>Tag / QR Dinámico Asignado</span>
@@ -1957,65 +2268,96 @@
             <select id="selectTag_comida1" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Logo Central del QR</span></label>
-              <select id="qrLogo_comida1" class="plaque-select">
-                <option value="burger" selected>🍔 Logo Hamburguesa</option>
-                <option value="bluecode">🔹 Logo BlueCode</option>
-                <option value="menu">🍴 Logo Cubiertos</option>
-                <option value="google">🌈 Logo Google 'G'</option>
-                <option value="instagram">📸 Logo Instagram</option>
-                <option value="whatsapp">💬 Logo WhatsApp</option>
-                <option value="wifi">📶 Logo Wi-Fi</option>
-                <option value="star">⭐ Estrella Dorada</option>
-                <option value="custom">🖼️ Tu Logo Subido</option>
-                <option value="none">⬜ Sin Logo (QR Limpio)</option>
-              </select>
-            </div>
-            <div class="plaque-field-group">
-              <label><span>Color / Degradado QR</span></label>
-              <select id="qrColor_comida1" class="plaque-select">
-                <option value="solid:#843511" selected>🟫 Café Burger Original</option>
-                <option value="solid:#C8102E">🟥 Rojo Intenso</option>
-                <option value="solid:#1B1A1A">⬛ Negro Carbón</option>
-                <option value="grad-bc">🌊 Degradado BlueCode</option>
-                <option value="grad-gold">🏆 Degradado Bronce</option>
-              </select>
-            </div>
-          </div>
+          <details class="plaque-custom-drawer">
+            <summary>🎨 Personalizar Colores, QR y Textos</summary>
+            <div class="plaque-drawer-body">
+              <div class="plaque-color-strip">
+                <div class="plaque-color-top">
+                  <select id="palettePreset_comida1" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                    <option value="original" selected>🎨 Arte Original Ilustrado</option>
+                    <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                    <option value="bc-tech">💠 BlueCode Tech</option>
+                    <option value="cream-boutique">🥂 Crema Boutique</option>
+                    <option value="minimal-bw">⚪ Blanco & Negro</option>
+                  </select>
+                  <button type="button" class="btn-sync-colors" data-sync-colors-motif="comida1" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+                </div>
+                <div class="color-chip-group">
+                  <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
+                    <input type="color" id="bgColor_comida1" value="#FFFFFF" />
+                    <span>Fondo</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
+                    <input type="color" id="textColor_comida1" value="#1B1A1A" />
+                    <span>Texto/NFC</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de la cabecera curva superior">
+                    <input type="color" id="accentColor_comida1" value="#C8102E" />
+                    <span>Cabecera</span>
+                  </label>
+                </div>
+              </div>
 
-          <!-- Modo QR Clean vs QR con Texto -->
-          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Modo QR (Clean / Texto)</span></label>
-              <select id="qrCaptionMode_comida1" class="plaque-select">
-                <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
-                <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
-                <option value="clean">🧼 QR Clean (Solo QR)</option>
-              </select>
-            </div>
-            <div class="plaque-field-group" id="wrapCaptionText_comida1">
-              <label><span>Texto del QR</span></label>
-              <input type="text" id="qrCaptionText_comida1" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
-            </div>
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Logo Central del QR</span></label>
+                  <select id="qrLogo_comida1" class="plaque-select">
+                    <option value="burger" selected>🍔 Logo Hamburguesa</option>
+                    <option value="bluecode">🔹 Logo BlueCode</option>
+                    <option value="menu">🍴 Logo Cubiertos</option>
+                    <option value="google">🌈 Logo Google 'G'</option>
+                    <option value="instagram">📸 Logo Instagram</option>
+                    <option value="whatsapp">💬 Logo WhatsApp</option>
+                    <option value="wifi">📶 Logo Wi-Fi</option>
+                    <option value="star">⭐ Estrella Dorada</option>
+                    <option value="custom">🖼️ Tu Logo Subido</option>
+                    <option value="none">⬜ Sin Logo (QR Limpio)</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Color / Degradado QR</span></label>
+                  <select id="qrColor_comida1" class="plaque-select">
+                    <option value="solid:#843511" selected>🟫 Café Burger Original</option>
+                    <option value="solid:#C8102E">🟥 Rojo Intenso</option>
+                    <option value="solid:#1B1A1A">⬛ Negro Carbón</option>
+                    <option value="grad-bc">🌊 Degradado BlueCode</option>
+                    <option value="grad-gold">🏆 Degradado Bronce</option>
+                  </select>
+                </div>
+              </div>
 
-          <div class="plaque-field-group">
-            <label><span>URL o Link del QR (Editable)</span></label>
-            <input type="text" id="customUrl_comida1" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Modo QR (Clean / Texto)</span></label>
+                  <select id="qrCaptionMode_comida1" class="plaque-select">
+                    <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
+                    <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
+                    <option value="clean">🧼 QR Clean (Solo QR)</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group" id="wrapCaptionText_comida1">
+                  <label><span>Texto del QR</span></label>
+                  <input type="text" id="qrCaptionText_comida1" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
+                </div>
+              </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Título Principal</span></label>
-              <input type="text" id="t1_comida1" class="plaque-input" value="BURGER & CO." />
+              <div class="plaque-field-group">
+                <label><span>URL o Link del QR (Editable)</span></label>
+                <input type="text" id="customUrl_comida1" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+              </div>
+
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Título Principal</span></label>
+                  <input type="text" id="t1_comida1" class="plaque-input" value="BURGER & CO." />
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Subtítulo</span></label>
+                  <input type="text" id="t2_comida1" class="plaque-input" value="Sabor al instante" />
+                </div>
+              </div>
             </div>
-            <div class="plaque-field-group">
-              <label><span>Subtítulo</span></label>
-              <input type="text" id="t2_comida1" class="plaque-input" value="Sabor al instante" />
-            </div>
-          </div>
+          </details>
 
           <div class="plaque-card-actions">
             <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="comida1" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
@@ -2044,8 +2386,8 @@
           </div>
 
           <div class="plaque-canvas-wrap">
-            <span class="plaque-drag-hint">✋ Arrastra elementos · Rueda = Zoom</span>
-            <button type="button" class="plaque-reset-btn" data-reset-motif="comida2" title="Restaurar todo el diseño original">↺ Resetear Todo</button>
+            <span class="plaque-drag-hint">✋ Arrastra · Rueda = Zoom</span>
+            <button type="button" class="plaque-reset-btn" data-reset-motif="comida2" title="Restaurar todo el diseño original">↺ Resetear</button>
             <canvas id="canvasMotif_comida2" width="1200" height="1200"></canvas>
             <span class="plaque-size-pill" id="pillSize_comida2">10 × 10 cm · 600 DPI</span>
           </div>
@@ -2065,34 +2407,6 @@
             <button type="button" class="btn-center-elem" data-center-motif="comida2" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
           </div>
 
-          <!-- Barra de Colores de Fondo y Elementos -->
-          <div class="plaque-color-strip">
-            <div class="plaque-color-top">
-              <select id="palettePreset_comida2" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
-                <option value="original" selected>🎨 Arte Original Ilustrado</option>
-                <option value="dark-gold">🖤 Dark Luxe & Oro</option>
-                <option value="bc-tech">💠 BlueCode Tech</option>
-                <option value="cream-boutique">🥂 Crema Boutique</option>
-                <option value="minimal-bw">⚪ Blanco & Negro</option>
-              </select>
-              <button type="button" class="btn-sync-colors" data-sync-colors-motif="comida2" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
-            </div>
-            <div class="color-chip-group">
-              <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
-                <input type="color" id="bgColor_comida2" value="#FFFFFF" />
-                <span>Fondo</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                <input type="color" id="textColor_comida2" value="#1B1A1A" />
-                <span>Texto/NFC</span>
-              </label>
-              <label class="color-swatch-chip" title="Color de la cabecera curva superior">
-                <input type="color" id="accentColor_comida2" value="#1E1E1E" />
-                <span>Cabecera</span>
-              </label>
-            </div>
-          </div>
-
           <div class="plaque-field-group">
             <label>
               <span>Tag / QR Dinámico Asignado</span>
@@ -2101,65 +2415,96 @@
             <select id="selectTag_comida2" class="plaque-select"></select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Logo Central del QR</span></label>
-              <select id="qrLogo_comida2" class="plaque-select">
-                <option value="burger" selected>🍔 Logo Hamburguesa</option>
-                <option value="bluecode">🔹 Logo BlueCode</option>
-                <option value="menu">🍴 Logo Cubiertos</option>
-                <option value="google">🌈 Logo Google 'G'</option>
-                <option value="instagram">📸 Logo Instagram</option>
-                <option value="whatsapp">💬 Logo WhatsApp</option>
-                <option value="wifi">📶 Logo Wi-Fi</option>
-                <option value="star">⭐ Estrella Dorada</option>
-                <option value="custom">🖼️ Tu Logo Subido</option>
-                <option value="none">⬜ Sin Logo (QR Limpio)</option>
-              </select>
-            </div>
-            <div class="plaque-field-group">
-              <label><span>Color / Degradado QR</span></label>
-              <select id="qrColor_comida2" class="plaque-select">
-                <option value="solid:#843511" selected>🟫 Café Burger Original</option>
-                <option value="solid:#1B1A1A">⬛ Negro Carbón</option>
-                <option value="solid:#C8102E">🟥 Rojo Intenso</option>
-                <option value="grad-bc">🌊 Degradado BlueCode</option>
-                <option value="grad-gold">🏆 Degradado Bronce</option>
-              </select>
-            </div>
-          </div>
+          <details class="plaque-custom-drawer">
+            <summary>🎨 Personalizar Colores, QR y Textos</summary>
+            <div class="plaque-drawer-body">
+              <div class="plaque-color-strip">
+                <div class="plaque-color-top">
+                  <select id="palettePreset_comida2" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                    <option value="original" selected>🎨 Arte Original Ilustrado</option>
+                    <option value="dark-gold">🖤 Dark Luxe & Oro</option>
+                    <option value="bc-tech">💠 BlueCode Tech</option>
+                    <option value="cream-boutique">🥂 Crema Boutique</option>
+                    <option value="minimal-bw">⚪ Blanco & Negro</option>
+                  </select>
+                  <button type="button" class="btn-sync-colors" data-sync-colors-motif="comida2" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+                </div>
+                <div class="color-chip-group">
+                  <label class="color-swatch-chip" title="Color de fondo inferior de la tarjeta">
+                    <input type="color" id="bgColor_comida2" value="#FFFFFF" />
+                    <span>Fondo</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
+                    <input type="color" id="textColor_comida2" value="#1B1A1A" />
+                    <span>Texto/NFC</span>
+                  </label>
+                  <label class="color-swatch-chip" title="Color de la cabecera curva superior">
+                    <input type="color" id="accentColor_comida2" value="#1E1E1E" />
+                    <span>Cabecera</span>
+                  </label>
+                </div>
+              </div>
 
-          <!-- Modo QR Clean vs QR con Texto -->
-          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Modo QR (Clean / Texto)</span></label>
-              <select id="qrCaptionMode_comida2" class="plaque-select">
-                <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
-                <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
-                <option value="clean">🧼 QR Clean (Solo QR)</option>
-              </select>
-            </div>
-            <div class="plaque-field-group" id="wrapCaptionText_comida2">
-              <label><span>Texto del QR</span></label>
-              <input type="text" id="qrCaptionText_comida2" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
-            </div>
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Logo Central del QR</span></label>
+                  <select id="qrLogo_comida2" class="plaque-select">
+                    <option value="burger" selected>🍔 Logo Hamburguesa</option>
+                    <option value="bluecode">🔹 Logo BlueCode</option>
+                    <option value="menu">🍴 Logo Cubiertos</option>
+                    <option value="google">🌈 Logo Google 'G'</option>
+                    <option value="instagram">📸 Logo Instagram</option>
+                    <option value="whatsapp">💬 Logo WhatsApp</option>
+                    <option value="wifi">📶 Logo Wi-Fi</option>
+                    <option value="star">⭐ Estrella Dorada</option>
+                    <option value="custom">🖼️ Tu Logo Subido</option>
+                    <option value="none">⬜ Sin Logo (QR Limpio)</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Color / Degradado QR</span></label>
+                  <select id="qrColor_comida2" class="plaque-select">
+                    <option value="solid:#843511" selected>🟫 Café Burger Original</option>
+                    <option value="solid:#1B1A1A">⬛ Negro Carbón</option>
+                    <option value="solid:#C8102E">🟥 Rojo Intenso</option>
+                    <option value="grad-bc">🌊 Degradado BlueCode</option>
+                    <option value="grad-gold">🏆 Degradado Bronce</option>
+                  </select>
+                </div>
+              </div>
 
-          <div class="plaque-field-group">
-            <label><span>URL o Link del QR (Editable)</span></label>
-            <input type="text" id="customUrl_comida2" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
-          </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Modo QR (Clean / Texto)</span></label>
+                  <select id="qrCaptionMode_comida2" class="plaque-select">
+                    <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
+                    <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
+                    <option value="clean">🧼 QR Clean (Solo QR)</option>
+                  </select>
+                </div>
+                <div class="plaque-field-group" id="wrapCaptionText_comida2">
+                  <label><span>Texto del QR</span></label>
+                  <input type="text" id="qrCaptionText_comida2" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
+                </div>
+              </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-            <div class="plaque-field-group">
-              <label><span>Título Principal</span></label>
-              <input type="text" id="t1_comida2" class="plaque-input" value="BURGER & CO." />
+              <div class="plaque-field-group">
+                <label><span>URL o Link del QR (Editable)</span></label>
+                <input type="text" id="customUrl_comida2" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+              </div>
+
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Título Principal</span></label>
+                  <input type="text" id="t1_comida2" class="plaque-input" value="BURGER & CO." />
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Subtítulo</span></label>
+                  <input type="text" id="t2_comida2" class="plaque-input" value="Sabor al instante" />
+                </div>
+              </div>
             </div>
-            <div class="plaque-field-group">
-              <label><span>Subtítulo</span></label>
-              <input type="text" id="t2_comida2" class="plaque-input" value="Sabor al instante" />
-            </div>
-          </div>
+          </details>
 
           <div class="plaque-card-actions">
             <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="comida2" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
@@ -2182,19 +2527,19 @@
   <!-- Barra Flotante de Acciones Masivas -->
   <div class="bulk-bar" id="bulkBar">
     <div class="bulk-count-badge">
-      <span id="bulkCount">0</span> seleccionados
+      <span id="bulkCount">0</span> sel.
     </div>
     <button type="button" class="btn btn-subtle btn-sm" id="btnBulkEditDest">
       Cambiar Destino
     </button>
     <button type="button" class="btn btn-subtle btn-sm" id="btnBulkExportZip">
-      Descargar QRs (ZIP)
+      QRs (ZIP)
     </button>
     <button type="button" class="btn btn-subtle btn-sm" id="btnBulkPrint">
-      Imprimir Seleccionados
+      Imprimir
     </button>
     <button type="button" class="btn btn-subtle btn-sm" id="btnBulkToggleActive">
-      Pausar / Activar
+      Pausar/Activar
     </button>
     <button type="button" class="btn btn-danger btn-sm" id="btnBulkDelete">
       Eliminar
@@ -2219,7 +2564,7 @@
             <input type="text" id="newSlug" class="form-control" placeholder="ej: mesa-1" required />
             <button type="button" class="btn btn-subtle btn-sm" id="btnRandomSlug">Aleatorio</button>
           </div>
-          <div class="hint-text" id="slugPreviewText">Link: https://gestor-nfc-qr-2026.web.app/r/mesa-1</div>
+          <div class="hint-text" id="slugPreviewText" style="word-break: break-all;">Link: https://gestor-nfc-qr-2026.web.app/r/mesa-1</div>
         </div>
 
         <!-- Selector de Tipo de Destino -->
@@ -2255,11 +2600,11 @@
 
             <!-- 4. vCard Contacto -->
             <div class="type-panel" id="panelVcard" style="display: none;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+              <div class="plaque-grid-2" style="margin-bottom: 6px;">
                 <input type="text" id="vcardName" class="form-control" placeholder="Nombre completo" />
                 <input type="text" id="vcardPhone" class="form-control" placeholder="Teléfono" />
               </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div class="plaque-grid-2">
                 <input type="text" id="vcardOrg" class="form-control" placeholder="Empresa / Cargo" />
                 <input type="email" id="vcardEmail" class="form-control" placeholder="Correo electrónico" />
               </div>
@@ -2278,7 +2623,7 @@
           </div>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
           <button type="button" class="btn btn-subtle" id="btnCloseNewModal">Cancelar</button>
           <button type="submit" class="btn btn-bc">+ Crear Enlace</button>
         </div>
@@ -2303,7 +2648,7 @@
           <label>Prefijo del Nombre</label>
           <input type="text" id="seriesPrefix" class="form-control" value="Mesa" placeholder="Mesa, Tag, Habitación..." required />
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+        <div class="plaque-grid-2" style="margin-bottom: 14px;">
           <div>
             <label style="font-size: 0.76rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Desde el número</label>
             <input type="number" id="seriesFrom" class="form-control" value="1" min="1" required />
@@ -2317,7 +2662,7 @@
           <label>Destino Inicial Común</label>
           <input type="text" id="seriesTarget" class="form-control" placeholder="https://tu-web.com o menú..." required />
         </div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
           <button type="button" class="btn btn-subtle" id="btnCloseBulkCreateModal">Cancelar</button>
           <button type="submit" class="btn btn-bc">Generar Lote en Serie</button>
         </div>
@@ -2334,7 +2679,7 @@
           <label>Destino por defecto (si no se especifica en la línea)</label>
           <input type="text" id="bulkListDefaultTarget" class="form-control" value="https://google.com" />
         </div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
           <button type="button" class="btn btn-subtle" id="btnCloseBulkListModal">Cancelar</button>
           <button type="submit" class="btn btn-bc">Crear Tags de la Lista</button>
         </div>
@@ -2352,7 +2697,7 @@
           <label>Nueva URL o Destino</label>
           <input type="text" id="bulkNewTarget" class="form-control" placeholder="https://..." required />
         </div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
           <button type="button" class="btn btn-subtle" id="btnCloseBulkEditModal">Cancelar</button>
           <button type="submit" class="btn btn-bc">Actualizar Todos</button>
         </div>
@@ -2362,16 +2707,16 @@
 
   <!-- Modal: QR Studio & Exportación Personalizable Ultra-HD -->
   <div class="modal-backdrop" id="qrModal">
-    <div class="modal-box" style="text-align: center; max-width: 500px;">
+    <div class="modal-box" style="text-align: center; max-width: 470px;">
       <h3 class="modal-title" id="qrModalTitle">Código QR Único & Personalizado</h3>
-      <p class="modal-subtitle">Personaliza trama, ojos, degradados, marco y logo central. Nivel H de corrección (100% escaneable sin fallos) en Ultra-HD 2048 px.</p>
+      <p class="modal-subtitle">Personaliza trama, ojos, colores y logo. Nivel H de corrección en Ultra-HD 2048 px.</p>
 
-      <div class="qr-export-preview" style="padding: 16px;">
+      <div class="qr-export-preview" style="padding: 10px;">
         <div id="qrCanvasBox" style="display: flex; justify-content: center;"></div>
         <div class="qr-export-label" id="qrModalLabel"></div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; text-align: left; margin-bottom: 12px;">
+      <div class="qr-modal-controls-grid">
         <div class="plaque-field-group">
           <label><span>Logo Central</span></label>
           <select id="modalQrLogo" class="plaque-select">
@@ -2438,19 +2783,19 @@
         </div>
       </div>
 
-      <div style="margin-bottom: 14px;">
-        <code id="qrModalUrl" style="font-family: var(--mono); font-size: 0.74rem; color: #93c5fd;"></code>
+      <div style="margin-bottom: 10px;">
+        <code id="qrModalUrl" style="font-family: var(--mono); font-size: 0.7rem; color: #93c5fd; word-break: break-all; display: block;"></code>
       </div>
 
       <div class="export-options-grid">
-        <button type="button" class="btn btn-bc btn-sm" id="btnExportQrPdf" style="grid-column: span 2;">
+        <button type="button" class="btn btn-bc btn-sm btn-span-full" id="btnExportQrPdf">
           📄 Exportar PDF Individual (Alta Calidad)
         </button>
         <button type="button" class="btn btn-subtle btn-sm" id="btnExportPngTagged">
-          🖼️ PNG Ultra-HD + Etiqueta
+          🖼️ PNG + Etiqueta
         </button>
         <button type="button" class="btn btn-subtle btn-sm" id="btnExportPngClean">
-          🖼️ PNG Ultra-HD Limpio
+          🖼️ PNG Limpio
         </button>
         <button type="button" class="btn btn-subtle btn-sm" id="btnExportSvg">
           📐 Vectorial SVG
@@ -2460,7 +2805,7 @@
         </button>
       </div>
 
-      <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
         <button type="button" class="btn btn-subtle btn-sm" id="btnSendModalQrToPlaque" style="color: var(--bc-cyan);">
           🪧 Abrir en Estudio de Placas
         </button>
@@ -3380,8 +3725,9 @@
         const previewCanvas = document.createElement("canvas");
         previewCanvas.width = 560;
         previewCanvas.height = 560;
-        previewCanvas.style.width = "210px";
-        previewCanvas.style.height = "210px";
+        previewCanvas.style.width = "156px";
+        previewCanvas.style.height = "156px";
+        previewCanvas.style.maxWidth = "100%";
         previewCanvas.style.display = "block";
         const ctx = previewCanvas.getContext("2d");
         ctx.fillStyle = "#FFFFFF";
@@ -3726,21 +4072,54 @@
         reader.readAsDataURL(file);
       });
 
+      function filterPlaqueCardsByMotif(filterVal) {
+        const mode = filterVal || "all";
+        document.querySelectorAll(".motif-filter-pill").forEach(function (pill) {
+          pill.classList.toggle("active", pill.getAttribute("data-filter-motif") === mode);
+        });
+        MOTIFS.forEach(function (m) {
+          const card = document.getElementById("cardMotif_" + m);
+          if (!card) return;
+          if (mode === "all" || mode === m) {
+            card.style.display = "flex";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      }
+
+      document.querySelectorAll(".motif-filter-pill").forEach(function (pill) {
+        pill.addEventListener("click", function () {
+          filterPlaqueCardsByMotif(pill.getAttribute("data-filter-motif") || "all");
+        });
+      });
+
       function openPlaqueStudioWithTag(item) {
         if (!item) return;
         switchMainView("plaques");
         const hay = ((item.name || "") + " " + (item.slug || "") + " " + (item.targetUrl || "")).toLowerCase();
         let targetMotif = "google";
-        if (hay.includes("menu") || hay.includes("menú") || hay.includes("carta") || hay.includes("mesa")) {
+        if (hay.includes("burger") || hay.includes("comida") || hay.includes("roja")) {
+          targetMotif = "comida1";
+        } else if (hay.includes("gourmet") || hay.includes("dark")) {
+          targetMotif = "comida2";
+        } else if (hay.includes("menu") || hay.includes("menú") || hay.includes("carta") || hay.includes("mesa")) {
           targetMotif = "menu";
         } else if (hay.includes("insta") || hay.includes("ig")) {
           targetMotif = "instagram";
+        } else if (hay.includes("blue") || hay.includes("contacto") || hay.includes("vcard")) {
+          targetMotif = "bluecode";
         }
         const sel = document.getElementById("selectTag_" + targetMotif);
         const urlIn = document.getElementById("customUrl_" + targetMotif);
         if (sel) sel.value = item.slug;
         if (urlIn) urlIn.value = getFixedUrl(item.slug);
         renderSinglePlaquePreview(targetMotif);
+        if (window.innerWidth <= 768) {
+          filterPlaqueCardsByMotif(targetMotif);
+        } else {
+          filterPlaqueCardsByMotif("all");
+        }
         const card = document.getElementById("cardMotif_" + targetMotif);
         if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
         showToast("Tag '" + (item.name || item.slug) + "' cargado en placa " + targetMotif.toUpperCase());
