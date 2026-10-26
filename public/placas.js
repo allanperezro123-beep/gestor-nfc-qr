@@ -51,15 +51,15 @@
     comida1: [
       { id: "qr", label: "Código QR", x: 620, y: 515, w: 280, h: 365, cx: 760, cy: 714 },
       { id: "nfc", label: "Ilustración NFC", x: 145, y: 540, w: 370, h: 330, cx: 338, cy: 720 },
-      { id: "hero", label: "Icono Burger & Fries", x: 375, y: 40, w: 250, h: 195, cx: 500, cy: 138 },
-      { id: "title", label: "Título BURGER & CO.", x: 110, y: 225, w: 780, h: 195, cx: 500, cy: 320 },
+      { id: "hero", label: "Icono Burger & Fries", x: 365, y: 30, w: 270, h: 175, cx: 500, cy: 118 },
+      { id: "title", label: "Título BURGER & CO.", x: 110, y: 215, w: 780, h: 175, cx: 500, cy: 305 },
       { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 945 }
     ],
     comida2: [
       { id: "qr", label: "Código QR", x: 620, y: 515, w: 280, h: 365, cx: 760, cy: 714 },
       { id: "nfc", label: "Ilustración NFC", x: 145, y: 540, w: 370, h: 330, cx: 338, cy: 720 },
-      { id: "hero", label: "Icono Burger & Fries", x: 375, y: 40, w: 250, h: 195, cx: 500, cy: 138 },
-      { id: "title", label: "Título BURGER & CO.", x: 110, y: 225, w: 780, h: 195, cx: 500, cy: 320 },
+      { id: "hero", label: "Icono Burger & Fries", x: 365, y: 30, w: 270, h: 175, cx: 500, cy: 118 },
+      { id: "title", label: "Título BURGER & CO.", x: 110, y: 215, w: 780, h: 175, cx: 500, cy: 305 },
       { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 945 }
     ]
   };
@@ -69,7 +69,8 @@
 
   const headerAssets = {
     comida1: typeof Image !== "undefined" ? new Image() : null,
-    comida2: typeof Image !== "undefined" ? new Image() : null
+    comida2: typeof Image !== "undefined" ? new Image() : null,
+    burgerIcon: typeof Image !== "undefined" ? new Image() : null
   };
 
   function notifyAssetsReady() {
@@ -80,11 +81,15 @@
 
   if (headerAssets.comida1) {
     headerAssets.comida1.onload = notifyAssetsReady;
-    headerAssets.comida1.src = "/header_comida1.png";
+    headerAssets.comida1.src = "/header_comida1.png?v=2";
   }
   if (headerAssets.comida2) {
     headerAssets.comida2.onload = notifyAssetsReady;
-    headerAssets.comida2.src = "/header_comida2.png";
+    headerAssets.comida2.src = "/header_comida2.png?v=2";
+  }
+  if (headerAssets.burgerIcon) {
+    headerAssets.burgerIcon.onload = notifyAssetsReady;
+    headerAssets.burgerIcon.src = "/icon_burger_fries.png?v=2";
   }
 
   function setOnAssetsLoaded(fn) {
@@ -1886,6 +1891,13 @@
         }
         ctx.restore();
       });
+
+      ctx.save();
+      ctx.fillStyle = textColor;
+      ctx.textAlign = "center";
+      ctx.font = "500 38px 'Plus Jakarta Sans', Arial, sans-serif";
+      ctx.fillText("or", 506, 735);
+      ctx.restore();
     }
 
     if (showQr) {
@@ -1909,9 +1921,6 @@
           ctx.save();
           ctx.fillStyle = textColor;
           ctx.textAlign = "center";
-          ctx.font = "500 38px 'Plus Jakarta Sans', Arial, sans-serif";
-          ctx.fillText("or", 506, 735);
-
           ctx.font = "500 31px 'Plus Jakarta Sans', Arial, sans-serif";
           ctx.fillText(data.qrCaptionText || "Scan QR code", 725, 572);
 
@@ -1971,19 +1980,10 @@
 
     const titleMain = (data.titleMain || "BURGER & CO.").trim();
     const subtitle = (data.subtitle || "Sabor al instante").trim();
-    const heroOff = getGroupOffset(data, "hero");
-    const titleOff = getGroupOffset(data, "title");
     const headerImg = isComida2 ? headerAssets.comida2 : headerAssets.comida1;
     const hasLoadedImg = Boolean(headerImg && headerImg.complete && headerImg.naturalWidth > 0);
-
-    // Si el usuario mantiene el título/subtítulo original y el estilo original, usamos el arte ilustrado 100% original
-    const useOriginalArtwork =
-      hasLoadedImg &&
-      data.borderStyle !== "accent" &&
-      titleMain.toUpperCase() === "BURGER & CO." &&
-      subtitle.toLowerCase() === "sabor al instante" &&
-      heroOff.x === 0 && heroOff.y === 0 && heroOff.scale === 1 &&
-      titleOff.x === 0 && titleOff.y === 0 && titleOff.scale === 1;
+    const burgerIconImg = headerAssets.burgerIcon;
+    const hasBurgerIcon = Boolean(burgerIconImg && burgerIconImg.complete && burgerIconImg.naturalWidth > 0);
 
     roundRectPath(ctx, 0, 0, 1000, 1000, 82);
     ctx.clip();
@@ -1992,10 +1992,27 @@
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, 1000, 1000);
 
-      if (useOriginalArtwork) {
+      if (hasLoadedImg) {
+        // SIEMPRE dibujamos el fondo ilustrado limpio (sin texto ni icono pegados),
+        // para que al mover o editar textos/iconos NUNCA desaparezcan las hamburguesas
         ctx.drawImage(headerImg, 0, 0, 1000, 550);
+
+        // Si el usuario eligió un color personalizado de cabecera, aplicamos un tinte suave manteniendo el arte de fondo
+        if (data.borderStyle === "accent" && accentColor.toLowerCase() !== defaultAccent.toLowerCase()) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(1000, 0);
+          ctx.lineTo(1000, 472);
+          ctx.bezierCurveTo(760, 485, 520, 342, 0, 520);
+          ctx.closePath();
+          ctx.fillStyle = accentColor;
+          ctx.globalAlpha = 0.72;
+          ctx.fill();
+          ctx.restore();
+        }
       } else {
-        // Sub-onda color durazno (#FAD9C8)
+        // Fallback vectorial instantáneo mientras termina de cargar la imagen
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(1000, 0);
@@ -2005,7 +2022,6 @@
         ctx.fillStyle = peachWaveColor;
         ctx.fill();
 
-        // Onda principal (Rojo Burger o Negro Gourmet o color personalizado)
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(1000, 0);
@@ -2023,11 +2039,18 @@
     }
 
     if (showIcons) {
-      if (!useOriginalArtwork) {
-        withGroupTransform(ctx, data, "hero", 500, 138, function () {
-          drawBurgerFriesHeroIcon(ctx, 500, 132, headerContentColor);
-        });
-      }
+      withGroupTransform(ctx, data, "hero", 500, 118, function () {
+        if (hasBurgerIcon && darkHeader) {
+          ctx.save();
+          ctx.shadowColor = "rgba(0,0,0,0.52)";
+          ctx.shadowBlur = 16;
+          ctx.shadowOffsetY = 6;
+          ctx.drawImage(burgerIconImg, 368.75, 32.5, 259.375, 168.75);
+          ctx.restore();
+        } else {
+          drawBurgerFriesHeroIcon(ctx, 500, 128, headerContentColor);
+        }
+      });
 
       withGroupTransform(ctx, data, "nfc", 338, 720, function () {
         drawUnifiedMenuNfcIllustration(ctx, 338, 732, 0.96, textColor, darkBg ? bgColor : "#FFFFFF");
@@ -2046,21 +2069,24 @@
       });
     }
 
-    if (showText && !useOriginalArtwork) {
-      withGroupTransform(ctx, data, "title", 500, 320, function () {
+    if (showText) {
+      withGroupTransform(ctx, data, "title", 500, 305, function () {
         ctx.save();
         ctx.textAlign = "center";
         ctx.fillStyle = headerContentColor;
-        ctx.shadowColor = "rgba(0,0,0,0.45)";
-        ctx.shadowBlur = 14;
-        ctx.shadowOffsetY = 5;
+        ctx.shadowColor = "rgba(0,0,0,0.72)";
+        ctx.shadowBlur = 16;
+        ctx.shadowOffsetY = 6;
 
-        const fontSizeMain = titleMain.length > 14 ? 76 : 96;
+        const fontSizeMain = titleMain.length > 14 ? 76 : 94;
         ctx.font = "800 " + fontSizeMain + "px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillText(titleMain, 500, 320);
+        ctx.fillText(titleMain, 500, 298);
 
-        ctx.font = "500 38px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillText(subtitle, 500, 386);
+        ctx.shadowColor = "rgba(0,0,0,0.78)";
+        ctx.shadowBlur = 12;
+        ctx.shadowOffsetY = 4;
+        ctx.font = "500 39px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillText(subtitle, 500, 364);
         ctx.restore();
       });
     }
