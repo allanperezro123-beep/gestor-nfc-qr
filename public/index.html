@@ -14,7 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle.js"></script>
-  <script src="/placas.js?v=9"></script>
+  <script src="/placas.js?v=10"></script>
 
   <style>
     :root {
@@ -1167,6 +1167,77 @@
       align-items: center;
       justify-content: space-between;
       gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Librería Visual de Iconos (Acorde al QR) y Selector de Fondo Superior */
+    .icon-lib-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(66px, 1fr));
+      gap: 5px;
+    }
+    .icon-lib-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 4px;
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      transition: all 0.14s ease;
+      line-height: 1.15;
+      text-align: center;
+      user-select: none;
+    }
+    .icon-lib-btn .ico-em {
+      font-size: 0.98rem;
+      line-height: 1.1;
+    }
+    .icon-lib-btn:hover {
+      border-color: rgba(8, 208, 230, 0.45);
+      color: #fff;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .icon-lib-btn.active {
+      border-color: var(--bc-cyan);
+      background: rgba(8, 101, 245, 0.18);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(8, 208, 230, 0.28);
+    }
+    .sync-icon-qr-chk {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: none;
+      letter-spacing: 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .sync-icon-qr-chk input {
+      accent-color: var(--bc-cyan);
+      width: 13px;
+      height: 13px;
+      cursor: pointer;
+    }
+    .header-bg-control-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .header-bg-control-row .plaque-select {
+      flex: 1;
+      min-width: 165px;
     }
 
     /* Acordeón Desplegable de Personalización Avanzada por Tarjeta */
@@ -1628,8 +1699,12 @@
 
           <div style="display: flex; flex-wrap: wrap; gap: 6px;">
             <input type="file" id="inputCustomQrLogo" accept="image/*" style="display: none;" />
-            <button type="button" class="btn btn-subtle btn-sm" id="btnUploadCustomQrLogo" style="border-color: rgba(8, 208, 230, 0.35); color: var(--bc-cyan);" title="Subir tu propio logo PNG/SVG para el centro de los códigos QR">
-              🖼️ Subir Logo QR
+            <input type="file" id="inputCustomHeaderBg" accept="image/*" style="display: none;" />
+            <button type="button" class="btn btn-subtle btn-sm" id="btnUploadCustomQrLogo" style="border-color: rgba(8, 208, 230, 0.35); color: var(--bc-cyan);" title="Subir tu propio logo PNG/SVG para el icono superior y el centro de los códigos QR">
+              🖼️ Subir Logo / Icono
+            </button>
+            <button type="button" class="btn btn-subtle btn-sm" id="btnUploadCustomHeaderBgGlobal" style="border-color: rgba(8, 208, 230, 0.35); color: var(--bc-cyan);" title="Subir una imagen o foto personalizada para el fondo superior (el fondo de arriba) de la placa activa">
+              🌄 Subir Fondo de Arriba
             </button>
             <button type="button" class="btn btn-bc btn-sm" id="btnExportPlaquePdf" title="Generar PDF con todas las placas y copias seleccionadas en centímetros exactos">
               📄 PDF Lote
@@ -4114,6 +4189,200 @@
         comida2: "original"
       };
 
+      const heroIconState = {
+        google: "original",
+        menu: "original",
+        instagram: "original",
+        bluecode: "original",
+        comida1: "original",
+        comida2: "original"
+      };
+
+      const headerBgState = {
+        google: "original",
+        menu: "original",
+        instagram: "original",
+        bluecode: "original",
+        comida1: "original",
+        comida2: "original"
+      };
+
+      let activeMotifTab = "google";
+      let pendingHeaderBgMotif = null;
+      let pendingCustomIconMotif = null;
+
+      const ICON_LIBRARY_ITEMS = [
+        { id: "original", em: "✨", label: "Original" },
+        { id: "menu", em: "🍴", label: "Menú" },
+        { id: "burger", em: "🍔", label: "Burger" },
+        { id: "pizza", em: "🍕", label: "Pizza" },
+        { id: "coffee", em: "☕", label: "Café" },
+        { id: "cocktail", em: "🍸", label: "Bar / Licor" },
+        { id: "icecream", em: "🍦", label: "Helado" },
+        { id: "barber", em: "✂️", label: "Barbería" },
+        { id: "store", em: "🛍️", label: "Tienda" },
+        { id: "wifi", em: "📶", label: "Wi-Fi" },
+        { id: "whatsapp", em: "💬", label: "WhatsApp" },
+        { id: "instagram", em: "📸", label: "Instagram" },
+        { id: "tiktok", em: "🎵", label: "TikTok" },
+        { id: "google", em: "⭐", label: "Google" },
+        { id: "bluecode", em: "🔹", label: "BlueCode" },
+        { id: "custom", em: "📤", label: "Subir" },
+        { id: "none", em: "🚫", label: "Sin Icono" }
+      ];
+
+      const EXTENDED_QR_LOGO_OPTIONS = [
+        { value: "pizza", text: "🍕 Logo Pizza" },
+        { value: "coffee", text: "☕ Logo Café" },
+        { value: "cocktail", text: "🍸 Logo Bar / Cóctel" },
+        { value: "icecream", text: "🍦 Logo Helado / Postre" },
+        { value: "barber", text: "✂️ Logo Barbería" },
+        { value: "store", text: "🛍️ Logo Tienda / Boutique" },
+        { value: "tiktok", text: "🎵 Logo TikTok" }
+      ];
+
+      function populateExtendedQrLogoSelects() {
+        const selects = [document.getElementById("modalQrLogo")];
+        MOTIFS.forEach(function (m) {
+          selects.push(document.getElementById("qrLogo_" + m));
+        });
+        selects.forEach(function (sel) {
+          if (!sel) return;
+          const customOpt = sel.querySelector('option[value="custom"]');
+          EXTENDED_QR_LOGO_OPTIONS.forEach(function (item) {
+            if (!sel.querySelector('option[value="' + item.value + '"]')) {
+              const opt = document.createElement("option");
+              opt.value = item.value;
+              opt.textContent = item.text;
+              if (customOpt) sel.insertBefore(opt, customOpt);
+              else sel.appendChild(opt);
+            }
+          });
+        });
+      }
+
+      function updateActiveIconLibBtn(motif, activeId) {
+        const grid = document.getElementById("iconLibGrid_" + motif);
+        if (!grid) return;
+        grid.querySelectorAll(".icon-lib-btn").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-icon-id") === activeId);
+        });
+      }
+
+      function injectIconLibraryAndHeaderBgControls() {
+        populateExtendedQrLogoSelects();
+
+        MOTIFS.forEach(function (m) {
+          const card = document.getElementById("cardMotif_" + m);
+          if (!card) return;
+          const colControls = card.querySelector(".plaque-col-controls");
+          const drawer = card.querySelector(".plaque-custom-drawer");
+          if (!colControls || !drawer || document.getElementById("iconLibBox_" + m)) return;
+
+          const summaryEl = drawer.querySelector("summary");
+          if (summaryEl) {
+            summaryEl.textContent = "🎨 3. Personalizar QR y Colores";
+          }
+
+          const box = document.createElement("div");
+          box.className = "plaque-section-box";
+          box.id = "iconLibBox_" + m;
+
+          const buttonsHtml = ICON_LIBRARY_ITEMS.map(function (it) {
+            const isAct = it.id === "original" ? " active" : "";
+            return '<button type="button" class="icon-lib-btn' + isAct + '" data-icon-id="' + it.id + '" title="Cambiar icono a ' + it.label + '">' +
+              '<span class="ico-em">' + it.em + '</span>' +
+              '<span>' + it.label + '</span>' +
+            '</button>';
+          }).join("");
+
+          box.innerHTML =
+            '<div class="plaque-section-label">' +
+              '<span>2. Librería de Iconos y Fondo de Arriba</span>' +
+              '<label class="sync-icon-qr-chk" title="Al elegir un icono arriba, cambia automáticamente el logo central del QR para que vayan acorde">' +
+                '<input type="checkbox" id="syncIconQr_' + m + '" checked />' +
+                '<span>🔗 Acorde al QR</span>' +
+              '</label>' +
+            '</div>' +
+            '<div class="icon-lib-grid" id="iconLibGrid_' + m + '">' +
+              buttonsHtml +
+            '</div>' +
+            '<div class="plaque-field-group" style="margin-top: 2px;">' +
+              '<label><span>Fondo de Arriba (Cabecera Curva Reemplazable)</span></label>' +
+              '<div class="header-bg-control-row">' +
+                '<select id="headerBgMode_' + m + '" class="plaque-select" title="Cambiar el fondo superior de la placa">' +
+                  '<option value="original" selected>✨ Fondo Original de Plantilla</option>' +
+                  '<option value="comida1">🍔 Hamburguesas Rojo Ilustrado</option>' +
+                  '<option value="comida2">🖤 Hamburguesa Gourmet Dark</option>' +
+                  '<option value="bluecode-glow">🌌 Onda Neón BlueCode</option>' +
+                  '<option value="dark-gold">🏆 Negro & Oro Luxury</option>' +
+                  '<option value="fire-ember">🔥 Brasa & Fuego</option>' +
+                  '<option value="coffee-warm">☕ Café Espresso & Caramelo</option>' +
+                  '<option value="ig-sunset">🌅 Degradado Instagram</option>' +
+                  '<option value="emerald-fresh">🌿 Verde Esmeralda / Eco</option>' +
+                  '<option value="solid-custom">🎨 Color Sólido (Selector Cabecera)</option>' +
+                  '<option value="custom-image">🖼️ Tu Imagen / Foto Subida</option>' +
+                '</select>' +
+                '<button type="button" class="btn btn-subtle btn-sm" data-upload-bg-motif="' + m + '" style="border-color: rgba(8, 208, 230, 0.35); color: var(--bc-cyan); padding: 5px 9px; font-size: 0.72rem; white-space: nowrap;" title="Subir una foto o imagen propia para el fondo de arriba">' +
+                  '📤 Subir Fondo' +
+                '</button>' +
+              '</div>' +
+            '</div>';
+
+          colControls.insertBefore(box, drawer);
+
+          const gridEl = document.getElementById("iconLibGrid_" + m);
+          const syncChk = document.getElementById("syncIconQr_" + m);
+          const qrLogoSel = document.getElementById("qrLogo_" + m);
+          const bgModeSel = document.getElementById("headerBgMode_" + m);
+          const uploadBgBtn = box.querySelector('[data-upload-bg-motif="' + m + '"]');
+
+          if (gridEl) {
+            gridEl.querySelectorAll(".icon-lib-btn").forEach(function (btn) {
+              btn.addEventListener("click", function () {
+                const iconId = btn.getAttribute("data-icon-id") || "original";
+                if (iconId === "custom") {
+                  pendingCustomIconMotif = m;
+                  document.getElementById("inputCustomQrLogo").click();
+                }
+                heroIconState[m] = iconId;
+                updateActiveIconLibBtn(m, iconId);
+
+                if (syncChk && syncChk.checked && qrLogoSel) {
+                  const targetQrLogo = iconId === "original" ? (DEFAULT_MOTIF_FIELDS[m].qrLogo || "bluecode") : iconId;
+                  if (qrLogoSel.querySelector('option[value="' + targetQrLogo + '"]')) {
+                    qrLogoSel.value = targetQrLogo;
+                  }
+                }
+                renderSinglePlaquePreview(m);
+              });
+            });
+          }
+
+          if (bgModeSel) {
+            bgModeSel.addEventListener("change", function () {
+              const mode = bgModeSel.value || "original";
+              if (mode === "custom-image") {
+                const hasImg = window.BlueCodePlaqueStudio && window.BlueCodePlaqueStudio.getCustomHeaderBgImage && window.BlueCodePlaqueStudio.getCustomHeaderBgImage(m);
+                if (!hasImg) {
+                  pendingHeaderBgMotif = m;
+                  document.getElementById("inputCustomHeaderBg").click();
+                }
+              }
+              headerBgState[m] = mode;
+              renderSinglePlaquePreview(m);
+            });
+          }
+
+          if (uploadBgBtn) {
+            uploadBgBtn.addEventListener("click", function () {
+              pendingHeaderBgMotif = m;
+              document.getElementById("inputCustomHeaderBg").click();
+            });
+          }
+        });
+      }
+
       function syncCaptionFieldVisibility(motif) {
         const modeEl = document.getElementById("qrCaptionMode_" + motif);
         const wrapEl = document.getElementById("wrapCaptionText_" + motif);
@@ -4227,6 +4496,11 @@
             if (colEl && defs.qrColor) colEl.value = defs.qrColor;
             if (capModeEl && defs.qrCaptionMode) capModeEl.value = defs.qrCaptionMode;
             borderStyleState[motif] = "original";
+            heroIconState[motif] = "original";
+            headerBgState[motif] = "original";
+            const bgModeSel = document.getElementById("headerBgMode_" + motif);
+            if (bgModeSel) bgModeSel.value = "original";
+            updateActiveIconLibBtn(motif, "original");
             syncCaptionFieldVisibility(motif);
           }
         });
@@ -4235,6 +4509,12 @@
       function resetMotifCustomization(motif) {
         layoutState[motif] = createDefaultLayout();
         activeGroupState[motif] = null;
+        heroIconState[motif] = "original";
+        headerBgState[motif] = "original";
+        const bgModeSel = document.getElementById("headerBgMode_" + motif);
+        if (bgModeSel) bgModeSel.value = "original";
+        updateActiveIconLibBtn(motif, "original");
+
         const presetSel = document.getElementById("palettePreset_" + motif);
         if (presetSel) presetSel.value = "original";
         applyPalettePreset(motif, "original");
@@ -4299,9 +4579,10 @@
         switchMainView("plaques");
       });
 
-      // Subir logo propio para el centro de los códigos QR
+      // Subir logo propio para el icono superior y el centro de los códigos QR
       const inputCustomQrLogo = document.getElementById("inputCustomQrLogo");
       document.getElementById("btnUploadCustomQrLogo").addEventListener("click", function () {
+        pendingCustomIconMotif = null;
         inputCustomQrLogo.click();
       });
       inputCustomQrLogo.addEventListener("change", function (e) {
@@ -4314,22 +4595,71 @@
             if (window.BlueCodePlaqueStudio && window.BlueCodePlaqueStudio.setCustomQrLogoImage) {
               window.BlueCodePlaqueStudio.setCustomQrLogoImage(img);
             }
-            MOTIFS.forEach(function (m) {
+            const targetMotifs = pendingCustomIconMotif ? [pendingCustomIconMotif] : MOTIFS;
+            targetMotifs.forEach(function (m) {
               const selLogo = document.getElementById("qrLogo_" + m);
               if (selLogo) selLogo.value = "custom";
+              const syncChk = document.getElementById("syncIconQr_" + m);
+              if (pendingCustomIconMotif === m || (syncChk && syncChk.checked)) {
+                heroIconState[m] = "custom";
+                updateActiveIconLibBtn(m, "custom");
+              }
             });
+            pendingCustomIconMotif = null;
             if (modalQrLogo) modalQrLogo.value = "custom";
             renderAllPlaquePreviews();
             renderModalQrPreview();
-            showToast("Logo personalizado cargado en el centro de los códigos QR.");
+            showToast("Icono / Logo personalizado aplicado arriba y en el QR.");
           };
           img.src = ev.target.result;
         };
         reader.readAsDataURL(file);
       });
 
+      // Subir imagen o foto propia para el Fondo de Arriba (Cabecera Curva)
+      const inputCustomHeaderBg = document.getElementById("inputCustomHeaderBg");
+      const btnUploadCustomHeaderBgGlobal = document.getElementById("btnUploadCustomHeaderBgGlobal");
+      if (btnUploadCustomHeaderBgGlobal) {
+        btnUploadCustomHeaderBgGlobal.addEventListener("click", function () {
+          pendingHeaderBgMotif = activeMotifTab && activeMotifTab !== "all" ? activeMotifTab : null;
+          inputCustomHeaderBg.click();
+        });
+      }
+      if (inputCustomHeaderBg) {
+        inputCustomHeaderBg.addEventListener("change", function (e) {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (ev) {
+            const img = new Image();
+            img.onload = function () {
+              const targetM = pendingHeaderBgMotif;
+              if (window.BlueCodePlaqueStudio && window.BlueCodePlaqueStudio.setCustomHeaderBgImage) {
+                if (targetM) {
+                  window.BlueCodePlaqueStudio.setCustomHeaderBgImage(targetM, img);
+                } else {
+                  window.BlueCodePlaqueStudio.setCustomHeaderBgImage("global", img);
+                }
+              }
+              const list = targetM ? [targetM] : MOTIFS;
+              list.forEach(function (m) {
+                headerBgState[m] = "custom-image";
+                const bgModeSel = document.getElementById("headerBgMode_" + m);
+                if (bgModeSel) bgModeSel.value = "custom-image";
+              });
+              pendingHeaderBgMotif = null;
+              renderAllPlaquePreviews();
+              showToast("Fondo de arriba actualizado con tu imagen.");
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
       function filterPlaqueCardsByMotif(filterVal) {
         const mode = filterVal || "google";
+        activeMotifTab = mode;
         const gridEl = document.getElementById("plaqueCardsGrid") || document.querySelector(".plaque-cards-grid");
         if (gridEl) {
           gridEl.classList.toggle("single-studio-mode", mode !== "all");
@@ -4491,6 +4821,8 @@
           textColor: textColor,
           accentColor: accentColor,
           borderStyle: borderStyleState[motif] || "original",
+          heroIcon: heroIconState[motif] || "original",
+          headerBgMode: headerBgState[motif] || "original",
           qrCaptionMode: qrCaptionMode,
           qrCaptionText: qrCaptionText,
           layout: JSON.parse(JSON.stringify(layoutState[motif])),
@@ -4729,7 +5061,17 @@
           renderSinglePlaquePreview(m);
         });
 
-        if (qrLogoSel) qrLogoSel.addEventListener("change", function () { renderSinglePlaquePreview(m); });
+        if (qrLogoSel) {
+          qrLogoSel.addEventListener("change", function () {
+            const syncChk = document.getElementById("syncIconQr_" + m);
+            if (syncChk && syncChk.checked) {
+              const v = qrLogoSel.value || "original";
+              heroIconState[m] = v;
+              updateActiveIconLibBtn(m, v);
+            }
+            renderSinglePlaquePreview(m);
+          });
+        }
         if (qrColorSel) qrColorSel.addEventListener("change", function () { renderSinglePlaquePreview(m); });
         if (qrCaptionModeSel) {
           qrCaptionModeSel.addEventListener("change", function () {
@@ -5027,6 +5369,7 @@
       }
 
       // Inicio en modo Estudio Enfocado (1 plantilla activa) y limpieza anti-autofill
+      injectIconLibraryAndHeaderBgControls();
       sanitizePlaqueStudioInputs(true);
       window.addEventListener("pageshow", function () {
         sanitizePlaqueStudioInputs(false);

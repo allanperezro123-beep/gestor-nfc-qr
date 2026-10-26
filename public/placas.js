@@ -65,6 +65,7 @@
   };
 
   let customQrLogoImage = null;
+  const customHeaderBgImages = { global: null };
   let onAssetsReadyCallback = null;
 
   const headerAssets = {
@@ -98,6 +99,14 @@
 
   function setCustomQrLogoImage(imgElementOrNull) {
     customQrLogoImage = imgElementOrNull || null;
+  }
+
+  function setCustomHeaderBgImage(motifOrGlobal, imgElementOrNull) {
+    const key = motifOrGlobal || "global";
+    customHeaderBgImages[key] = imgElementOrNull || null;
+    if (imgElementOrNull) {
+      customHeaderBgImages.global = imgElementOrNull;
+    }
   }
 
   function cmToPx(cm, dpi) {
@@ -661,6 +670,469 @@
     ctx.restore();
   }
 
+  // ============================================================================
+  // LIBRERÍA UNIVERSAL DE ICONOS VECTORIALES (PARA CABECERA Y CENTRO DEL QR)
+  // Soporta: menu, burger, pizza, coffee, cocktail, icecream, barber, store,
+  //          wifi, whatsapp, instagram, tiktok, google, bluecode, star, custom
+  // ============================================================================
+  function drawLibraryVectorGlyph(ctx, type, cx, cy, size, fgColor, cutoutColor) {
+    const col = fgColor || "#FFFFFF";
+    const cut = cutoutColor || "#1B1A1A";
+    const s = size / 100;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    ctx.fillStyle = col;
+    ctx.strokeStyle = col;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    if (type === "pizza") {
+      // Porción de pizza triangular con borde de queso y pepperonis
+      ctx.beginPath();
+      ctx.moveTo(0, 38);
+      ctx.lineTo(-34, -24);
+      ctx.quadraticCurveTo(0, -40, 34, -24);
+      ctx.closePath();
+      ctx.fill();
+
+      // Línea separadora del borde superior (corteza)
+      ctx.strokeStyle = cut;
+      ctx.lineWidth = 4.5;
+      ctx.beginPath();
+      ctx.quadraticCurveTo(0, -26, 29, -14);
+      ctx.moveTo(-29, -14);
+      ctx.quadraticCurveTo(0, -26, 29, -14);
+      ctx.stroke();
+
+      // Pepperonis recortados
+      ctx.fillStyle = cut;
+      const peps = [[-10, -4, 6.5], [11, -6, 6], [0, 12, 6.5], [-6, 23, 4.5]];
+      for (let i = 0; i < peps.length; i++) {
+        ctx.beginPath();
+        ctx.arc(peps[i][0], peps[i][1], peps[i][2], 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (type === "coffee") {
+      // Taza de café caliente con plato y ondas de vapor
+      // Vapor superior
+      ctx.lineWidth = 5.5;
+      const steamX = [-14, 0, 14];
+      for (let i = 0; i < steamX.length; i++) {
+        const sx = steamX[i];
+        ctx.beginPath();
+        ctx.moveTo(sx, -16);
+        ctx.quadraticCurveTo(sx - 5, -26, sx, -34);
+        ctx.quadraticCurveTo(sx + 5, -40, sx, -46);
+        ctx.stroke();
+      }
+      // Asa derecha
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.arc(24, 4, 12, -Math.PI * 0.45, Math.PI * 0.45);
+      ctx.stroke();
+      // Cuerpo de la taza
+      ctx.beginPath();
+      ctx.moveTo(-28, -10);
+      ctx.lineTo(24, -10);
+      ctx.lineTo(20, 14);
+      ctx.quadraticCurveTo(18, 28, 0, 28);
+      ctx.quadraticCurveTo(-22, 28, -24, 14);
+      ctx.closePath();
+      ctx.fill();
+      // Plato inferior
+      roundRectPath(ctx, -36, 33, 68, 7, 3.5);
+      ctx.fill();
+    } else if (type === "cocktail") {
+      // Copa Martini / Bar con rodaja cítrica y aceituna
+      // Rodaja en el borde
+      ctx.lineWidth = 5.5;
+      ctx.beginPath();
+      ctx.arc(24, -28, 12, 0, Math.PI * 2);
+      ctx.stroke();
+      // Copa triangular
+      ctx.beginPath();
+      ctx.moveTo(-34, -26);
+      ctx.lineTo(34, -26);
+      ctx.lineTo(0, 12);
+      ctx.closePath();
+      ctx.fill();
+      // Palillo con aceituna
+      ctx.strokeStyle = cut;
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(-10, -22);
+      ctx.lineTo(6, -2);
+      ctx.stroke();
+      ctx.fillStyle = cut;
+      ctx.beginPath();
+      ctx.arc(-2, -12, 5, 0, Math.PI * 2);
+      ctx.fill();
+      // Tallo y base de la copa
+      ctx.strokeStyle = col;
+      ctx.fillStyle = col;
+      ctx.lineWidth = 6.5;
+      ctx.beginPath();
+      ctx.moveTo(0, 10);
+      ctx.lineTo(0, 38);
+      ctx.stroke();
+      roundRectPath(ctx, -22, 35, 44, 7, 3.5);
+      ctx.fill();
+    } else if (type === "icecream") {
+      // Cono de helado con bolas y cereza
+      // Cono inferior
+      ctx.beginPath();
+      ctx.moveTo(-20, 4);
+      ctx.lineTo(20, 4);
+      ctx.lineTo(0, 44);
+      ctx.closePath();
+      ctx.fill();
+      // Textura waffle en el cono
+      ctx.strokeStyle = cut;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-12, 10);
+      ctx.lineTo(8, 28);
+      ctx.moveTo(12, 10);
+      ctx.lineTo(-8, 28);
+      ctx.stroke();
+      // Bolas de helado
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(-12, -4, 15, 0, Math.PI * 2);
+      ctx.arc(12, -4, 15, 0, Math.PI * 2);
+      ctx.arc(0, -18, 17, 0, Math.PI * 2);
+      ctx.fill();
+      // Cereza arriba
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(0, -37, 6.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(0, -42);
+      ctx.quadraticCurveTo(10, -48, 14, -44);
+      ctx.stroke();
+    } else if (type === "barber") {
+      // Tijeras de barbería cruzadas
+      ctx.lineWidth = 7;
+      // Hoja 1
+      ctx.beginPath();
+      ctx.moveTo(-24, 18);
+      ctx.lineTo(26, -34);
+      ctx.stroke();
+      // Hoja 2
+      ctx.beginPath();
+      ctx.moveTo(24, 18);
+      ctx.lineTo(-26, -34);
+      ctx.stroke();
+      // Aros de los dedos
+      ctx.lineWidth = 6.5;
+      ctx.beginPath();
+      ctx.arc(-24, 28, 12, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(24, 28, 12, 0, Math.PI * 2);
+      ctx.stroke();
+      // Tornillo central
+      ctx.fillStyle = cut;
+      ctx.beginPath();
+      ctx.arc(0, -6, 3.8, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === "store") {
+      // Bolsa de compras / Tienda con estrella central
+      ctx.lineWidth = 6.5;
+      ctx.beginPath();
+      ctx.arc(0, -18, 15, Math.PI, 0, false);
+      ctx.stroke();
+      roundRectPath(ctx, -30, -18, 60, 56, [6, 6, 14, 14]);
+      ctx.fill();
+      drawStar(ctx, 0, 10, 14, 6.5, cut);
+    } else if (type === "tiktok") {
+      // Nota musical estilo TikTok
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.moveTo(6, -34);
+      ctx.lineTo(6, 16);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(-8, 16, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(6, -34);
+      ctx.quadraticCurveTo(12, -16, 30, -14);
+      ctx.stroke();
+    } else if (type === "wifi") {
+      ctx.lineWidth = 8;
+      for (let i = 1; i <= 3; i++) {
+        ctx.beginPath();
+        ctx.arc(0, 24, i * 19, -Math.PI * 0.78, -Math.PI * 0.22);
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.arc(0, 26, 7.5, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === "whatsapp") {
+      // Burbuja de chat con teléfono adentro
+      ctx.beginPath();
+      ctx.arc(0, -2, 34, 0.18 * Math.PI, 1.92 * Math.PI, false);
+      ctx.lineTo(28, 28);
+      ctx.lineTo(10, 24);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = cut;
+      ctx.lineWidth = 7.5;
+      ctx.beginPath();
+      ctx.arc(0, -2, 16, 0.15 * Math.PI, 1.35 * Math.PI);
+      ctx.stroke();
+    } else if (type === "instagram") {
+      ctx.lineWidth = 7.5;
+      roundRectPath(ctx, -32, -32, 64, 64, 18);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, 15, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(18, -18, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === "google") {
+      drawStar(ctx, 0, 0, 34, 15, col);
+    } else if (type === "star") {
+      drawStar(ctx, 0, 0, 36, 16, col);
+    } else {
+      // Por defecto: Cubiertos (menu)
+      roundRectPath(ctx, -24, -34, 5, 26, 2.5);
+      ctx.fill();
+      roundRectPath(ctx, -15, -34, 5, 26, 2.5);
+      ctx.fill();
+      roundRectPath(ctx, -6, -34, 5, 26, 2.5);
+      ctx.fill();
+      roundRectPath(ctx, -24, -12, 23, 12, 5);
+      ctx.fill();
+      roundRectPath(ctx, -16, -2, 8, 36, 4);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(16, -18, 12, 17, 0, 0, Math.PI * 2);
+      ctx.fill();
+      roundRectPath(ctx, 12, -4, 8, 38, 4);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  // Dibuja cualquier icono de la librería dentro del centro del QR
+  function drawExtendedBadgeIcon(ctx, type, cx, cy, size, mainFill) {
+    const r = size * 0.46;
+    const badgeColors = {
+      pizza: "#D9381E",
+      coffee: "#6F4E37",
+      cocktail: "#7C3AED",
+      icecream: "#EC4899",
+      barber: "#1E293B",
+      store: "#0D9488",
+      tiktok: "#111111"
+    };
+    const bgCol = badgeColors[type] || (typeof mainFill === "string" ? mainFill : "#1B1A1A");
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = bgCol;
+    ctx.fill();
+    drawLibraryVectorGlyph(ctx, type, cx, cy, size * 0.72, "#FFFFFF", bgCol);
+    ctx.restore();
+  }
+
+  // Dibuja cualquier icono de la librería como Icono Hero Superior de una placa
+  function drawCustomHeroIconOverride(ctx, heroIcon, cx, cy, color, cutoutColor) {
+    if (!heroIcon || heroIcon === "none") return;
+    if (heroIcon === "burger") {
+      const burgerIconImg = headerAssets.burgerIcon;
+      const hasBurgerIcon = Boolean(burgerIconImg && burgerIconImg.complete && burgerIconImg.naturalWidth > 0);
+      if (hasBurgerIcon && color === "#FFFFFF") {
+        ctx.save();
+        ctx.shadowColor = "rgba(0,0,0,0.48)";
+        ctx.shadowBlur = 16;
+        ctx.shadowOffsetY = 6;
+        ctx.drawImage(burgerIconImg, cx - 130, cy - 85, 260, 170);
+        ctx.restore();
+      } else {
+        drawBurgerFriesHeroIcon(ctx, cx, cy + 8, color);
+      }
+      return;
+    }
+    if (heroIcon === "bluecode") {
+      drawBlueCodeLogo(ctx, cx - 95, cy - 52, 104);
+      return;
+    }
+    if (heroIcon === "custom" && customQrLogoImage) {
+      ctx.save();
+      const s = 148;
+      ctx.shadowColor = "rgba(0,0,0,0.32)";
+      ctx.shadowBlur = 14;
+      ctx.shadowOffsetY = 4;
+      ctx.drawImage(customQrLogoImage, cx - s / 2, cy - s / 2, s, s);
+      ctx.restore();
+      return;
+    }
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.35)";
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 5;
+    drawLibraryVectorGlyph(ctx, heroIcon, cx, cy, 165, color, cutoutColor || "#1B1A1A");
+    ctx.restore();
+  }
+
+  // Dibuja el Fondo Superior (Cabecera en Onda) Reemplazable en cualquier plantilla
+  function drawReplaceableWaveHeader(ctx, motif, data, defaultAccent, defaultSubWave) {
+    const mode = data.headerBgMode || "original";
+    const accentColor = data.accentColor || defaultAccent || "#1B1A1A";
+    const subWave = defaultSubWave || "#DCE8F3";
+
+    function traceSubWavePath() {
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(1000, 0);
+      ctx.lineTo(1000, 492);
+      ctx.bezierCurveTo(760, 505, 520, 365, 0, 542);
+      ctx.closePath();
+    }
+
+    function traceMainWavePath() {
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(1000, 0);
+      ctx.lineTo(1000, 472);
+      ctx.bezierCurveTo(760, 485, 520, 342, 0, 520);
+      ctx.closePath();
+    }
+
+    function drawImageCoverInWave(img, overlayAlpha) {
+      traceSubWavePath();
+      ctx.fillStyle = "#FAD9C8";
+      ctx.fill();
+
+      ctx.save();
+      traceMainWavePath();
+      ctx.clip();
+      const targetW = 1000;
+      const targetH = 525;
+      const iw = img.naturalWidth || img.width || 1000;
+      const ih = img.naturalHeight || img.height || 525;
+      const scale = Math.max(targetW / iw, targetH / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      const dx = (targetW - dw) / 2;
+      const dy = (targetH - dh) / 2;
+      ctx.drawImage(img, dx, dy, dw, dh);
+
+      if (overlayAlpha > 0) {
+        const vig = ctx.createLinearGradient(0, 0, 0, targetH);
+        vig.addColorStop(0, "rgba(0,0,0," + (overlayAlpha * 0.75).toFixed(2) + ")");
+        vig.addColorStop(0.65, "rgba(0,0,0," + overlayAlpha.toFixed(2) + ")");
+        vig.addColorStop(1, "rgba(0,0,0," + Math.min(0.85, overlayAlpha * 1.15).toFixed(2) + ")");
+        ctx.fillStyle = vig;
+        ctx.fillRect(0, 0, targetW, targetH);
+      }
+      ctx.restore();
+    }
+
+    // 1. Imagen personalizada subida por el usuario
+    const customImg = customHeaderBgImages[motif] || customHeaderBgImages.global;
+    if (mode === "custom-image" && customImg) {
+      drawImageCoverInWave(customImg, 0.38);
+      return true;
+    }
+
+    // 2. Fondos ilustrados de Comida 1 o Comida 2 elegidos explícitamente
+    if (mode === "comida1" && headerAssets.comida1 && headerAssets.comida1.complete && headerAssets.comida1.naturalWidth > 0) {
+      ctx.drawImage(headerAssets.comida1, 0, 0, 1000, 550);
+      return true;
+    }
+    if (mode === "comida2" && headerAssets.comida2 && headerAssets.comida2.complete && headerAssets.comida2.naturalWidth > 0) {
+      ctx.drawImage(headerAssets.comida2, 0, 0, 1000, 550);
+      return true;
+    }
+
+    // 3. Onda Neón BlueCode
+    if (mode === "bluecode-glow") {
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(1000, 0);
+      ctx.lineTo(1000, 495);
+      ctx.bezierCurveTo(660, 535, 350, 430, 0, 598);
+      ctx.closePath();
+      ctx.fillStyle = "#060A14";
+      ctx.fill();
+
+      ctx.save();
+      ctx.clip();
+      const glow = ctx.createRadialGradient(180, 110, 20, 220, 180, 540);
+      glow.addColorStop(0, "rgba(8, 101, 245, 0.28)");
+      glow.addColorStop(0.55, "rgba(8, 124, 245, 0.1)");
+      glow.addColorStop(1, "rgba(6, 10, 20, 0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, 1000, 620);
+      ctx.restore();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(-10, 599);
+      ctx.bezierCurveTo(350, 431, 660, 536, 1010, 496);
+      const waveGrad = ctx.createLinearGradient(0, 500, 1000, 500);
+      waveGrad.addColorStop(0, "#0550C8");
+      waveGrad.addColorStop(0.5, "#0865F5");
+      waveGrad.addColorStop(1, "#08D0E6");
+      ctx.strokeStyle = waveGrad;
+      ctx.lineWidth = 10;
+      ctx.shadowColor = "rgba(8, 101, 245, 0.55)";
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.restore();
+      return true;
+    }
+
+    // 4. Degradados Premium para Cabecera Superior
+    const gradients = {
+      "dark-gold": { sub: "#F3E5AB", stops: [[0, "#0B0D13"], [0.6, "#1C1917"], [1, "#785A28"]] },
+      "fire-ember": { sub: "#FED7AA", stops: [[0, "#7F1D1D"], [0.55, "#B91C1C"], [1, "#EA580C"]] },
+      "coffee-warm": { sub: "#F5EBE6", stops: [[0, "#27150E"], [0.55, "#4A2511"], [1, "#7C3F1C"]] },
+      "ig-sunset": { sub: "#FCE7F3", stops: [[0, "#F58529"], [0.45, "#DD2A7B"], [1, "#8134AF"]] },
+      "emerald-fresh": { sub: "#D1FAE5", stops: [[0, "#064E3B"], [0.55, "#047857"], [1, "#0D9488"]] }
+    };
+
+    if (gradients[mode]) {
+      const gCfg = gradients[mode];
+      traceSubWavePath();
+      ctx.fillStyle = gCfg.sub;
+      ctx.fill();
+
+      traceMainWavePath();
+      const grad = ctx.createLinearGradient(0, 0, 1000, 480);
+      for (let i = 0; i < gCfg.stops.length; i++) {
+        grad.addColorStop(gCfg.stops[i][0], gCfg.stops[i][1]);
+      }
+      ctx.fillStyle = grad;
+      ctx.fill();
+      return true;
+    }
+
+    if (mode === "solid-custom") {
+      traceSubWavePath();
+      ctx.fillStyle = subWave;
+      ctx.fill();
+
+      traceMainWavePath();
+      ctx.fillStyle = accentColor;
+      ctx.fill();
+      return true;
+    }
+
+    return false;
+  }
+
   // Comprueba si una celda (r, c) pertenece a uno de los 3 ojos buscadores (7x7)
   function isFinderPattern(r, c, count) {
     if (r < 7 && c < 7) return true;
@@ -1023,6 +1495,8 @@
         }
         ctx.drawImage(customQrLogoImage, bx + pad, by + pad, boxSize - pad * 2, boxSize - pad * 2);
         ctx.restore();
+      } else if (logoType && logoType !== "none") {
+        drawExtendedBadgeIcon(ctx, logoType, cx, cy, boxSize * 0.86, mainFill);
       }
     }
 
@@ -1248,6 +1722,14 @@
       ctx.fillStyle = bgColor;
       ctx.fill();
 
+      if (data.headerBgMode && data.headerBgMode !== "original") {
+        ctx.save();
+        roundRectPath(ctx, 118, 40, 764, 850, 36);
+        ctx.clip();
+        drawReplaceableWaveHeader(ctx, "google", data, accentColor, "#DCE8F3");
+        ctx.restore();
+      }
+
       roundRectPath(ctx, 2, 2, 996, 996, 75);
       ctx.strokeStyle = darkBg ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)";
       ctx.lineWidth = 4;
@@ -1255,38 +1737,42 @@
     }
 
     if (showIcons) {
-      // Grupo HERO: Anillo Google + 5 Estrellas
+      // Grupo HERO: Anillo Google + 5 Estrellas (o Icono de la Librería)
       withGroupTransform(ctx, data, "hero", 500, 290, function () {
-        const cx = 500, cy = 252, r = 194;
-        const useCustomRing = data.borderStyle === "accent";
-        ctx.save();
-        ctx.lineWidth = 22;
-        ctx.lineCap = "butt";
+        if (data.heroIcon && data.heroIcon !== "original") {
+          drawCustomHeroIconOverride(ctx, data.heroIcon, 500, 122, data.headerBgMode && data.headerBgMode !== "original" ? "#FFFFFF" : accentColor, bgColor);
+        } else {
+          const cx = 500, cy = 252, r = 194;
+          const useCustomRing = data.borderStyle === "accent";
+          ctx.save();
+          ctx.lineWidth = 22;
+          ctx.lineCap = "butt";
 
-        ctx.beginPath();
-        ctx.strokeStyle = useCustomRing ? accentColor : "#4285F4";
-        ctx.arc(cx, cy, r, (172 * Math.PI) / 180, (270 * Math.PI) / 180);
-        ctx.stroke();
+          ctx.beginPath();
+          ctx.strokeStyle = useCustomRing ? accentColor : "#4285F4";
+          ctx.arc(cx, cy, r, (172 * Math.PI) / 180, (270 * Math.PI) / 180);
+          ctx.stroke();
 
-        ctx.beginPath();
-        ctx.strokeStyle = useCustomRing ? accentColor : "#EA4335";
-        ctx.arc(cx, cy, r, (270 * Math.PI) / 180, (368 * Math.PI) / 180);
-        ctx.stroke();
+          ctx.beginPath();
+          ctx.strokeStyle = useCustomRing ? accentColor : "#EA4335";
+          ctx.arc(cx, cy, r, (270 * Math.PI) / 180, (368 * Math.PI) / 180);
+          ctx.stroke();
 
-        ctx.beginPath();
-        ctx.strokeStyle = useCustomRing ? accentColor : "#FBBC05";
-        ctx.arc(cx, cy, r, (8 * Math.PI) / 180, (90 * Math.PI) / 180);
-        ctx.stroke();
+          ctx.beginPath();
+          ctx.strokeStyle = useCustomRing ? accentColor : "#FBBC05";
+          ctx.arc(cx, cy, r, (8 * Math.PI) / 180, (90 * Math.PI) / 180);
+          ctx.stroke();
 
-        ctx.beginPath();
-        ctx.strokeStyle = useCustomRing ? accentColor : "#34A853";
-        ctx.arc(cx, cy, r, (90 * Math.PI) / 180, (172 * Math.PI) / 180);
-        ctx.stroke();
-        ctx.restore();
+          ctx.beginPath();
+          ctx.strokeStyle = useCustomRing ? accentColor : "#34A853";
+          ctx.arc(cx, cy, r, (90 * Math.PI) / 180, (172 * Math.PI) / 180);
+          ctx.stroke();
+          ctx.restore();
 
-        const starX = [392, 446, 500, 554, 608];
-        for (let i = 0; i < starX.length; i++) {
-          drawStar(ctx, starX[i], 508, 21, 10, accentColor);
+          const starX = [392, 446, 500, 554, 608];
+          for (let i = 0; i < starX.length; i++) {
+            drawStar(ctx, starX[i], 508, 21, 10, accentColor);
+          }
         }
       });
 
@@ -1444,6 +1930,14 @@
       ctx.fillStyle = bgColor;
       ctx.fill();
 
+      if (data.headerBgMode && data.headerBgMode !== "original") {
+        ctx.save();
+        roundRectPath(ctx, 56, 56, 888, 888, 62);
+        ctx.clip();
+        drawReplaceableWaveHeader(ctx, "instagram", data, accentColor, "#FCE7F3");
+        ctx.restore();
+      }
+
       ctx.save();
       ctx.strokeStyle = textColor;
       ctx.lineWidth = 5.5;
@@ -1458,46 +1952,51 @@
 
     if (showIcons) {
       withGroupTransform(ctx, data, "hero", 500, 260, function () {
-        ctx.save();
-        let camStroke;
-        if (data.borderStyle === "accent") {
-          camStroke = accentColor;
+        if (data.heroIcon && data.heroIcon !== "original") {
+          const heroCol = (data.headerBgMode && data.headerBgMode !== "original") ? "#FFFFFF" : accentColor;
+          drawCustomHeroIconOverride(ctx, data.heroIcon, 500, 248, heroCol, bgColor);
         } else {
-          const camGrad = ctx.createLinearGradient(408, 352, 592, 168);
-          camGrad.addColorStop(0, "#FEDA75");
-          camGrad.addColorStop(0.28, "#FA7E1E");
-          camGrad.addColorStop(0.6, "#D62976");
-          camGrad.addColorStop(1, "#962FBF");
-          camStroke = camGrad;
-        }
+          ctx.save();
+          let camStroke;
+          if (data.borderStyle === "accent") {
+            camStroke = accentColor;
+          } else {
+            const camGrad = ctx.createLinearGradient(408, 352, 592, 168);
+            camGrad.addColorStop(0, "#FEDA75");
+            camGrad.addColorStop(0.28, "#FA7E1E");
+            camGrad.addColorStop(0.6, "#D62976");
+            camGrad.addColorStop(1, "#962FBF");
+            camStroke = camGrad;
+          }
 
-        ctx.strokeStyle = camStroke;
-        ctx.lineWidth = 17;
-        roundRectPath(ctx, 412, 172, 176, 176, 46);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(500, 260, 44, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(548, 212, 11, 0, Math.PI * 2);
-        ctx.fillStyle = camStroke;
-        ctx.fill();
-
-        ctx.strokeStyle = accentColor;
-        ctx.lineWidth = 11;
-        ctx.lineCap = "round";
-        const waveRadii = [58, 92, 126];
-        for (let i = 0; i < waveRadii.length; i++) {
-          ctx.beginPath();
-          ctx.arc(405, 260, waveRadii[i], (142 * Math.PI) / 180, (218 * Math.PI) / 180);
+          ctx.strokeStyle = camStroke;
+          ctx.lineWidth = 17;
+          roundRectPath(ctx, 412, 172, 176, 176, 46);
           ctx.stroke();
+
           ctx.beginPath();
-          ctx.arc(595, 260, waveRadii[i], (-38 * Math.PI) / 180, (38 * Math.PI) / 180);
+          ctx.arc(500, 260, 44, 0, Math.PI * 2);
           ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(548, 212, 11, 0, Math.PI * 2);
+          ctx.fillStyle = camStroke;
+          ctx.fill();
+
+          ctx.strokeStyle = accentColor;
+          ctx.lineWidth = 11;
+          ctx.lineCap = "round";
+          const waveRadii = [58, 92, 126];
+          for (let i = 0; i < waveRadii.length; i++) {
+            ctx.beginPath();
+            ctx.arc(405, 260, waveRadii[i], (142 * Math.PI) / 180, (218 * Math.PI) / 180);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(595, 260, waveRadii[i], (-38 * Math.PI) / 180, (38 * Math.PI) / 180);
+            ctx.stroke();
+          }
+          ctx.restore();
         }
-        ctx.restore();
       });
 
       withGroupTransform(ctx, data, "nfc", 332, 682, function () {
@@ -1599,7 +2098,8 @@
     const accentColor = data.accentColor || "#1B1A1A";
     const waveSubColor = data.waveSubColor || "#DCE8F3";
     const darkBg = isHexDark(bgColor);
-    const darkHeader = isHexDark(accentColor);
+    const hasRichHeaderBg = Boolean(data.headerBgMode && data.headerBgMode !== "original" && data.headerBgMode !== "solid-custom");
+    const darkHeader = hasRichHeaderBg || isHexDark(accentColor);
     const headerContentColor = darkHeader ? "#FFFFFF" : "#111827";
 
     roundRectPath(ctx, 0, 0, 1000, 1000, 82);
@@ -1609,23 +2109,25 @@
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, 1000, 1000);
 
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(1000, 0);
-      ctx.lineTo(1000, 492);
-      ctx.bezierCurveTo(760, 505, 520, 365, 0, 542);
-      ctx.closePath();
-      ctx.fillStyle = waveSubColor;
-      ctx.fill();
+      if (!drawReplaceableWaveHeader(ctx, "menu", data, accentColor, waveSubColor)) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(1000, 0);
+        ctx.lineTo(1000, 492);
+        ctx.bezierCurveTo(760, 505, 520, 365, 0, 542);
+        ctx.closePath();
+        ctx.fillStyle = waveSubColor;
+        ctx.fill();
 
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(1000, 0);
-      ctx.lineTo(1000, 472);
-      ctx.bezierCurveTo(760, 485, 520, 342, 0, 520);
-      ctx.closePath();
-      ctx.fillStyle = accentColor;
-      ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(1000, 0);
+        ctx.lineTo(1000, 472);
+        ctx.bezierCurveTo(760, 485, 520, 342, 0, 520);
+        ctx.closePath();
+        ctx.fillStyle = accentColor;
+        ctx.fill();
+      }
 
       roundRectPath(ctx, 2, 2, 996, 996, 80);
       ctx.strokeStyle = darkBg ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)";
@@ -1634,40 +2136,44 @@
     }
 
     if (showIcons) {
-      // Grupo HERO: Tenedor y cuchara superiores
+      // Grupo HERO: Tenedor y cuchara superiores (o Icono de la Librería)
       withGroupTransform(ctx, data, "hero", 500, 120, function () {
-        ctx.save();
-        ctx.fillStyle = headerContentColor;
+        if (data.heroIcon && data.heroIcon !== "original" && data.heroIcon !== "menu") {
+          drawCustomHeroIconOverride(ctx, data.heroIcon, 500, 120, headerContentColor, accentColor);
+        } else {
+          ctx.save();
+          ctx.fillStyle = headerContentColor;
 
-        roundRectPath(ctx, 442, 42, 9, 48, 4);
-        ctx.fill();
-        roundRectPath(ctx, 461, 42, 9, 48, 4);
-        ctx.fill();
-        roundRectPath(ctx, 480, 42, 9, 48, 4);
-        ctx.fill();
+          roundRectPath(ctx, 442, 42, 9, 48, 4);
+          ctx.fill();
+          roundRectPath(ctx, 461, 42, 9, 48, 4);
+          ctx.fill();
+          roundRectPath(ctx, 480, 42, 9, 48, 4);
+          ctx.fill();
 
-        ctx.beginPath();
-        ctx.moveTo(442, 82);
-        ctx.lineTo(489, 82);
-        ctx.quadraticCurveTo(489, 114, 474, 118);
-        ctx.lineTo(478, 194);
-        ctx.quadraticCurveTo(465, 204, 453, 194);
-        ctx.lineTo(457, 118);
-        ctx.quadraticCurveTo(442, 114, 442, 82);
-        ctx.closePath();
-        ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(442, 82);
+          ctx.lineTo(489, 82);
+          ctx.quadraticCurveTo(489, 114, 474, 118);
+          ctx.lineTo(478, 194);
+          ctx.quadraticCurveTo(465, 204, 453, 194);
+          ctx.lineTo(457, 118);
+          ctx.quadraticCurveTo(442, 114, 442, 82);
+          ctx.closePath();
+          ctx.fill();
 
-        ctx.beginPath();
-        ctx.ellipse(536, 78, 25, 36, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(527, 108);
-        ctx.lineTo(545, 108);
-        ctx.lineTo(549, 194);
-        ctx.quadraticCurveTo(536, 204, 523, 194);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
+          ctx.beginPath();
+          ctx.ellipse(536, 78, 25, 36, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(527, 108);
+          ctx.lineTo(545, 108);
+          ctx.lineTo(549, 194);
+          ctx.quadraticCurveTo(536, 204, 523, 194);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
       });
 
       // Grupo NFC: Ilustración teléfono y mano (+ texto en arco cuando se arrastra junto)
@@ -1797,7 +2303,8 @@
     const accentColor = data.accentColor || "#060A14";
     const waveStrokeColor = data.waveSubColor || "#0865F5";
     const darkBg = isHexDark(bgColor);
-    const darkHeader = isHexDark(accentColor);
+    const hasRichHeaderBg = Boolean(data.headerBgMode && data.headerBgMode !== "original" && data.headerBgMode !== "solid-custom");
+    const darkHeader = hasRichHeaderBg || isHexDark(accentColor);
     const headerPrimaryColor = darkHeader ? "#FFFFFF" : "#0F172A";
 
     roundRectPath(ctx, 0, 0, 1000, 1000, 82);
@@ -1807,51 +2314,53 @@
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, 1000, 1000);
 
-      // Encabezado oscuro con onda S corporativa
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(1000, 0);
-      ctx.lineTo(1000, 495);
-      ctx.bezierCurveTo(660, 535, 350, 430, 0, 598);
-      ctx.closePath();
-      ctx.fillStyle = accentColor;
-      ctx.fill();
-
-      // Brillo radial azul sutil en esquina superior izquierda (idéntico a Blue Code.png)
-      if (darkHeader) {
-        ctx.save();
+      if (!drawReplaceableWaveHeader(ctx, "bluecode", data, accentColor, "#DCE8F3")) {
+        // Encabezado oscuro con onda S corporativa
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(1000, 0);
         ctx.lineTo(1000, 495);
         ctx.bezierCurveTo(660, 535, 350, 430, 0, 598);
         ctx.closePath();
-        ctx.clip();
+        ctx.fillStyle = accentColor;
+        ctx.fill();
 
-        const glow = ctx.createRadialGradient(180, 110, 20, 220, 180, 540);
-        glow.addColorStop(0, "rgba(8, 101, 245, 0.25)");
-        glow.addColorStop(0.55, "rgba(8, 124, 245, 0.08)");
-        glow.addColorStop(1, "rgba(6, 10, 20, 0)");
-        ctx.fillStyle = glow;
-        ctx.fillRect(0, 0, 1000, 620);
+        // Brillo radial azul sutil en esquina superior izquierda (idéntico a Blue Code.png)
+        if (darkHeader) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(1000, 0);
+          ctx.lineTo(1000, 495);
+          ctx.bezierCurveTo(660, 535, 350, 430, 0, 598);
+          ctx.closePath();
+          ctx.clip();
+
+          const glow = ctx.createRadialGradient(180, 110, 20, 220, 180, 540);
+          glow.addColorStop(0, "rgba(8, 101, 245, 0.25)");
+          glow.addColorStop(0.55, "rgba(8, 124, 245, 0.08)");
+          glow.addColorStop(1, "rgba(6, 10, 20, 0)");
+          ctx.fillStyle = glow;
+          ctx.fillRect(0, 0, 1000, 620);
+          ctx.restore();
+        }
+
+        // Línea luminosa azul en la curva S
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(-10, 599);
+        ctx.bezierCurveTo(350, 431, 660, 536, 1010, 496);
+        const waveGrad = ctx.createLinearGradient(0, 500, 1000, 500);
+        waveGrad.addColorStop(0, "#0550C8");
+        waveGrad.addColorStop(0.5, waveStrokeColor);
+        waveGrad.addColorStop(1, "#0696EE");
+        ctx.strokeStyle = data.borderStyle === "accent" ? accentColor : waveGrad;
+        ctx.lineWidth = 10;
+        ctx.shadowColor = "rgba(8, 101, 245, 0.52)";
+        ctx.shadowBlur = 10;
+        ctx.stroke();
         ctx.restore();
       }
-
-      // Línea luminosa azul en la curva S
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(-10, 599);
-      ctx.bezierCurveTo(350, 431, 660, 536, 1010, 496);
-      const waveGrad = ctx.createLinearGradient(0, 500, 1000, 500);
-      waveGrad.addColorStop(0, "#0550C8");
-      waveGrad.addColorStop(0.5, waveStrokeColor);
-      waveGrad.addColorStop(1, "#0696EE");
-      ctx.strokeStyle = data.borderStyle === "accent" ? accentColor : waveGrad;
-      ctx.lineWidth = 10;
-      ctx.shadowColor = "rgba(8, 101, 245, 0.52)";
-      ctx.shadowBlur = 10;
-      ctx.stroke();
-      ctx.restore();
 
       roundRectPath(ctx, 2, 2, 996, 996, 80);
       ctx.strokeStyle = darkBg ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)";
@@ -1860,9 +2369,13 @@
     }
 
     if (showIcons) {
-      // Grupo HERO: Logo oficial BC en el encabezado
+      // Grupo HERO: Logo oficial BC en el encabezado (o Icono de la Librería)
       withGroupTransform(ctx, data, "hero", 238, 275, function () {
-        drawBlueCodeLogo(ctx, 134, 219, 112);
+        if (data.heroIcon && data.heroIcon !== "original" && data.heroIcon !== "bluecode") {
+          drawCustomHeroIconOverride(ctx, data.heroIcon, 238, 275, headerPrimaryColor, accentColor);
+        } else if (data.heroIcon !== "none") {
+          drawBlueCodeLogo(ctx, 134, 219, 112);
+        }
       });
 
       // Grupo NFC: Ilustración teléfono y mano + arco "Tap your phone"
@@ -2001,7 +2514,8 @@
     const accentColor = data.accentColor || defaultAccent;
     const peachWaveColor = "#FAD9C8";
     const darkBg = isHexDark(bgColor);
-    const darkHeader = isHexDark(accentColor);
+    const hasRichHeaderBg = Boolean(data.headerBgMode && data.headerBgMode !== "original" && data.headerBgMode !== "solid-custom");
+    const darkHeader = hasRichHeaderBg || isHexDark(accentColor);
     const headerContentColor = darkHeader ? "#FFFFFF" : "#111827";
 
     const titleMain = cleanVisualText(data.titleMain, "BURGER & CO.");
@@ -2018,14 +2532,37 @@
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, 1000, 1000);
 
-      if (hasLoadedImg) {
-        // SIEMPRE dibujamos el fondo ilustrado limpio (sin texto ni icono pegados),
-        // para que al mover o editar textos/iconos NUNCA desaparezcan las hamburguesas
-        ctx.drawImage(headerImg, 0, 0, 1000, 550);
+      if (!drawReplaceableWaveHeader(ctx, variant, data, accentColor, peachWaveColor)) {
+        if (hasLoadedImg) {
+          // SIEMPRE dibujamos el fondo ilustrado limpio (sin texto ni icono pegados),
+          // para que al mover o editar textos/iconos NUNCA desaparezcan las hamburguesas
+          ctx.drawImage(headerImg, 0, 0, 1000, 550);
 
-        // Si el usuario eligió un color personalizado de cabecera, aplicamos un tinte suave manteniendo el arte de fondo
-        if (data.borderStyle === "accent" && accentColor.toLowerCase() !== defaultAccent.toLowerCase()) {
-          ctx.save();
+          // Si el usuario eligió un color personalizado de cabecera, aplicamos un tinte suave manteniendo el arte de fondo
+          if (data.borderStyle === "accent" && accentColor.toLowerCase() !== defaultAccent.toLowerCase()) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(1000, 0);
+            ctx.lineTo(1000, 472);
+            ctx.bezierCurveTo(760, 485, 520, 342, 0, 520);
+            ctx.closePath();
+            ctx.fillStyle = accentColor;
+            ctx.globalAlpha = 0.72;
+            ctx.fill();
+            ctx.restore();
+          }
+        } else {
+          // Fallback vectorial instantáneo mientras termina de cargar la imagen
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(1000, 0);
+          ctx.lineTo(1000, 492);
+          ctx.bezierCurveTo(760, 505, 520, 365, 0, 542);
+          ctx.closePath();
+          ctx.fillStyle = peachWaveColor;
+          ctx.fill();
+
           ctx.beginPath();
           ctx.moveTo(0, 0);
           ctx.lineTo(1000, 0);
@@ -2033,29 +2570,8 @@
           ctx.bezierCurveTo(760, 485, 520, 342, 0, 520);
           ctx.closePath();
           ctx.fillStyle = accentColor;
-          ctx.globalAlpha = 0.72;
           ctx.fill();
-          ctx.restore();
         }
-      } else {
-        // Fallback vectorial instantáneo mientras termina de cargar la imagen
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(1000, 0);
-        ctx.lineTo(1000, 492);
-        ctx.bezierCurveTo(760, 505, 520, 365, 0, 542);
-        ctx.closePath();
-        ctx.fillStyle = peachWaveColor;
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(1000, 0);
-        ctx.lineTo(1000, 472);
-        ctx.bezierCurveTo(760, 485, 520, 342, 0, 520);
-        ctx.closePath();
-        ctx.fillStyle = accentColor;
-        ctx.fill();
       }
 
       roundRectPath(ctx, 2, 2, 996, 996, 80);
@@ -2066,15 +2582,19 @@
 
     if (showIcons) {
       withGroupTransform(ctx, data, "hero", 500, 118, function () {
-        if (hasBurgerIcon && darkHeader) {
-          ctx.save();
-          ctx.shadowColor = "rgba(0,0,0,0.52)";
-          ctx.shadowBlur = 16;
-          ctx.shadowOffsetY = 6;
-          ctx.drawImage(burgerIconImg, 368.75, 32.5, 259.375, 168.75);
-          ctx.restore();
-        } else {
-          drawBurgerFriesHeroIcon(ctx, 500, 128, headerContentColor);
+        if (data.heroIcon && data.heroIcon !== "original" && data.heroIcon !== "burger") {
+          drawCustomHeroIconOverride(ctx, data.heroIcon, 500, 118, headerContentColor, accentColor);
+        } else if (data.heroIcon !== "none") {
+          if (hasBurgerIcon && darkHeader) {
+            ctx.save();
+            ctx.shadowColor = "rgba(0,0,0,0.52)";
+            ctx.shadowBlur = 16;
+            ctx.shadowOffsetY = 6;
+            ctx.drawImage(burgerIconImg, 368.75, 32.5, 259.375, 168.75);
+            ctx.restore();
+          } else {
+            drawBurgerFriesHeroIcon(ctx, 500, 128, headerContentColor);
+          }
         }
       });
 
@@ -2420,6 +2940,7 @@
     drawBlueCodeLogo: drawBlueCodeLogo,
     drawQrMatrix: drawQrMatrix,
     setCustomQrLogoImage: setCustomQrLogoImage,
+    setCustomHeaderBgImage: setCustomHeaderBgImage,
     onAssetsLoaded: setOnAssetsLoaded,
     getTransformedHitBoxes: getTransformedHitBoxes,
     renderPlaqueToCanvas: renderPlaqueToCanvas,
