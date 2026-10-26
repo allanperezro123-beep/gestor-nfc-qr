@@ -14,7 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle.js"></script>
-  <script src="/placas.js?v=8"></script>
+  <script src="/placas.js?v=9"></script>
 
   <style>
     :root {
@@ -936,7 +936,7 @@
       box-shadow: 0 6px 22px rgba(0, 0, 0, 0.32);
     }
     .plaque-card.disabled-motif {
-      opacity: 0.55;
+      border-color: var(--border);
     }
 
     .plaque-col-preview {
@@ -4165,6 +4165,73 @@
         comida2: { t1: "BURGER & CO.", t2: "Sabor al instante", qrLogo: "burger", qrColor: "solid:#843511", qrCaptionMode: "bottom-text-id", qrCaptionText: "SCAN QR" }
       };
 
+      function isUrlLikeValue(val) {
+        if (!val) return false;
+        const s = String(val).trim();
+        return /^(https?:\/\/|www\.|wa\.me\/|t\.me\/|mailto:|tel:)/i.test(s) ||
+          s.indexOf("://") !== -1 ||
+          /\.(com|net|org|io|app|co|me|es|pe|mx|ar|cl)\//i.test(s) ||
+          /\.web\.app/i.test(s);
+      }
+
+      // Limpia cualquier contaminación por autocompletado de formularios del navegador o restauración de sesión
+      function sanitizePlaqueStudioInputs(forceResetDefaults) {
+        const studioSec = document.getElementById("plaqueStudioSection");
+        if (studioSec) {
+          studioSec.querySelectorAll("input, select").forEach(function (el) {
+            el.setAttribute("autocomplete", "off");
+            el.setAttribute("autocorrect", "off");
+            el.setAttribute("spellcheck", "false");
+            el.setAttribute("data-lpignore", "true");
+            el.setAttribute("data-form-type", "other");
+          });
+        }
+
+        MOTIFS.forEach(function (motif) {
+          const defs = DEFAULT_MOTIF_FIELDS[motif];
+          const colDefs = DEFAULT_COLORS[motif];
+          if (!defs || !colDefs) return;
+
+          const chk = document.getElementById("chkMotif_" + motif);
+          const qty = document.getElementById("qtyMotif_" + motif);
+          if (forceResetDefaults) {
+            if (chk) chk.checked = true;
+            if (qty && (parseInt(qty.value, 10) || 0) <= 0) qty.value = "1";
+          }
+
+          ["t1", "t2", "t3", "qrCaptionText"].forEach(function (fieldKey) {
+            const defVal = defs[fieldKey];
+            if (defVal === undefined) return;
+            const el = document.getElementById(fieldKey + "_" + motif);
+            if (!el) return;
+            const cur = (el.value || "").trim();
+            if (forceResetDefaults || !cur || isUrlLikeValue(cur)) {
+              el.value = defVal;
+            }
+          });
+
+          if (forceResetDefaults) {
+            const bgEl = document.getElementById("bgColor_" + motif);
+            const txtEl = document.getElementById("textColor_" + motif);
+            const accEl = document.getElementById("accentColor_" + motif);
+            const presetSel = document.getElementById("palettePreset_" + motif);
+            const logoEl = document.getElementById("qrLogo_" + motif);
+            const colEl = document.getElementById("qrColor_" + motif);
+            const capModeEl = document.getElementById("qrCaptionMode_" + motif);
+
+            if (bgEl) bgEl.value = colDefs.bg;
+            if (txtEl) txtEl.value = colDefs.text;
+            if (accEl) accEl.value = colDefs.accent;
+            if (presetSel) presetSel.value = "original";
+            if (logoEl && defs.qrLogo) logoEl.value = defs.qrLogo;
+            if (colEl && defs.qrColor) colEl.value = defs.qrColor;
+            if (capModeEl && defs.qrCaptionMode) capModeEl.value = defs.qrCaptionMode;
+            borderStyleState[motif] = "original";
+            syncCaptionFieldVisibility(motif);
+          }
+        });
+      }
+
       function resetMotifCustomization(motif) {
         layoutState[motif] = createDefaultLayout();
         activeGroupState[motif] = null;
@@ -4214,6 +4281,7 @@
           linksViewWrapper.style.display = "none";
           plaqueStudioSection.classList.add("active");
           document.getElementById("bulkBar").classList.remove("visible");
+          sanitizePlaqueStudioInputs(false);
           syncPlaqueStudioTags();
           renderAllPlaquePreviews();
         } else {
@@ -4672,7 +4740,20 @@
             }
           });
         }
-        if (qrCaptionTextIn) qrCaptionTextIn.addEventListener("input", function () { renderSinglePlaquePreview(m); });
+        if (qrCaptionTextIn) {
+          qrCaptionTextIn.addEventListener("input", function (ev) {
+            const val = (qrCaptionTextIn.value || "").trim();
+            if (isUrlLikeValue(val)) {
+              if (ev && ev.inputType === "insertFromPaste" && urlIn) {
+                urlIn.value = val;
+                if (sel) sel.value = "__custom__";
+                showToast("Enlace asignado al QR automáticamente.");
+              }
+              qrCaptionTextIn.value = DEFAULT_MOTIF_FIELDS[m].qrCaptionText;
+            }
+            renderSinglePlaquePreview(m);
+          });
+        }
 
         if (paletteSel) {
           paletteSel.addEventListener("change", function () {
@@ -4717,9 +4798,21 @@
           });
         }
 
-        ["t1_" + m, "t2_" + m, "t3_" + m].forEach(function (id) {
-          const el = document.getElementById(id);
-          if (el) el.addEventListener("input", function () { renderSinglePlaquePreview(m); });
+        ["t1", "t2", "t3"].forEach(function (fieldKey) {
+          const el = document.getElementById(fieldKey + "_" + m);
+          if (!el) return;
+          el.addEventListener("input", function (ev) {
+            const val = (el.value || "").trim();
+            if (isUrlLikeValue(val)) {
+              if (ev && ev.inputType === "insertFromPaste" && urlIn) {
+                urlIn.value = val;
+                if (sel) sel.value = "__custom__";
+                showToast("Enlace asignado al QR automáticamente.");
+              }
+              el.value = DEFAULT_MOTIF_FIELDS[m][fieldKey] || "";
+            }
+            renderSinglePlaquePreview(m);
+          });
         });
       });
 
@@ -4933,7 +5026,12 @@
         });
       }
 
-      // Inicio en modo Estudio Enfocado (1 plantilla activa)
+      // Inicio en modo Estudio Enfocado (1 plantilla activa) y limpieza anti-autofill
+      sanitizePlaqueStudioInputs(true);
+      window.addEventListener("pageshow", function () {
+        sanitizePlaqueStudioInputs(false);
+        renderAllPlaquePreviews();
+      });
       filterPlaqueCardsByMotif("google");
       loadData();
       startSync();

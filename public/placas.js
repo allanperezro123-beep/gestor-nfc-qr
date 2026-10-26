@@ -1082,6 +1082,39 @@
     };
   }
 
+  // Detecta si un texto visual fue contaminado por autocompletado de URL del navegador o pegado por error
+  function isUrlLikeString(str) {
+    if (!str) return false;
+    const s = String(str).trim();
+    return /^(https?:\/\/|www\.|wa\.me\/|t\.me\/|mailto:|tel:)/i.test(s) ||
+      s.indexOf("://") !== -1 ||
+      /\.(com|net|org|io|app|co|me|es|pe|mx|ar|cl)\//i.test(s) ||
+      /\.web\.app/i.test(s);
+  }
+
+  function cleanVisualText(val, fallback) {
+    const s = String(val == null ? "" : val).trim();
+    if (!s || isUrlLikeString(s)) return fallback;
+    return s;
+  }
+
+  // Dibuja texto ajustando automáticamente el tamaño de fuente para que NUNCA se salga de su ancho máximo
+  function drawFittedText(ctx, text, x, y, maxWidth, baseSize, minSize, fontWeight, fontFamily) {
+    const str = String(text == null ? "" : text);
+    if (!str) return;
+    const weight = fontWeight || "800";
+    const family = fontFamily || "'Plus Jakarta Sans', Arial, sans-serif";
+    const floorSize = minSize || Math.max(14, Math.round(baseSize * 0.45));
+    let sz = baseSize;
+    while (sz > floorSize) {
+      ctx.font = weight + " " + sz + "px " + family;
+      if (ctx.measureText(str).width <= maxWidth) break;
+      sz -= 2;
+    }
+    ctx.font = weight + " " + sz + "px " + family;
+    ctx.fillText(str, x, y, maxWidth);
+  }
+
   /**
    * Dibuja el bloque de texto opcional debajo del QR según `data.qrCaptionMode`:
    * - 'clean': No dibuja nada (QR 100% limpio)
@@ -1092,8 +1125,8 @@
     const mode = data.qrCaptionMode || "clean";
     if (mode === "clean") return;
 
-    const caption = (data.qrCaptionText || "").trim();
-    const slugText = (data.slug || "TAG-ID").toUpperCase();
+    const caption = cleanVisualText(data.qrCaptionText, "SCAN QR CODE");
+    const slugText = cleanVisualText(data.slug, "TAG-ID").toUpperCase();
 
     ctx.save();
     ctx.textAlign = "center";
@@ -1102,16 +1135,14 @@
 
     if (caption) {
       ctx.fillStyle = textColor || "#181818";
-      ctx.font = "800 24px 'Plus Jakarta Sans', Arial, sans-serif";
-      ctx.fillText(caption, centerX, curY);
+      drawFittedText(ctx, caption, centerX, curY, 280, 24, 15, "800", "'Plus Jakarta Sans', Arial, sans-serif");
       curY += 28;
     }
 
     if (mode === "bottom-text-id") {
       ctx.fillStyle = textColor || "#333333";
       ctx.globalAlpha = 0.78;
-      ctx.font = "600 19px 'JetBrains Mono', monospace";
-      ctx.fillText("ID: " + slugText, centerX, curY);
+      drawFittedText(ctx, "ID: " + slugText, centerX, curY, 280, 19, 13, "600", "'JetBrains Mono', monospace");
     }
     ctx.restore();
   }
@@ -1271,14 +1302,12 @@
         ctx.save();
         ctx.fillStyle = textColor;
         ctx.textAlign = "center";
-        const line1 = data.titleLine1 || data.googleLine1 || "Valóranos";
-        const line2 = data.titleLine2 || data.googleLine2 || "en";
-        const line3 = data.titleLine3 || "Google";
+        const line1 = cleanVisualText(data.titleLine1 || data.googleLine1, "Valóranos");
+        const line2 = cleanVisualText(data.titleLine2 || data.googleLine2, "en");
+        const line3 = cleanVisualText(data.titleLine3, "Google");
 
-        ctx.font = "700 49px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillText(line1, 500, 195);
-        ctx.font = "700 45px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillText(line2, 500, 249);
+        drawFittedText(ctx, line1, 500, 195, 320, 49, 24, "700", "'Plus Jakarta Sans', Arial, sans-serif");
+        drawFittedText(ctx, line2, 500, 249, 320, 45, 22, "700", "'Plus Jakarta Sans', Arial, sans-serif");
 
         if (line3.toLowerCase() === "google" && data.borderStyle !== "accent") {
           const gLetters = [
@@ -1304,9 +1333,8 @@
             curX += widths[i];
           }
         } else {
-          ctx.font = "800 68px 'Plus Jakarta Sans', Arial, sans-serif";
           ctx.fillStyle = data.borderStyle === "accent" ? accentColor : "#4285F4";
-          ctx.fillText(line3, 500, 329);
+          drawFittedText(ctx, line3, 500, 329, 320, 68, 28, "800", "'Plus Jakarta Sans', Arial, sans-serif");
         }
         ctx.restore();
       });
@@ -1483,11 +1511,11 @@
         ctx.fillStyle = textColor;
         ctx.textAlign = "center";
 
-        ctx.font = "400 78px 'Grand Hotel', 'Brush Script MT', cursive";
-        ctx.fillText(data.titleScript || data.igTitle || "Instagram", 500, 446);
+        const igTitle = cleanVisualText(data.titleScript || data.igTitle, "Instagram");
+        const igSub = cleanVisualText(data.subtitle || data.igSubtitle, "¡Acerca tu móvil y síguenos!");
 
-        ctx.font = "500 33px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillText(data.subtitle || data.igSubtitle || "¡Acerca tu móvil y síguenos!", 500, 504);
+        drawFittedText(ctx, igTitle, 500, 446, 680, 78, 38, "400", "'Grand Hotel', 'Brush Script MT', cursive");
+        drawFittedText(ctx, igSub, 500, 504, 680, 33, 18, "500", "'Plus Jakarta Sans', Arial, sans-serif");
         ctx.restore();
       });
     }
@@ -1665,12 +1693,12 @@
         ctx.save();
         ctx.textAlign = "center";
 
-        ctx.fillStyle = headerContentColor;
-        ctx.font = "800 124px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillText(data.titleMain || data.menuTitle || "MENU", 500, 322);
+        const menuTitle = cleanVisualText(data.titleMain || data.menuTitle, "MENU");
+        const menuSub = cleanVisualText(data.subtitle || data.menuSubtitle, "VIEW OUR MENU ONLINE");
 
-        ctx.font = "400 34px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillText(data.subtitle || data.menuSubtitle || "VIEW OUR MENU ONLINE", 500, 386);
+        ctx.fillStyle = headerContentColor;
+        drawFittedText(ctx, menuTitle, 500, 322, 860, 124, 42, "800", "'Plus Jakarta Sans', Arial, sans-serif");
+        drawFittedText(ctx, menuSub, 500, 386, 840, 34, 18, "400", "'Plus Jakarta Sans', Arial, sans-serif");
         ctx.restore();
       });
     }
@@ -1716,14 +1744,14 @@
           ctx.fillStyle = textColor;
           ctx.font = "500 25px 'Plus Jakarta Sans', Arial, sans-serif";
           ctx.fillText("OR", 760, 542);
-          ctx.font = "800 29px 'Plus Jakarta Sans', Arial, sans-serif";
-          ctx.fillText((data.qrCaptionText || "SCAN QR").toUpperCase(), 760, 578);
+          const cleanCap = cleanVisualText(data.qrCaptionText, "SCAN QR").toUpperCase();
+          drawFittedText(ctx, cleanCap, 760, 578, 280, 29, 16, "800", "'Plus Jakarta Sans', Arial, sans-serif");
 
           if (captionMode === "bottom-text-id") {
             ctx.fillStyle = textColor;
             ctx.globalAlpha = 0.82;
-            ctx.font = "600 21px 'JetBrains Mono', monospace";
-            ctx.fillText((data.slug || "TAG-ID").toUpperCase(), 760, 868);
+            const cleanSlugVal = cleanVisualText(data.slug, "TAG-ID").toUpperCase();
+            drawFittedText(ctx, cleanSlugVal, 760, 868, 280, 21, 13, "600", "'JetBrains Mono', monospace");
           }
           ctx.restore();
         }
@@ -1859,8 +1887,8 @@
       // Grupo TITLE: "BLUE CODE" en una sola línea (o 2 líneas si el subtítulo es largo)
       withGroupTransform(ctx, data, "title", 615, 275, function () {
         ctx.save();
-        const w1 = (data.titleMain || "BLUE").trim();
-        const w2 = (data.subtitle || "CODE").trim();
+        const w1 = cleanVisualText(data.titleMain, "BLUE");
+        const w2 = cleanVisualText(data.subtitle, "CODE");
 
         if (w1.length + w2.length <= 13) {
           ctx.font = "800 94px 'Plus Jakarta Sans', Arial, sans-serif";
@@ -1882,12 +1910,10 @@
         } else {
           ctx.textAlign = "center";
           ctx.fillStyle = headerPrimaryColor;
-          ctx.font = "800 78px 'Plus Jakarta Sans', Arial, sans-serif";
-          ctx.fillText(w1, 620, 275);
+          drawFittedText(ctx, w1, 620, 275, 540, 78, 34, "800", "'Plus Jakarta Sans', Arial, sans-serif");
 
           ctx.fillStyle = "#087CF5";
-          ctx.font = "700 34px 'Plus Jakarta Sans', Arial, sans-serif";
-          ctx.fillText(w2, 620, 332);
+          drawFittedText(ctx, w2, 620, 332, 540, 34, 18, "700", "'Plus Jakarta Sans', Arial, sans-serif");
         }
         ctx.restore();
       });
@@ -1921,13 +1947,13 @@
           ctx.save();
           ctx.fillStyle = textColor;
           ctx.textAlign = "center";
-          ctx.font = "500 31px 'Plus Jakarta Sans', Arial, sans-serif";
-          ctx.fillText(data.qrCaptionText || "Scan QR code", 725, 572);
+          const bcCap = cleanVisualText(data.qrCaptionText, "Scan QR code");
+          drawFittedText(ctx, bcCap, 725, 572, 280, 31, 16, "500", "'Plus Jakarta Sans', Arial, sans-serif");
 
           if (hasId) {
             ctx.globalAlpha = 0.82;
-            ctx.font = "600 20px 'JetBrains Mono', monospace";
-            ctx.fillText((data.slug || "TAG-ID").toUpperCase(), 725, qrY + qrSize + 30);
+            const bcSlug = cleanVisualText(data.slug, "TAG-ID").toUpperCase();
+            drawFittedText(ctx, bcSlug, 725, qrY + qrSize + 30, 280, 20, 13, "600", "'JetBrains Mono', monospace");
           }
           ctx.restore();
         }
@@ -1978,8 +2004,8 @@
     const darkHeader = isHexDark(accentColor);
     const headerContentColor = darkHeader ? "#FFFFFF" : "#111827";
 
-    const titleMain = (data.titleMain || "BURGER & CO.").trim();
-    const subtitle = (data.subtitle || "Sabor al instante").trim();
+    const titleMain = cleanVisualText(data.titleMain, "BURGER & CO.");
+    const subtitle = cleanVisualText(data.subtitle, "Sabor al instante");
     const headerImg = isComida2 ? headerAssets.comida2 : headerAssets.comida1;
     const hasLoadedImg = Boolean(headerImg && headerImg.complete && headerImg.naturalWidth > 0);
     const burgerIconImg = headerAssets.burgerIcon;
@@ -2078,15 +2104,12 @@
         ctx.shadowBlur = 16;
         ctx.shadowOffsetY = 6;
 
-        const fontSizeMain = titleMain.length > 14 ? 76 : 94;
-        ctx.font = "800 " + fontSizeMain + "px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillText(titleMain, 500, 298);
+        drawFittedText(ctx, titleMain, 500, 298, 860, 94, 42, "800", "'Plus Jakarta Sans', Arial, sans-serif");
 
         ctx.shadowColor = "rgba(0,0,0,0.78)";
         ctx.shadowBlur = 12;
         ctx.shadowOffsetY = 4;
-        ctx.font = "500 39px 'Plus Jakarta Sans', Arial, sans-serif";
-        ctx.fillText(subtitle, 500, 364);
+        drawFittedText(ctx, subtitle, 500, 364, 840, 39, 20, "500", "'Plus Jakarta Sans', Arial, sans-serif");
         ctx.restore();
       });
     }
@@ -2131,14 +2154,14 @@
           ctx.fillStyle = textColor;
           ctx.font = "500 25px 'Plus Jakarta Sans', Arial, sans-serif";
           ctx.fillText("OR", 760, 542);
-          ctx.font = "800 29px 'Plus Jakarta Sans', Arial, sans-serif";
-          ctx.fillText((data.qrCaptionText || "SCAN QR").toUpperCase(), 760, 578);
+          const foodCap = cleanVisualText(data.qrCaptionText, "SCAN QR").toUpperCase();
+          drawFittedText(ctx, foodCap, 760, 578, 280, 29, 16, "800", "'Plus Jakarta Sans', Arial, sans-serif");
 
           if (captionMode === "bottom-text-id") {
             ctx.fillStyle = textColor;
             ctx.globalAlpha = 0.85;
-            ctx.font = "600 21px 'JetBrains Mono', monospace";
-            ctx.fillText((data.slug || "BURGER-AND-CO").toUpperCase(), 760, 868);
+            const foodSlug = cleanVisualText(data.slug, "BURGER-AND-CO").toUpperCase();
+            drawFittedText(ctx, foodSlug, 760, 868, 280, 21, 13, "600", "'JetBrains Mono', monospace");
           }
           ctx.restore();
         }
