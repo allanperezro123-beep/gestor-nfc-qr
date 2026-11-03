@@ -14,7 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle.js"></script>
-  <script src="/placas.js?v=10"></script>
+  <script src="/placas.js?v=12"></script>
 
   <style>
     :root {
@@ -1819,10 +1819,11 @@
         <button type="button" class="motif-filter-pill" data-filter-motif="bluecode">🔹 BlueCode</button>
         <button type="button" class="motif-filter-pill" data-filter-motif="comida1">🍔 Comida 1</button>
         <button type="button" class="motif-filter-pill" data-filter-motif="comida2">🍕 Comida 2</button>
-        <button type="button" class="motif-filter-pill" data-filter-motif="all">🗂️ Ver las 6</button>
+        <button type="button" class="motif-filter-pill" data-filter-motif="leburre">🌯 Le Burré</button>
+        <button type="button" class="motif-filter-pill" data-filter-motif="all">🗂️ Ver las 7</button>
       </div>
 
-      <!-- Grid de los 6 Motivos (Inicia en single-studio-mode para máxima comodidad) -->
+      <!-- Grid de los 7 Motivos (Inicia en single-studio-mode para máxima comodidad) -->
       <div class="plaque-cards-grid single-studio-mode" id="plaqueCardsGrid">
 
         <!-- MOTIVO 1: GOOGLE REVIEW -->
@@ -1893,15 +1894,15 @@
               <div class="plaque-grid-3">
                 <div class="plaque-field-group">
                   <label><span>Línea 1</span></label>
-                  <input type="text" id="t1_google" class="plaque-input" value="Valóranos" />
+                  <input type="text" id="t1_google" class="plaque-input" maxlength="32" value="Valóranos" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Línea 2</span></label>
-                  <input type="text" id="t2_google" class="plaque-input" value="en" />
+                  <input type="text" id="t2_google" class="plaque-input" maxlength="45" value="en" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Línea 3</span></label>
-                  <input type="text" id="t3_google" class="plaque-input" value="Google" />
+                  <input type="text" id="t3_google" class="plaque-input" maxlength="24" value="Google" />
                 </div>
               </div>
             </div>
@@ -1949,7 +1950,7 @@
                   </div>
                   <div class="plaque-field-group dimmed-field" id="wrapCaptionText_google">
                     <label><span>Texto Abajo del QR</span></label>
-                    <input type="text" id="qrCaptionText_google" class="plaque-input" value="SCAN QR CODE" placeholder="Ej: ESCANÉAME" />
+                    <input type="text" id="qrCaptionText_google" class="plaque-input" maxlength="24" value="SCAN QR CODE" placeholder="Ej: ESCANÉAME" />
                   </div>
                 </div>
 
@@ -2052,11 +2053,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Título Principal</span></label>
-                  <input type="text" id="t1_menu" class="plaque-input" value="MENU" />
+                  <input type="text" id="t1_menu" class="plaque-input" maxlength="32" value="MENU" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Subtítulo</span></label>
-                  <input type="text" id="t2_menu" class="plaque-input" value="VIEW OUR MENU ONLINE" />
+                  <input type="text" id="t2_menu" class="plaque-input" maxlength="45" value="VIEW OUR MENU ONLINE" />
                 </div>
               </div>
             </div>
@@ -2103,7 +2104,7 @@
                   </div>
                   <div class="plaque-field-group" id="wrapCaptionText_menu">
                     <label><span>Texto del QR</span></label>
-                    <input type="text" id="qrCaptionText_menu" class="plaque-input" value="SCAN QR" placeholder="Ej: VER MENÚ" />
+                    <input type="text" id="qrCaptionText_menu" class="plaque-input" maxlength="24" value="SCAN QR" placeholder="Ej: VER MENÚ" />
                   </div>
                 </div>
 
@@ -2206,11 +2207,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Título Cursiva</span></label>
-                  <input type="text" id="t1_instagram" class="plaque-input" value="Instagram" />
+                  <input type="text" id="t1_instagram" class="plaque-input" maxlength="32" value="Instagram" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Llamado a la acción</span></label>
-                  <input type="text" id="t2_instagram" class="plaque-input" value="¡Acerca tu móvil y síguenos!" />
+                  <input type="text" id="t2_instagram" class="plaque-input" maxlength="45" value="¡Acerca tu móvil y síguenos!" />
                 </div>
               </div>
             </div>
@@ -2257,7 +2258,7 @@
                   </div>
                   <div class="plaque-field-group dimmed-field" id="wrapCaptionText_instagram">
                     <label><span>Texto Abajo del QR</span></label>
-                    <input type="text" id="qrCaptionText_instagram" class="plaque-input" value="SÍGUENOS" placeholder="Ej: ESCANÉAME" />
+                    <input type="text" id="qrCaptionText_instagram" class="plaque-input" maxlength="24" value="SÍGUENOS" placeholder="Ej: ESCANÉAME" />
                   </div>
                 </div>
 
@@ -2360,11 +2361,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Palabra 1 (Blanco)</span></label>
-                  <input type="text" id="t1_bluecode" class="plaque-input" value="BLUE" />
+                  <input type="text" id="t1_bluecode" class="plaque-input" maxlength="32" value="BLUE" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Palabra 2 (Azul)</span></label>
-                  <input type="text" id="t2_bluecode" class="plaque-input" value="CODE" />
+                  <input type="text" id="t2_bluecode" class="plaque-input" maxlength="45" value="CODE" />
                 </div>
               </div>
             </div>
@@ -2411,7 +2412,7 @@
                   </div>
                   <div class="plaque-field-group" id="wrapCaptionText_bluecode">
                     <label><span>Texto del QR</span></label>
-                    <input type="text" id="qrCaptionText_bluecode" class="plaque-input" value="Scan QR code" placeholder="Ej: Scan QR code" />
+                    <input type="text" id="qrCaptionText_bluecode" class="plaque-input" maxlength="24" value="Scan QR code" placeholder="Ej: Scan QR code" />
                   </div>
                 </div>
 
@@ -2514,11 +2515,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Título Principal</span></label>
-                  <input type="text" id="t1_comida1" class="plaque-input" value="BURGER & CO." />
+                  <input type="text" id="t1_comida1" class="plaque-input" maxlength="32" value="BURGER & CO." />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Subtítulo</span></label>
-                  <input type="text" id="t2_comida1" class="plaque-input" value="Sabor al instante" />
+                  <input type="text" id="t2_comida1" class="plaque-input" maxlength="45" value="Sabor al instante" />
                 </div>
               </div>
             </div>
@@ -2565,7 +2566,7 @@
                   </div>
                   <div class="plaque-field-group" id="wrapCaptionText_comida1">
                     <label><span>Texto del QR</span></label>
-                    <input type="text" id="qrCaptionText_comida1" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
+                    <input type="text" id="qrCaptionText_comida1" class="plaque-input" maxlength="24" value="SCAN QR" placeholder="Ej: SCAN QR" />
                   </div>
                 </div>
 
@@ -2668,11 +2669,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Título Principal</span></label>
-                  <input type="text" id="t1_comida2" class="plaque-input" value="BURGER & CO." />
+                  <input type="text" id="t1_comida2" class="plaque-input" maxlength="32" value="BURGER & CO." />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Subtítulo</span></label>
-                  <input type="text" id="t2_comida2" class="plaque-input" value="Sabor al instante" />
+                  <input type="text" id="t2_comida2" class="plaque-input" maxlength="45" value="Sabor al instante" />
                 </div>
               </div>
             </div>
@@ -2719,7 +2720,7 @@
                   </div>
                   <div class="plaque-field-group" id="wrapCaptionText_comida2">
                     <label><span>Texto del QR</span></label>
-                    <input type="text" id="qrCaptionText_comida2" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
+                    <input type="text" id="qrCaptionText_comida2" class="plaque-input" maxlength="24" value="SCAN QR" placeholder="Ej: SCAN QR" />
                   </div>
                 </div>
 
@@ -2746,6 +2747,161 @@
                     <label class="color-swatch-chip" title="Color de la cabecera curva superior">
                       <input type="color" id="accentColor_comida2" value="#1E1E1E" />
                       <span>Cabecera</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- MOTIVO 7: LE BURRÉ (CANTINA TEX-MEX & 7 SALSAS) -->
+        <div class="plaque-card selected-motif" id="cardMotif_leburre" style="display: none;">
+          <div class="plaque-col-preview">
+            <div class="plaque-card-top">
+              <label class="plaque-card-title" style="cursor: pointer;">
+                <input type="checkbox" id="chkMotif_leburre" checked style="accent-color: var(--bc-blue); width: 16px; height: 16px;" />
+                <span>🌯 Le Burré — Cantina Tex-Mex</span>
+              </label>
+              <div class="qty-badge-control" title="Cantidad de copias a imprimir en el PDF">
+                <span>Copias:</span>
+                <input type="number" id="qtyMotif_leburre" value="1" min="0" max="100" />
+              </div>
+            </div>
+
+            <div class="plaque-canvas-wrap">
+              <span class="plaque-drag-hint">✋ Arrastra elementos para mover</span>
+              <button type="button" class="plaque-reset-btn" data-reset-motif="leburre" title="Restaurar todo el diseño original">↺ Resetear</button>
+              <canvas id="canvasMotif_leburre" width="1200" height="1200"></canvas>
+              <span class="plaque-size-pill" id="pillSize_leburre">10 × 10 cm · 600 DPI</span>
+            </div>
+
+            <!-- Barra de Ajuste de Elemento (Mover / Escalar / Centrar) -->
+            <div class="elem-adjust-bar">
+              <span style="color: var(--bc-cyan); font-weight: 700;">✥</span>
+              <select id="elemSelect_leburre" title="Elemento a ajustar">
+                <option value="qr" selected>Código QR</option>
+                <option value="nfc">Ilustración NFC</option>
+                <option value="title">Título LE BURRÉ</option>
+                <option value="hero">Mascota Le Burré</option>
+                <option value="brand">Sello BlueCode</option>
+              </select>
+              <input type="range" id="elemScale_leburre" min="0.55" max="1.65" step="0.03" value="1" title="Escalar elemento seleccionado" />
+              <span id="elemScaleVal_leburre" style="font-family: var(--mono); width: 34px; text-align: right; color: var(--bc-cyan);">100%</span>
+              <button type="button" class="btn-center-elem" data-center-motif="leburre" title="Restaurar posición y tamaño de este elemento">⊕ Centrar</button>
+            </div>
+
+            <div class="plaque-card-actions">
+              <button type="button" class="btn btn-bc btn-sm" data-pdf-motif="leburre" title="Descargar únicamente esta placa en PDF a escala exacta en cm (600 DPI)">
+                📄 PDF
+              </button>
+              <button type="button" class="btn btn-subtle btn-sm" data-png-motif="leburre" title="Descargar imagen PNG en Ultra-HD">
+                🖼️ PNG
+              </button>
+              <button type="button" class="btn btn-subtle btn-sm" data-psd-motif="leburre" title="Descargar archivo Adobe Photoshop .PSD con capas separadas">
+                🎨 .PSD
+              </button>
+            </div>
+          </div>
+
+          <div class="plaque-col-controls">
+            <div class="plaque-section-box">
+              <div class="plaque-section-label">
+                <span>1. Enlace y Textos de la Placa</span>
+                <a href="javascript:void(0)" class="quick-new-tag-link" data-motif="leburre" style="color: var(--bc-cyan); text-decoration: none; font-size: 0.7rem; text-transform: none;">+ Crear Tag</a>
+              </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Tag / QR Dinámico</span></label>
+                  <select id="selectTag_leburre" class="plaque-select"></select>
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>URL o Link del QR</span></label>
+                  <input type="text" id="customUrl_leburre" class="plaque-input" placeholder="https://gestor-nfc-qr-2026.web.app/r/..." />
+                </div>
+              </div>
+              <div class="plaque-grid-2">
+                <div class="plaque-field-group">
+                  <label><span>Título Principal</span></label>
+                  <input type="text" id="t1_leburre" class="plaque-input" maxlength="32" value="LE BURRÉ" />
+                </div>
+                <div class="plaque-field-group">
+                  <label><span>Subtítulo</span></label>
+                  <input type="text" id="t2_leburre" class="plaque-input" maxlength="45" value="Carta Oficial & 7 Salsas" />
+                </div>
+              </div>
+            </div>
+
+            <details class="plaque-custom-drawer" open>
+              <summary>🎨 2. Personalizar QR y Colores</summary>
+              <div class="plaque-drawer-body">
+                <div class="plaque-grid-2">
+                  <div class="plaque-field-group">
+                    <label><span>Logo Central del QR</span></label>
+                    <select id="qrLogo_leburre" class="plaque-select">
+                      <option value="leburre" selected>🌯 Mascota Le Burré</option>
+                      <option value="burger">🍔 Logo Hamburguesa</option>
+                      <option value="bluecode">🔹 Logo BlueCode</option>
+                      <option value="menu">🍴 Logo Cubiertos</option>
+                      <option value="google">🌈 Logo Google 'G'</option>
+                      <option value="instagram">📸 Logo Instagram</option>
+                      <option value="whatsapp">💬 Logo WhatsApp</option>
+                      <option value="wifi">📶 Logo Wi-Fi</option>
+                      <option value="star">⭐ Estrella Dorada</option>
+                      <option value="custom">🖼️ Tu Logo Subido</option>
+                      <option value="none">⬜ Sin Logo (QR Limpio)</option>
+                    </select>
+                  </div>
+                  <div class="plaque-field-group">
+                    <label><span>Color / Degradado QR</span></label>
+                    <select id="qrColor_leburre" class="plaque-select">
+                      <option value="solid:#F2B705" selected>🟡 Oro Maíz Le Burré</option>
+                      <option value="solid:#7A0C0C">🔴 Rojo Carmesí</option>
+                      <option value="solid:#1B1A1A">⬛ Negro Carbón</option>
+                      <option value="grad-gold">🏆 Degradado Oro</option>
+                      <option value="grad-bc">🌊 Degradado BlueCode</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="plaque-grid-2">
+                  <div class="plaque-field-group">
+                    <label><span>Modo QR (Clean / Texto)</span></label>
+                    <select id="qrCaptionMode_leburre" class="plaque-select">
+                      <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
+                      <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
+                      <option value="clean">🧼 QR Clean (Solo QR)</option>
+                    </select>
+                  </div>
+                  <div class="plaque-field-group" id="wrapCaptionText_leburre">
+                    <label><span>Texto del QR</span></label>
+                    <input type="text" id="qrCaptionText_leburre" class="plaque-input" maxlength="24" value="VER CARTA & SALSAS" placeholder="Ej: VER CARTA" />
+                  </div>
+                </div>
+
+                <div class="plaque-color-strip">
+                  <div class="plaque-color-top">
+                    <select id="palettePreset_leburre" class="plaque-select" style="flex: 1; padding: 4px 8px; font-size: 0.74rem;" title="Temas rápidos de color">
+                      <option value="original" selected>🌶️ Crimson Cantina & Oro (Original)</option>
+                      <option value="parchment">📜 Papel de Estraza & Carmesí</option>
+                      <option value="dark-grill">🖤 Dark Grill & Brasa</option>
+                      <option value="agave-mex">🌿 Verde Agave & Maíz</option>
+                      <option value="minimal-bw">⚪ Blanco & Negro</option>
+                    </select>
+                    <button type="button" class="btn-sync-colors" data-sync-colors-motif="leburre" title="Aplicar este tema y colores a todas las placas">⚡ Aplicar a todas</button>
+                  </div>
+                  <div class="color-chip-group">
+                    <label class="color-swatch-chip" title="Color de fondo de la tarjeta">
+                      <input type="color" id="bgColor_leburre" value="#7A0C0C" />
+                      <span>Fondo</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
+                      <input type="color" id="textColor_leburre" value="#FAF6EE" />
+                      <span>Texto/NFC</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de cabecera y acentos dorados">
+                      <input type="color" id="accentColor_leburre" value="#F2B705" />
+                      <span>Acento</span>
                     </label>
                   </div>
                 </div>
@@ -4134,9 +4290,9 @@
       });
 
       // ==========================================================
-      // CONTROLADOR DEL ESTUDIO DE PLACAS (6 PLANTILLAS OFICIALES)
+      // CONTROLADOR DEL ESTUDIO DE PLACAS (7 PLANTILLAS OFICIALES)
       // ==========================================================
-      const MOTIFS = ["google", "menu", "instagram", "bluecode", "comida1", "comida2"];
+      const MOTIFS = ["google", "menu", "instagram", "bluecode", "comida1", "comida2", "leburre"];
       const tabViewLinks = document.getElementById("tabViewLinks");
       const tabViewPlaques = document.getElementById("tabViewPlaques");
       const linksViewWrapper = document.getElementById("linksViewWrapper");
@@ -4159,7 +4315,8 @@
         instagram: createDefaultLayout(),
         bluecode: createDefaultLayout(),
         comida1: createDefaultLayout(),
-        comida2: createDefaultLayout()
+        comida2: createDefaultLayout(),
+        leburre: createDefaultLayout()
       };
 
       const activeGroupState = {
@@ -4168,7 +4325,8 @@
         instagram: null,
         bluecode: null,
         comida1: null,
-        comida2: null
+        comida2: null,
+        leburre: null
       };
 
       const DEFAULT_COLORS = {
@@ -4177,7 +4335,8 @@
         instagram: { bg: "#FFFFFF", text: "#141414", accent: "#E11D74", borderStyle: "original" },
         bluecode: { bg: "#FFFFFF", text: "#181818", accent: "#060A14", borderStyle: "original" },
         comida1: { bg: "#FFFFFF", text: "#1B1A1A", accent: "#C8102E", borderStyle: "original" },
-        comida2: { bg: "#FFFFFF", text: "#1B1A1A", accent: "#1E1E1E", borderStyle: "original" }
+        comida2: { bg: "#FFFFFF", text: "#1B1A1A", accent: "#1E1E1E", borderStyle: "original" },
+        leburre: { bg: "#7A0C0C", text: "#FAF6EE", accent: "#F2B705", borderStyle: "original" }
       };
 
       const borderStyleState = {
@@ -4186,7 +4345,8 @@
         instagram: "original",
         bluecode: "original",
         comida1: "original",
-        comida2: "original"
+        comida2: "original",
+        leburre: "original"
       };
 
       const heroIconState = {
@@ -4195,7 +4355,8 @@
         instagram: "original",
         bluecode: "original",
         comida1: "original",
-        comida2: "original"
+        comida2: "original",
+        leburre: "original"
       };
 
       const headerBgState = {
@@ -4204,7 +4365,8 @@
         instagram: "original",
         bluecode: "original",
         comida1: "original",
-        comida2: "original"
+        comida2: "original",
+        leburre: "original"
       };
 
       let activeMotifTab = "google";
@@ -4213,6 +4375,9 @@
 
       const ICON_LIBRARY_ITEMS = [
         { id: "original", em: "✨", label: "Original" },
+        { id: "leburre", em: "🌯", label: "Le Burré" },
+        { id: "taco", em: "🌮", label: "Taco" },
+        { id: "pepper", em: "🌶️", label: "Chile" },
         { id: "menu", em: "🍴", label: "Menú" },
         { id: "burger", em: "🍔", label: "Burger" },
         { id: "pizza", em: "🍕", label: "Pizza" },
@@ -4232,6 +4397,9 @@
       ];
 
       const EXTENDED_QR_LOGO_OPTIONS = [
+        { value: "leburre", text: "🌯 Logo Le Burré" },
+        { value: "taco", text: "🌮 Logo Taco" },
+        { value: "pepper", text: "🌶️ Logo Chile Picante" },
         { value: "pizza", text: "🍕 Logo Pizza" },
         { value: "coffee", text: "☕ Logo Café" },
         { value: "cocktail", text: "🍸 Logo Bar / Cóctel" },
@@ -4312,6 +4480,7 @@
               '<div class="header-bg-control-row">' +
                 '<select id="headerBgMode_' + m + '" class="plaque-select" title="Cambiar el fondo superior de la placa">' +
                   '<option value="original" selected>✨ Fondo Original de Plantilla</option>' +
+                  '<option value="leburre">🌯 Le Burré Crimson & Greca</option>' +
                   '<option value="comida1">🍔 Hamburguesas Rojo Ilustrado</option>' +
                   '<option value="comida2">🖤 Hamburguesa Gourmet Dark</option>' +
                   '<option value="bluecode-glow">🌌 Onda Neón BlueCode</option>' +
@@ -4395,6 +4564,37 @@
         const txtEl = document.getElementById("textColor_" + motif);
         const accEl = document.getElementById("accentColor_" + motif);
 
+        if (motif === "leburre") {
+          if (preset === "original") {
+            bgEl.value = "#7A0C0C";
+            txtEl.value = "#FAF6EE";
+            accEl.value = "#F2B705";
+            borderStyleState[motif] = "original";
+          } else if (preset === "parchment") {
+            bgEl.value = "#F6F0E4";
+            txtEl.value = "#22120E";
+            accEl.value = "#7A0C0C";
+            borderStyleState[motif] = "accent";
+          } else if (preset === "dark-grill") {
+            bgEl.value = "#1A0808";
+            txtEl.value = "#FAF6EE";
+            accEl.value = "#FF5722";
+            borderStyleState[motif] = "accent";
+          } else if (preset === "agave-mex") {
+            bgEl.value = "#0F2E1B";
+            txtEl.value = "#FAF6EE";
+            accEl.value = "#F2B705";
+            borderStyleState[motif] = "accent";
+          } else if (preset === "minimal-bw") {
+            bgEl.value = "#FFFFFF";
+            txtEl.value = "#111111";
+            accEl.value = "#111111";
+            borderStyleState[motif] = "accent";
+          }
+          renderSinglePlaquePreview(motif);
+          return;
+        }
+
         if (preset === "original") {
           const def = DEFAULT_COLORS[motif];
           bgEl.value = def.bg;
@@ -4431,7 +4631,8 @@
         instagram: { t1: "Instagram", t2: "¡Acerca tu móvil y síguenos!", qrLogo: "bluecode", qrColor: "solid:#141414", qrCaptionMode: "clean", qrCaptionText: "SÍGUENOS" },
         bluecode: { t1: "BLUE", t2: "CODE", qrLogo: "none", qrColor: "solid:#111111", qrCaptionMode: "bottom-text", qrCaptionText: "Scan QR code" },
         comida1: { t1: "BURGER & CO.", t2: "Sabor al instante", qrLogo: "burger", qrColor: "solid:#843511", qrCaptionMode: "bottom-text-id", qrCaptionText: "SCAN QR" },
-        comida2: { t1: "BURGER & CO.", t2: "Sabor al instante", qrLogo: "burger", qrColor: "solid:#843511", qrCaptionMode: "bottom-text-id", qrCaptionText: "SCAN QR" }
+        comida2: { t1: "BURGER & CO.", t2: "Sabor al instante", qrLogo: "burger", qrColor: "solid:#843511", qrCaptionMode: "bottom-text-id", qrCaptionText: "SCAN QR" },
+        leburre: { t1: "LE BURRÉ", t2: "Carta Oficial & 7 Salsas", qrLogo: "leburre", qrColor: "solid:#F2B705", qrCaptionMode: "bottom-text-id", qrCaptionText: "VER CARTA & SALSAS" }
       };
 
       function isUrlLikeValue(val) {
@@ -4697,7 +4898,9 @@
         switchMainView("plaques");
         const hay = ((item.name || "") + " " + (item.slug || "") + " " + (item.targetUrl || "")).toLowerCase();
         let targetMotif = "google";
-        if (hay.includes("burger") || hay.includes("comida") || hay.includes("roja")) {
+        if (hay.includes("burre") || hay.includes("burrito") || hay.includes("taco") || hay.includes("tex") || hay.includes("mex")) {
+          targetMotif = "leburre";
+        } else if (hay.includes("burger") || hay.includes("comida") || hay.includes("roja")) {
           targetMotif = "comida1";
         } else if (hay.includes("gourmet") || hay.includes("dark")) {
           targetMotif = "comida2";
@@ -4759,6 +4962,7 @@
           } else {
             const match = allItems.find(function (it) {
               const s = ((it.name || "") + " " + (it.slug || "")).toLowerCase();
+              if (m === "leburre") return s.includes("burre") || s.includes("taco") || s.includes("mex") || s.includes("carta");
               if (m === "google") return s.includes("google") || s.includes("rese") || s.includes("review");
               if (m === "menu") return s.includes("menu") || s.includes("menú") || s.includes("mesa") || s.includes("carta");
               if (m === "instagram") return s.includes("insta") || s.includes("ig");
@@ -4790,7 +4994,7 @@
 
         const globalStyleVal = document.getElementById("plaqueGlobalQrStyle").value || "auto";
         const globalEyeVal = document.getElementById("plaqueGlobalQrEyeStyle").value || "auto";
-        const isFoodMotif = motif === "comida1" || motif === "comida2";
+        const isFoodMotif = motif === "comida1" || motif === "comida2" || motif === "leburre";
         const qrStyle = globalStyleVal === "auto" ? (isFoodMotif ? "dots" : "classic") : globalStyleVal;
         const qrEyeStyle = globalEyeVal === "auto" ? (isFoodMotif ? "circle" : "square") : globalEyeVal;
         const eyeColorMode = document.getElementById("plaqueGlobalEyeColorMode").value || "match";
@@ -4851,6 +5055,12 @@
           baseCfg.titleMain = document.getElementById("t1_" + motif).value || "BURGER & CO.";
           baseCfg.subtitle = document.getElementById("t2_" + motif).value || "Sabor al instante";
           baseCfg.arcText = "TAP YOUR PHONE";
+          return baseCfg;
+        }
+        if (motif === "leburre") {
+          baseCfg.titleMain = document.getElementById("t1_leburre").value || "LE BURRÉ";
+          baseCfg.subtitle = document.getElementById("t2_leburre").value || "Carta Oficial & 7 Salsas";
+          baseCfg.arcText = "TOCA CON TU MÓVIL";
           return baseCfg;
         }
         baseCfg.titleScript = document.getElementById("t1_instagram").value || "Instagram";
@@ -5084,14 +5294,17 @@
         }
         if (qrCaptionTextIn) {
           qrCaptionTextIn.addEventListener("input", function (ev) {
-            const val = (qrCaptionTextIn.value || "").trim();
+            let val = (qrCaptionTextIn.value || "").trim();
             if (isUrlLikeValue(val)) {
               if (ev && ev.inputType === "insertFromPaste" && urlIn) {
                 urlIn.value = val;
                 if (sel) sel.value = "__custom__";
                 showToast("Enlace asignado al QR automáticamente.");
               }
-              qrCaptionTextIn.value = DEFAULT_MOTIF_FIELDS[m].qrCaptionText;
+              if (/youtube\.com|youtu\.be/i.test(val)) qrCaptionTextIn.value = "VER EN YOUTUBE";
+              else if (/instagram\.com/i.test(val)) qrCaptionTextIn.value = "VER EN INSTAGRAM";
+              else if (/wa\.me|whatsapp\.com/i.test(val)) qrCaptionTextIn.value = "WHATSAPP";
+              else qrCaptionTextIn.value = DEFAULT_MOTIF_FIELDS[m].qrCaptionText;
             }
             renderSinglePlaquePreview(m);
           });
@@ -5144,14 +5357,15 @@
           const el = document.getElementById(fieldKey + "_" + m);
           if (!el) return;
           el.addEventListener("input", function (ev) {
-            const val = (el.value || "").trim();
+            let val = (el.value || "").trim();
             if (isUrlLikeValue(val)) {
               if (ev && ev.inputType === "insertFromPaste" && urlIn) {
                 urlIn.value = val;
                 if (sel) sel.value = "__custom__";
                 showToast("Enlace asignado al QR automáticamente.");
               }
-              el.value = DEFAULT_MOTIF_FIELDS[m][fieldKey] || "";
+              const clean = val.replace(/^https?:\/\/+/i, "").replace(/^:\/\/+/i, "").replace(/^www\.+/i, "").replace(/\/+$/, "");
+              el.value = clean || DEFAULT_MOTIF_FIELDS[m][fieldKey] || "";
             }
             renderSinglePlaquePreview(m);
           });
@@ -5199,7 +5413,7 @@
               renderSinglePlaquePreview(targetM);
             }
           });
-          showToast("Colores aplicados a las 6 placas.");
+          showToast("Colores aplicados a las 7 placas.");
         });
       });
 
@@ -5238,6 +5452,9 @@
           } else if (motif === "comida1" || motif === "comida2") {
             newName.value = "Burger & Co. Menú";
             newSlug.value = "burger-and-co";
+          } else if (motif === "leburre") {
+            newName.value = "Le Burré Menú Oficial";
+            newSlug.value = "le-burre-carta";
           } else {
             newName.value = "Síguenos en Instagram";
             newSlug.value = "instagram";

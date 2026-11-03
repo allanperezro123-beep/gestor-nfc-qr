@@ -61,6 +61,13 @@
       { id: "hero", label: "Icono Burger & Fries", x: 365, y: 30, w: 270, h: 175, cx: 500, cy: 118 },
       { id: "title", label: "Título BURGER & CO.", x: 110, y: 215, w: 780, h: 175, cx: 500, cy: 305 },
       { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 945 }
+    ],
+    leburre: [
+      { id: "qr", label: "Código QR", x: 620, y: 515, w: 280, h: 365, cx: 760, cy: 714 },
+      { id: "nfc", label: "Ilustración NFC", x: 145, y: 540, w: 370, h: 330, cx: 338, cy: 720 },
+      { id: "hero", label: "Mascota Le Burré", x: 370, y: 20, w: 260, h: 195, cx: 500, cy: 116 },
+      { id: "title", label: "Título LE BURRÉ", x: 110, y: 200, w: 780, h: 195, cx: 500, cy: 292 },
+      { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 946 }
     ]
   };
 
@@ -71,7 +78,11 @@
   const headerAssets = {
     comida1: typeof Image !== "undefined" ? new Image() : null,
     comida2: typeof Image !== "undefined" ? new Image() : null,
-    burgerIcon: typeof Image !== "undefined" ? new Image() : null
+    burgerIcon: typeof Image !== "undefined" ? new Image() : null,
+    leburreLogo: typeof Image !== "undefined" ? new Image() : null,
+    leburreBg: typeof Image !== "undefined" ? new Image() : null,
+    leburreGreca: typeof Image !== "undefined" ? new Image() : null,
+    leburreEmblema: typeof Image !== "undefined" ? new Image() : null
   };
 
   function notifyAssetsReady() {
@@ -91,6 +102,22 @@
   if (headerAssets.burgerIcon) {
     headerAssets.burgerIcon.onload = notifyAssetsReady;
     headerAssets.burgerIcon.src = "/icon_burger_fries.png?v=2";
+  }
+  if (headerAssets.leburreLogo) {
+    headerAssets.leburreLogo.onload = notifyAssetsReady;
+    headerAssets.leburreLogo.src = "/logo_leburre.png?v=1";
+  }
+  if (headerAssets.leburreBg) {
+    headerAssets.leburreBg.onload = notifyAssetsReady;
+    headerAssets.leburreBg.src = "/bg_leburre.png?v=1";
+  }
+  if (headerAssets.leburreGreca) {
+    headerAssets.leburreGreca.onload = notifyAssetsReady;
+    headerAssets.leburreGreca.src = "/greca_leburre.png?v=1";
+  }
+  if (headerAssets.leburreEmblema) {
+    headerAssets.leburreEmblema.onload = notifyAssetsReady;
+    headerAssets.leburreEmblema.src = "/emblema_leburre.png?v=1";
   }
 
   function setOnAssetsLoaded(fn) {
@@ -896,6 +923,46 @@
       ctx.beginPath();
       ctx.arc(18, -18, 4.5, 0, Math.PI * 2);
       ctx.fill();
+    } else if (type === "burrito") {
+      // Burrito cilíndrico artesanal enrollado con marcas de grill al comal
+      roundRectPath(ctx, -18, -32, 36, 64, 18);
+      ctx.fill();
+      ctx.strokeStyle = cut;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(-14, -12);
+      ctx.lineTo(14, -6);
+      ctx.moveTo(-14, 4);
+      ctx.lineTo(14, 10);
+      ctx.moveTo(-14, 20);
+      ctx.lineTo(14, 26);
+      ctx.stroke();
+    } else if (type === "taco") {
+      // Taco mexicano semicircular doblado al comal con relleno artesanal
+      ctx.beginPath();
+      ctx.arc(0, 10, 34, Math.PI, 0, false);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = cut;
+      ctx.beginPath();
+      ctx.arc(-14, -6, 5, 0, Math.PI * 2);
+      ctx.arc(0, -10, 6, 0, Math.PI * 2);
+      ctx.arc(14, -6, 5, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === "pepper" || type === "chili") {
+      // Ají / Chile picante mexicano con curvatura y llama de fuego
+      ctx.beginPath();
+      ctx.moveTo(-6, -26);
+      ctx.bezierCurveTo(24, -18, 28, 12, 10, 32);
+      ctx.bezierCurveTo(-14, 28, -26, 4, -12, -24);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = cut;
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(-6, -26);
+      ctx.quadraticCurveTo(-14, -36, -2, -40);
+      ctx.stroke();
     } else if (type === "google") {
       drawStar(ctx, 0, 0, 34, 15, col);
     } else if (type === "star") {
@@ -926,7 +993,25 @@
   // Dibuja cualquier icono de la librería dentro del centro del QR
   function drawExtendedBadgeIcon(ctx, type, cx, cy, size, mainFill) {
     const r = size * 0.46;
+    if (type === "leburre") {
+      const leburreLogoImg = headerAssets.leburreLogo;
+      if (leburreLogoImg && leburreLogoImg.complete && leburreLogoImg.naturalWidth > 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = "#FAF6EE";
+        ctx.fill();
+        ctx.clip();
+        ctx.drawImage(leburreLogoImg, cx - r, cy - r, r * 2, r * 2);
+        ctx.restore();
+        return;
+      }
+    }
     const badgeColors = {
+      leburre: "#7A0C0C",
+      burrito: "#D97706",
+      taco: "#B45309",
+      pepper: "#DC2626",
       pizza: "#D9381E",
       coffee: "#6F4E37",
       cocktail: "#7C3AED",
@@ -948,6 +1033,29 @@
   // Dibuja cualquier icono de la librería como Icono Hero Superior de una placa
   function drawCustomHeroIconOverride(ctx, heroIcon, cx, cy, color, cutoutColor) {
     if (!heroIcon || heroIcon === "none") return;
+    if (heroIcon === "leburre") {
+      const leburreLogoImg = headerAssets.leburreLogo;
+      const hasLeburre = Boolean(leburreLogoImg && leburreLogoImg.complete && leburreLogoImg.naturalWidth > 0);
+      if (hasLeburre) {
+        ctx.save();
+        ctx.shadowColor = "rgba(0,0,0,0.52)";
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 6;
+        const r = 84;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r + 4, 0, Math.PI * 2);
+        ctx.fillStyle = cutoutColor || "#F2B705";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = "#FAF6EE";
+        ctx.fill();
+        ctx.clip();
+        ctx.drawImage(leburreLogoImg, cx - r, cy - r, r * 2, r * 2);
+        ctx.restore();
+        return;
+      }
+    }
     if (heroIcon === "burger") {
       const burgerIconImg = headerAssets.burgerIcon;
       const hasBurgerIcon = Boolean(burgerIconImg && burgerIconImg.complete && burgerIconImg.naturalWidth > 0);
@@ -1056,7 +1164,44 @@
       return true;
     }
 
-    // 3. Onda Neón BlueCode
+    // 3. Fondo auténtico Le Burré (Carmesí Tex-Mex + Greca Mexicana)
+    if (mode === "leburre") {
+      traceSubWavePath();
+      ctx.fillStyle = "#F2B705";
+      ctx.fill();
+
+      ctx.save();
+      traceMainWavePath();
+      ctx.clip();
+      const grad = ctx.createLinearGradient(0, 0, 0, 480);
+      grad.addColorStop(0, "#360505");
+      grad.addColorStop(0.55, "#560808");
+      grad.addColorStop(1, "#7A0C0C");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1000, 525);
+
+      if (headerAssets.leburreBg && headerAssets.leburreBg.complete && headerAssets.leburreBg.naturalWidth > 0) {
+        ctx.globalAlpha = 0.35;
+        ctx.drawImage(headerAssets.leburreBg, 0, 0, 1000, 525);
+        ctx.globalAlpha = 1.0;
+      }
+      ctx.restore();
+
+      if (headerAssets.leburreGreca && headerAssets.leburreGreca.complete && headerAssets.leburreGreca.naturalWidth > 0) {
+        ctx.save();
+        const gw = headerAssets.leburreGreca.naturalWidth || headerAssets.leburreGreca.width || 366;
+        const gh = headerAssets.leburreGreca.naturalHeight || headerAssets.leburreGreca.height || 55;
+        const tH = 26;
+        const tW = (gw / gh) * tH;
+        for (let x = 0; x < 1000; x += tW - 1) {
+          ctx.drawImage(headerAssets.leburreGreca, x, 442, tW, tH);
+        }
+        ctx.restore();
+      }
+      return true;
+    }
+
+    // 4. Onda Neón BlueCode
     if (mode === "bluecode-glow") {
       ctx.beginPath();
       ctx.moveTo(0, 0);
@@ -1532,6 +1677,7 @@
     if (requested === "auto") {
       if (motif === "google") return "google";
       if (motif === "comida1" || motif === "comida2") return "burger";
+      if (motif === "leburre") return "leburre";
       return "bluecode";
     }
     return requested;
@@ -1557,6 +1703,52 @@
   }
 
   // Detecta si un texto visual fue contaminado por autocompletado de URL del navegador o pegado por error
+  // Limpia cualquier texto visual de cabeceras, subtítulos o títulos de placas:
+  // Si el usuario escribe una URL o dominio (ej. https://blueedit.web o ://blueedit.web o wa.me/123),
+  // se limpian los protocolos antiestéticos y caracteres técnicos sobrantes para que luzca estético y profesional.
+  function cleanVisualDisplayText(val, fallback, maxLen) {
+    if (val == null) return fallback || "";
+    let s = String(val).trim();
+    if (!s) return fallback || "";
+    // Remover prefijos de protocolo y caracteres técnicos rotos
+    s = s.replace(/^https?:\/\/+/i, "")
+         .replace(/^:\/\/+/i, "")
+         .replace(/^www\.+/i, "");
+    // Remover barras diagonales finales
+    s = s.replace(/\/+$/, "");
+    if (!s) return fallback || "";
+    const limit = maxLen || 60;
+    if (s.length > limit) {
+      s = s.slice(0, limit).trim() + "…";
+    }
+    return s;
+  }
+
+  // Limpia el texto de pie/etiqueta del QR (ej. SCAN QR CODE, VER MENÚ):
+  // Si se detecta una URL completa (como youtube.com, wa.me, etc.), se transforma en un Call To Action limpio y conciso.
+  function cleanQrCaptionText(val, fallback) {
+    if (val == null) return fallback || "SCAN QR";
+    let s = String(val).trim();
+    if (!s) return fallback || "SCAN QR";
+    if (/^(https?:\/\/|www\.|wa\.me\/|mailto:|tel:)/i.test(s) || s.includes("://") || s.includes("youtube.com") || s.includes("youtu.be")) {
+      if (/youtube\.com|youtu\.be/i.test(s)) return "VER EN YOUTUBE";
+      if (/instagram\.com/i.test(s)) return "VER EN INSTAGRAM";
+      if (/wa\.me|whatsapp\.com/i.test(s)) return "WHATSAPP";
+      if (/tiktok\.com/i.test(s)) return "VER EN TIKTOK";
+      if (/google\.com\/maps|review/i.test(s)) return "DEJAR RESEÑA";
+      try {
+        const u = new URL(s.startsWith("http") ? s : "https://" + s);
+        const host = u.hostname.replace(/^www\./i, "").toUpperCase();
+        if (host && host.length <= 16) return host;
+      } catch (e) {}
+      return fallback || "ESCANEA EL QR";
+    }
+    if (s.length > 24) {
+      s = s.slice(0, 24).trim();
+    }
+    return s;
+  }
+
   function isUrlLikeString(str) {
     if (!str) return false;
     const s = String(str).trim();
@@ -1567,26 +1759,45 @@
   }
 
   function cleanVisualText(val, fallback) {
-    const s = String(val == null ? "" : val).trim();
-    if (!s || isUrlLikeString(s)) return fallback;
-    return s;
+    return cleanVisualDisplayText(val, fallback);
   }
 
-  // Dibuja texto ajustando automáticamente el tamaño de fuente para que NUNCA se salga de su ancho máximo
+  // Dibuja texto ajustando automáticamente tamaño y longitud con GARANTÍA MATEMÁTICA de no salirse de maxWidth
   function drawFittedText(ctx, text, x, y, maxWidth, baseSize, minSize, fontWeight, fontFamily) {
-    const str = String(text == null ? "" : text);
+    let str = String(text == null ? "" : text).trim();
     if (!str) return;
     const weight = fontWeight || "800";
     const family = fontFamily || "'Plus Jakarta Sans', Arial, sans-serif";
     const floorSize = minSize || Math.max(14, Math.round(baseSize * 0.45));
     let sz = baseSize;
+
+    // 1. Reducir tamaño de fuente progresivamente
     while (sz > floorSize) {
       ctx.font = weight + " " + sz + "px " + family;
       if (ctx.measureText(str).width <= maxWidth) break;
       sz -= 2;
     }
+
+    // 2. Si aún excede maxWidth al llegar a floorSize, bajar hasta un mínimo absoluto legible
+    const absMin = Math.max(11, Math.min(floorSize, 14));
+    while (sz > absMin) {
+      ctx.font = weight + " " + sz + "px " + family;
+      if (ctx.measureText(str).width <= maxWidth) break;
+      sz -= 1;
+    }
+
+    // 3. Garantía matemática: si incluso en absMin supera maxWidth, recortar con puntos suspensivos (…)
     ctx.font = weight + " " + sz + "px " + family;
-    ctx.fillText(str, x, y, maxWidth);
+    let renderStr = str;
+    if (ctx.measureText(renderStr).width > maxWidth) {
+      while (renderStr.length > 2 && ctx.measureText(renderStr + "…").width > maxWidth) {
+        renderStr = renderStr.slice(0, -1);
+      }
+      renderStr = renderStr.trim() + "…";
+    }
+
+    // 4. Dibujar sin deformación horizontal del navegador
+    ctx.fillText(renderStr, x, y);
   }
 
   /**
@@ -1599,8 +1810,8 @@
     const mode = data.qrCaptionMode || "clean";
     if (mode === "clean") return;
 
-    const caption = cleanVisualText(data.qrCaptionText, "SCAN QR CODE");
-    const slugText = cleanVisualText(data.slug, "TAG-ID").toUpperCase();
+    const caption = cleanQrCaptionText(data.qrCaptionText, "SCAN QR CODE");
+    const slugText = cleanVisualDisplayText(data.slug, "TAG-ID", 22).toUpperCase();
 
     ctx.save();
     ctx.textAlign = "center";
@@ -1609,14 +1820,14 @@
 
     if (caption) {
       ctx.fillStyle = textColor || "#181818";
-      drawFittedText(ctx, caption, centerX, curY, 280, 24, 15, "800", "'Plus Jakarta Sans', Arial, sans-serif");
-      curY += 28;
+      drawFittedText(ctx, caption, centerX, curY, 240, 22, 14, "800", "'Plus Jakarta Sans', Arial, sans-serif");
+      curY += 26;
     }
 
     if (mode === "bottom-text-id") {
       ctx.fillStyle = textColor || "#333333";
       ctx.globalAlpha = 0.78;
-      drawFittedText(ctx, "ID: " + slugText, centerX, curY, 280, 19, 13, "600", "'JetBrains Mono', monospace");
+      drawFittedText(ctx, "ID: " + slugText, centerX, curY, 240, 18, 12, "600", "'JetBrains Mono', monospace");
     }
     ctx.restore();
   }
@@ -2199,12 +2410,21 @@
         ctx.save();
         ctx.textAlign = "center";
 
-        const menuTitle = cleanVisualText(data.titleMain || data.menuTitle, "MENU");
-        const menuSub = cleanVisualText(data.subtitle || data.menuSubtitle, "VIEW OUR MENU ONLINE");
+        const menuTitle = cleanVisualDisplayText(data.titleMain || data.menuTitle, "MENU", 35);
+        const menuSub = cleanVisualDisplayText(data.subtitle || data.menuSubtitle, "VIEW OUR MENU ONLINE", 45);
 
         ctx.fillStyle = headerContentColor;
-        drawFittedText(ctx, menuTitle, 500, 322, 860, 124, 42, "800", "'Plus Jakarta Sans', Arial, sans-serif");
-        drawFittedText(ctx, menuSub, 500, 386, 840, 34, 18, "400", "'Plus Jakarta Sans', Arial, sans-serif");
+        let baseSz = 96;
+        let minSz = 36;
+        if (menuTitle.length > 18) {
+          baseSz = 48; minSz = 22;
+        } else if (menuTitle.length > 11) {
+          baseSz = 62; minSz = 28;
+        } else if (menuTitle.length > 6) {
+          baseSz = 76; minSz = 32;
+        }
+        drawFittedText(ctx, menuTitle, 500, 314, 760, baseSz, minSz, "800", "'Plus Jakarta Sans', Arial, sans-serif");
+        drawFittedText(ctx, menuSub, 500, 368, 740, 32, 16, "500", "'Plus Jakarta Sans', Arial, sans-serif");
         ctx.restore();
       });
     }
@@ -2248,16 +2468,16 @@
           ctx.save();
           ctx.textAlign = "center";
           ctx.fillStyle = textColor;
-          ctx.font = "500 25px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.font = "600 22px 'Plus Jakarta Sans', Arial, sans-serif";
           ctx.fillText("OR", 760, 542);
-          const cleanCap = cleanVisualText(data.qrCaptionText, "SCAN QR").toUpperCase();
-          drawFittedText(ctx, cleanCap, 760, 578, 280, 29, 16, "800", "'Plus Jakarta Sans', Arial, sans-serif");
+          const cleanCap = cleanQrCaptionText(data.qrCaptionText, "SCAN QR").toUpperCase();
+          drawFittedText(ctx, cleanCap, 760, 574, 230, 26, 14, "800", "'Plus Jakarta Sans', Arial, sans-serif");
 
           if (captionMode === "bottom-text-id") {
             ctx.fillStyle = textColor;
             ctx.globalAlpha = 0.82;
-            const cleanSlugVal = cleanVisualText(data.slug, "TAG-ID").toUpperCase();
-            drawFittedText(ctx, cleanSlugVal, 760, 868, 280, 21, 13, "600", "'JetBrains Mono', monospace");
+            const cleanSlugVal = cleanVisualDisplayText(data.slug, "TAG-ID", 22).toUpperCase();
+            drawFittedText(ctx, cleanSlugVal, 760, 868, 230, 20, 13, "600", "'JetBrains Mono', monospace");
           }
           ctx.restore();
         }
@@ -2400,8 +2620,8 @@
       // Grupo TITLE: "BLUE CODE" en una sola línea (o 2 líneas si el subtítulo es largo)
       withGroupTransform(ctx, data, "title", 615, 275, function () {
         ctx.save();
-        const w1 = cleanVisualText(data.titleMain, "BLUE");
-        const w2 = cleanVisualText(data.subtitle, "CODE");
+        const w1 = cleanVisualDisplayText(data.titleMain, "BLUE", 24);
+        const w2 = cleanVisualDisplayText(data.subtitle, "CODE", 24);
 
         if (w1.length + w2.length <= 13) {
           ctx.font = "800 94px 'Plus Jakarta Sans', Arial, sans-serif";
@@ -2423,10 +2643,10 @@
         } else {
           ctx.textAlign = "center";
           ctx.fillStyle = headerPrimaryColor;
-          drawFittedText(ctx, w1, 620, 275, 540, 78, 34, "800", "'Plus Jakarta Sans', Arial, sans-serif");
+          drawFittedText(ctx, w1, 620, 275, 520, 78, 34, "800", "'Plus Jakarta Sans', Arial, sans-serif");
 
           ctx.fillStyle = "#087CF5";
-          drawFittedText(ctx, w2, 620, 332, 540, 34, 18, "700", "'Plus Jakarta Sans', Arial, sans-serif");
+          drawFittedText(ctx, w2, 620, 332, 520, 34, 18, "700", "'Plus Jakarta Sans', Arial, sans-serif");
         }
         ctx.restore();
       });
@@ -2460,13 +2680,13 @@
           ctx.save();
           ctx.fillStyle = textColor;
           ctx.textAlign = "center";
-          const bcCap = cleanVisualText(data.qrCaptionText, "Scan QR code");
-          drawFittedText(ctx, bcCap, 725, 572, 280, 31, 16, "500", "'Plus Jakarta Sans', Arial, sans-serif");
+          const bcCap = cleanQrCaptionText(data.qrCaptionText, "Scan QR code");
+          drawFittedText(ctx, bcCap, 725, 572, 240, 28, 14, "500", "'Plus Jakarta Sans', Arial, sans-serif");
 
           if (hasId) {
             ctx.globalAlpha = 0.82;
-            const bcSlug = cleanVisualText(data.slug, "TAG-ID").toUpperCase();
-            drawFittedText(ctx, bcSlug, 725, qrY + qrSize + 30, 280, 20, 13, "600", "'JetBrains Mono', monospace");
+            const bcSlug = cleanVisualDisplayText(data.slug, "TAG-ID", 22).toUpperCase();
+            drawFittedText(ctx, bcSlug, 725, qrY + qrSize + 30, 240, 20, 13, "600", "'JetBrains Mono', monospace");
           }
           ctx.restore();
         }
@@ -2518,8 +2738,8 @@
     const darkHeader = hasRichHeaderBg || isHexDark(accentColor);
     const headerContentColor = darkHeader ? "#FFFFFF" : "#111827";
 
-    const titleMain = cleanVisualText(data.titleMain, "BURGER & CO.");
-    const subtitle = cleanVisualText(data.subtitle, "Sabor al instante");
+    const titleMain = cleanVisualDisplayText(data.titleMain, "BURGER & CO.", 35);
+    const subtitle = cleanVisualDisplayText(data.subtitle, "Sabor al instante", 45);
     const headerImg = isComida2 ? headerAssets.comida2 : headerAssets.comida1;
     const hasLoadedImg = Boolean(headerImg && headerImg.complete && headerImg.naturalWidth > 0);
     const burgerIconImg = headerAssets.burgerIcon;
@@ -2624,12 +2844,21 @@
         ctx.shadowBlur = 16;
         ctx.shadowOffsetY = 6;
 
-        drawFittedText(ctx, titleMain, 500, 298, 860, 94, 42, "800", "'Plus Jakarta Sans', Arial, sans-serif");
+        let baseSz = 90;
+        let minSz = 36;
+        if (titleMain.length > 18) {
+          baseSz = 48; minSz = 22;
+        } else if (titleMain.length > 11) {
+          baseSz = 62; minSz = 28;
+        } else if (titleMain.length > 6) {
+          baseSz = 76; minSz = 32;
+        }
+        drawFittedText(ctx, titleMain, 500, 296, 760, baseSz, minSz, "800", "'Plus Jakarta Sans', Arial, sans-serif");
 
         ctx.shadowColor = "rgba(0,0,0,0.78)";
         ctx.shadowBlur = 12;
         ctx.shadowOffsetY = 4;
-        drawFittedText(ctx, subtitle, 500, 364, 840, 39, 20, "500", "'Plus Jakarta Sans', Arial, sans-serif");
+        drawFittedText(ctx, subtitle, 500, 360, 740, 34, 18, "500", "'Plus Jakarta Sans', Arial, sans-serif");
         ctx.restore();
       });
     }
@@ -2672,16 +2901,16 @@
           ctx.save();
           ctx.textAlign = "center";
           ctx.fillStyle = textColor;
-          ctx.font = "500 25px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.font = "600 22px 'Plus Jakarta Sans', Arial, sans-serif";
           ctx.fillText("OR", 760, 542);
-          const foodCap = cleanVisualText(data.qrCaptionText, "SCAN QR").toUpperCase();
-          drawFittedText(ctx, foodCap, 760, 578, 280, 29, 16, "800", "'Plus Jakarta Sans', Arial, sans-serif");
+          const foodCap = cleanQrCaptionText(data.qrCaptionText, "SCAN QR").toUpperCase();
+          drawFittedText(ctx, foodCap, 760, 574, 230, 26, 14, "800", "'Plus Jakarta Sans', Arial, sans-serif");
 
           if (captionMode === "bottom-text-id") {
             ctx.fillStyle = textColor;
             ctx.globalAlpha = 0.85;
-            const foodSlug = cleanVisualText(data.slug, "BURGER-AND-CO").toUpperCase();
-            drawFittedText(ctx, foodSlug, 760, 868, 280, 21, 13, "600", "'JetBrains Mono', monospace");
+            const foodSlug = cleanVisualDisplayText(data.slug, "BURGER-AND-CO", 22).toUpperCase();
+            drawFittedText(ctx, foodSlug, 760, 868, 230, 20, 13, "600", "'JetBrains Mono', monospace");
           }
           ctx.restore();
         }
@@ -2708,6 +2937,335 @@
     ctx.restore();
   }
 
+  // ============================================================================
+  // 7. RENDERIZADOR PLACA LE BURRÉ (COCINA ARTESANAL TEX-MEX & 7 SALSAS)
+  // ============================================================================
+  function renderLeburrePlaque(ctx, W, H, data, layerFilter) {
+    const S = W / 1000;
+    ctx.save();
+    ctx.scale(S, S);
+
+    const showBg = !layerFilter || layerFilter === "all" || layerFilter === "bg";
+    const showIcons = !layerFilter || layerFilter === "all" || layerFilter === "icons";
+    const showText = !layerFilter || layerFilter === "all" || layerFilter === "text";
+    const showBrand = !layerFilter || layerFilter === "all" || layerFilter === "brand";
+    const showQr = !layerFilter || layerFilter === "all" || layerFilter === "qr";
+
+    const bgColor = data.bgColor || "#7A0C0C";
+    const textColor = data.textColor || "#FAF6EE";
+    const accentColor = data.accentColor || "#F2B705";
+    const darkBg = isHexDark(bgColor);
+    const hasRichHeaderBg = Boolean(data.headerBgMode && data.headerBgMode !== "original" && data.headerBgMode !== "solid-custom");
+    const darkHeader = hasRichHeaderBg || isHexDark(accentColor);
+    const headerContentColor = darkHeader ? "#FFFFFF" : "#1B1A1A";
+
+    const titleMain = cleanVisualDisplayText(data.titleMain, "LE BURRÉ", 35);
+    const subtitle = cleanVisualDisplayText(data.subtitle, "Carta Oficial & 7 Salsas", 45);
+    const arcText = data.arcText || "TOCA CON TU MÓVIL";
+
+    const logoImg = headerAssets.leburreLogo;
+    const hasLogoImg = Boolean(logoImg && logoImg.complete && logoImg.naturalWidth > 0);
+    const bgImg = headerAssets.leburreBg;
+    const hasBgImg = Boolean(bgImg && bgImg.complete && bgImg.naturalWidth > 0);
+    const grecaImg = headerAssets.leburreGreca;
+    const hasGrecaImg = Boolean(grecaImg && grecaImg.complete && grecaImg.naturalWidth > 0);
+
+    roundRectPath(ctx, 0, 0, 1000, 1000, 82);
+    ctx.clip();
+
+    if (showBg) {
+      // 1. Fondo base
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, 1000, 1000);
+
+      // Si el fondo es oscuro/rojo, dibujar textura de doodles auténtica Le Burré
+      if (hasBgImg && (bgColor === "#7A0C0C" || darkBg)) {
+        ctx.save();
+        ctx.globalAlpha = 0.28;
+        ctx.drawImage(bgImg, 0, 0, 1000, 1000);
+        ctx.restore();
+      }
+
+      // Viñeta cálida radial en el centro para resaltar los elementos
+      ctx.save();
+      const radGlow = ctx.createRadialGradient(500, 260, 40, 500, 500, 600);
+      radGlow.addColorStop(0, "rgba(242, 183, 5, 0.12)");
+      radGlow.addColorStop(0.65, "rgba(0, 0, 0, 0.18)");
+      radGlow.addColorStop(1, "rgba(0, 0, 0, 0.48)");
+      ctx.fillStyle = radGlow;
+      ctx.fillRect(0, 0, 1000, 1000);
+      ctx.restore();
+
+      // 2. Cabecera superior curva
+      if (!drawReplaceableWaveHeader(ctx, "leburre", data, accentColor, "#F2B705")) {
+        // Cabecera Cantina Original Le Burré
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(1000, 0);
+        ctx.lineTo(1000, 440);
+        ctx.bezierCurveTo(760, 460, 520, 395, 0, 452);
+        ctx.closePath();
+
+        const gradH = ctx.createLinearGradient(0, 0, 0, 452);
+        gradH.addColorStop(0, "#360505");
+        gradH.addColorStop(0.6, "#540808");
+        gradH.addColorStop(1, "#360505");
+        ctx.fillStyle = gradH;
+        ctx.fill();
+
+        // Tinte de textura en la cabecera
+        if (hasBgImg) {
+          ctx.save();
+          ctx.clip();
+          ctx.globalAlpha = 0.35;
+          ctx.drawImage(bgImg, 0, 0, 1000, 480);
+          ctx.restore();
+        }
+
+        // Tira Greca Banderillas Mexicanas a lo largo de la división
+        if (hasGrecaImg) {
+          ctx.save();
+          const gw = grecaImg.naturalWidth || grecaImg.width || 366;
+          const gh = grecaImg.naturalHeight || grecaImg.height || 55;
+          const tH = 26;
+          const tW = (gw / gh) * tH;
+          for (let x = 0; x < 1000; x += tW - 1) {
+            ctx.drawImage(grecaImg, x, 428, tW, tH);
+          }
+          ctx.restore();
+        }
+
+        // Línea de acento dorado
+        ctx.beginPath();
+        ctx.moveTo(0, 452);
+        ctx.bezierCurveTo(520, 395, 760, 460, 1000, 440);
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // 3. Doble marco táctil de autor con esquinas doradas
+      ctx.save();
+      roundRectPath(ctx, 4, 4, 992, 992, 78);
+      ctx.strokeStyle = accentColor;
+      ctx.lineWidth = 4.5;
+      ctx.stroke();
+
+      roundRectPath(ctx, 16, 16, 968, 968, 68);
+      ctx.strokeStyle = darkBg ? "rgba(242, 183, 5, 0.42)" : "rgba(0,0,0,0.18)";
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      // 4 remaches dorados en las esquinas
+      const rivets = [[40, 40], [960, 40], [40, 960], [960, 960]];
+      for (let i = 0; i < rivets.length; i++) {
+        const rx = rivets[i][0];
+        const ry = rivets[i][1];
+        ctx.beginPath();
+        ctx.arc(rx, ry, 5.5, 0, Math.PI * 2);
+        ctx.fillStyle = accentColor;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(rx - 1.2, ry - 1.2, 2, 0, Math.PI * 2);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    if (showIcons) {
+      // Icono Hero Superior (Mascota Le Burré o Icono personalizado)
+      withGroupTransform(ctx, data, "hero", 500, 116, function () {
+        if (data.heroIcon && data.heroIcon !== "original" && data.heroIcon !== "leburre") {
+          drawCustomHeroIconOverride(ctx, data.heroIcon, 500, 116, headerContentColor, accentColor);
+        } else if (data.heroIcon !== "none") {
+          ctx.save();
+          const r = 84;
+          ctx.shadowColor = "rgba(0, 0, 0, 0.65)";
+          ctx.shadowBlur = 20;
+          ctx.shadowOffsetY = 6;
+
+          ctx.beginPath();
+          ctx.arc(500, 116, r + 5, 0, Math.PI * 2);
+          ctx.fillStyle = accentColor;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(500, 116, r, 0, Math.PI * 2);
+          ctx.fillStyle = "#FAF6EE";
+          ctx.fill();
+          ctx.clip();
+
+          if (hasLogoImg) {
+            ctx.drawImage(logoImg, 500 - r, 116 - r, r * 2, r * 2);
+          } else {
+            drawLibraryVectorGlyph(ctx, "burrito", 500, 116, 120, "#7A0C0C", "#F2B705");
+          }
+          ctx.restore();
+        }
+      });
+
+      // Ilustración NFC y llamado a la acción
+      withGroupTransform(ctx, data, "nfc", 338, 715, function () {
+        drawUnifiedMenuNfcIllustration(ctx, 338, 725, 0.96, textColor, darkBg ? bgColor : "#FAF6EE");
+        drawArcText(
+          ctx,
+          arcText,
+          4,
+          342,
+          788,
+          228,
+          (-126 * Math.PI) / 180,
+          (-54 * Math.PI) / 180,
+          31,
+          textColor
+        );
+
+        // Pastilla distintiva Le Burré: 🌶️ 7 Salsas de Autor
+        ctx.save();
+        roundRectPath(ctx, 338 - 110, 842, 220, 30, 15);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.42)";
+        ctx.fill();
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.font = "700 13px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillStyle = accentColor;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("🌶️ 7 Salsas de Autor", 338, 857);
+        ctx.restore();
+      });
+    }
+
+    if (showText) {
+      withGroupTransform(ctx, data, "title", 500, 292, function () {
+        ctx.save();
+        ctx.textAlign = "center";
+
+        // Pastilla eyebrow "★ COCINA ARTESANAL TEX-MEX ★"
+        roundRectPath(ctx, 500 - 150, 206, 300, 26, 13);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.48)";
+        ctx.fill();
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.font = "800 12px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillStyle = accentColor;
+        ctx.textBaseline = "middle";
+        ctx.fillText("★ COCINA ARTESANAL TEX-MEX ★", 500, 219);
+
+        // Título Principal "LE BURRÉ"
+        ctx.shadowColor = "rgba(0, 0, 0, 0.88)";
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 6;
+        ctx.fillStyle = headerContentColor;
+        let baseSz = 86;
+        let minSz = 36;
+        if (titleMain.length > 18) {
+          baseSz = 48; minSz = 22;
+        } else if (titleMain.length > 11) {
+          baseSz = 62; minSz = 28;
+        } else if (titleMain.length > 6) {
+          baseSz = 74; minSz = 32;
+        }
+        drawFittedText(ctx, titleMain, 500, 290, 780, baseSz, minSz, "800", "'Plus Jakarta Sans', 'Outfit', Arial, sans-serif");
+
+        // Subtítulo "Carta Oficial & 7 Salsas"
+        ctx.shadowColor = "rgba(0, 0, 0, 0.82)";
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 4;
+        ctx.fillStyle = accentColor;
+        drawFittedText(ctx, subtitle, 500, 356, 760, 32, 16, "600", "'Plus Jakarta Sans', Georgia, serif");
+
+        ctx.restore();
+      });
+    }
+
+    if (showQr) {
+      withGroupTransform(ctx, data, "qr", 760, 714, function () {
+        const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app/r/leburre";
+        const captionMode = data.qrCaptionMode || "bottom-text-id";
+        const isClean = captionMode === "clean";
+        const boxSize = isClean ? 248 : 232;
+        const boxX = 760 - boxSize / 2;
+        const boxY = isClean ? 580 : 598;
+        const qrPad = 18;
+        const qrSize = boxSize - qrPad * 2;
+
+        ctx.save();
+        ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+        ctx.shadowBlur = 16;
+        ctx.shadowOffsetY = 6;
+
+        // Tarjeta de papel de estraza / pergamino claro
+        roundRectPath(ctx, boxX, boxY, boxSize, boxSize, 22);
+        ctx.fillStyle = "#FAF6EE";
+        ctx.fill();
+
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.restore();
+
+        // Código QR
+        drawQrMatrix(
+          ctx,
+          targetUrl,
+          boxX + qrPad,
+          boxY + qrPad,
+          qrSize,
+          buildQrOptionsFromData("leburre", data, "#7A0C0C", false)
+        );
+
+        // Texto bajo el QR si está activo
+        if (!isClean) {
+          ctx.save();
+          ctx.textAlign = "center";
+          ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+          ctx.shadowBlur = 6;
+          ctx.shadowOffsetY = 2;
+
+          const caption = cleanQrCaptionText(data.qrCaptionText, "VER CARTA & SALSAS").toUpperCase();
+          ctx.fillStyle = accentColor;
+          drawFittedText(ctx, caption, 760, 856, 230, 15, 11, "800", "'Plus Jakarta Sans', Arial, sans-serif");
+
+          if (captionMode === "bottom-text-id") {
+            ctx.fillStyle = textColor;
+            ctx.globalAlpha = 0.88;
+            const slug = cleanVisualDisplayText(data.slug, "LE-BURRE", 22).toUpperCase();
+            drawFittedText(ctx, slug, 760, 874, 230, 20, 13, "600", "'JetBrains Mono', monospace");
+          }
+          ctx.restore();
+        }
+      });
+    }
+
+    if (showBrand) {
+      withGroupTransform(ctx, data, "brand", 500, 946, function () {
+        drawPoweredByBlueCodeFooter(ctx, 500, 955, {
+          lowercase: true,
+          fontSize: 27,
+          brandFontSize: 30,
+          logoHeight: 33,
+          prefixColor: darkBg ? "rgba(250, 246, 238, 0.78)" : "#222222",
+          brandColor: accentColor || "#F2B705"
+        });
+      });
+    }
+
+    if (!layerFilter || layerFilter === "all") {
+      drawSelectionOverlayIfActive(ctx, "leburre", data);
+    }
+
+    ctx.restore();
+  }
+
   function renderPlaqueToCanvas(canvas, motif, widthPx, heightPx, data, layerFilter) {
     canvas.width = widthPx;
     canvas.height = heightPx;
@@ -2724,6 +3282,8 @@
       renderBlueCodePlaque(ctx, widthPx, heightPx, data, layerFilter);
     } else if (motif === "comida1" || motif === "comida2") {
       renderComidaPlaque(ctx, widthPx, heightPx, data, layerFilter, motif);
+    } else if (motif === "leburre") {
+      renderLeburrePlaque(ctx, widthPx, heightPx, data, layerFilter);
     } else {
       renderMenuPlaque(ctx, widthPx, heightPx, data, layerFilter);
     }
