@@ -1894,15 +1894,15 @@
               <div class="plaque-grid-3">
                 <div class="plaque-field-group">
                   <label><span>Línea 1</span></label>
-                  <input type="text" id="t1_google" class="plaque-input" maxlength="32" value="Valóranos" />
+                  <input type="text" id="t1_google" class="plaque-input" value="Valóranos" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Línea 2</span></label>
-                  <input type="text" id="t2_google" class="plaque-input" maxlength="45" value="en" />
+                  <input type="text" id="t2_google" class="plaque-input" value="en" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Línea 3</span></label>
-                  <input type="text" id="t3_google" class="plaque-input" maxlength="24" value="Google" />
+                  <input type="text" id="t3_google" class="plaque-input" value="Google" />
                 </div>
               </div>
             </div>
@@ -1950,7 +1950,7 @@
                   </div>
                   <div class="plaque-field-group dimmed-field" id="wrapCaptionText_google">
                     <label><span>Texto Abajo del QR</span></label>
-                    <input type="text" id="qrCaptionText_google" class="plaque-input" maxlength="24" value="SCAN QR CODE" placeholder="Ej: ESCANÉAME" />
+                    <input type="text" id="qrCaptionText_google" class="plaque-input" value="SCAN QR CODE" placeholder="Ej: ESCANÉAME" />
                   </div>
                 </div>
 
@@ -1970,13 +1970,25 @@
                       <input type="color" id="bgColor_google" value="#FFFFFF" />
                       <span>Fondo</span>
                     </label>
-                    <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                      <input type="color" id="textColor_google" value="#202124" />
-                      <span>Texto/NFC</span>
-                    </label>
                     <label class="color-swatch-chip" title="Color de estrellas y acentos">
                       <input type="color" id="accentColor_google" value="#FBC02D" />
                       <span>Estrellas</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del título (Valóranos en)">
+                      <input type="color" id="titleColor_google" value="#202124" />
+                      <span>Título</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de subtítulos y pie de página">
+                      <input type="color" id="textColor_google" value="#202124" />
+                      <span>Subtítulo</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de la ilustración del móvil/NFC">
+                      <input type="color" id="nfcColor_google" value="#202124" />
+                      <span>Logo NFC</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del texto NFC">
+                      <input type="color" id="nfcTextColor_google" value="#202124" />
+                      <span>Texto NFC</span>
                     </label>
                   </div>
                 </div>
@@ -2053,11 +2065,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Título Principal</span></label>
-                  <input type="text" id="t1_menu" class="plaque-input" maxlength="32" value="MENU" />
+                  <input type="text" id="t1_menu" class="plaque-input" value="MENU" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Subtítulo</span></label>
-                  <input type="text" id="t2_menu" class="plaque-input" maxlength="45" value="VIEW OUR MENU ONLINE" />
+                  <input type="text" id="t2_menu" class="plaque-input" value="VIEW OUR MENU ONLINE" />
                 </div>
               </div>
             </div>
@@ -2104,7 +2116,7 @@
                   </div>
                   <div class="plaque-field-group" id="wrapCaptionText_menu">
                     <label><span>Texto del QR</span></label>
-                    <input type="text" id="qrCaptionText_menu" class="plaque-input" maxlength="24" value="SCAN QR" placeholder="Ej: VER MENÚ" />
+                    <input type="text" id="qrCaptionText_menu" class="plaque-input" value="SCAN QR" placeholder="Ej: VER MENÚ" />
                   </div>
                 </div>
 
@@ -2124,13 +2136,25 @@
                       <input type="color" id="bgColor_menu" value="#FFFFFF" />
                       <span>Fondo</span>
                     </label>
-                    <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                      <input type="color" id="textColor_menu" value="#1B1A1A" />
-                      <span>Texto/NFC</span>
-                    </label>
                     <label class="color-swatch-chip" title="Color de la cabecera curva superior">
                       <input type="color" id="accentColor_menu" value="#1B1A1A" />
                       <span>Cabecera</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del título (MENU)">
+                      <input type="color" id="titleColor_menu" value="#FFFFFF" />
+                      <span>Título</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del subtítulo (VIEW OUR MENU ONLINE)">
+                      <input type="color" id="textColor_menu" value="#4B5563" />
+                      <span>Subtítulo</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de la ilustración del móvil/NFC">
+                      <input type="color" id="nfcColor_menu" value="#1B1A1A" />
+                      <span>Logo NFC</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del texto en arco (TAP YOUR PHONE)">
+                      <input type="color" id="nfcTextColor_menu" value="#1B1A1A" />
+                      <span>Texto NFC</span>
                     </label>
                   </div>
                 </div>
@@ -2207,11 +2231,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Título Cursiva</span></label>
-                  <input type="text" id="t1_instagram" class="plaque-input" maxlength="32" value="Instagram" />
+                  <input type="text" id="t1_instagram" class="plaque-input" value="Instagram" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Llamado a la acción</span></label>
-                  <input type="text" id="t2_instagram" class="plaque-input" maxlength="45" value="¡Acerca tu móvil y síguenos!" />
+                  <input type="text" id="t2_instagram" class="plaque-input" value="¡Acerca tu móvil y síguenos!" />
                 </div>
               </div>
             </div>
@@ -2258,7 +2282,7 @@
                   </div>
                   <div class="plaque-field-group dimmed-field" id="wrapCaptionText_instagram">
                     <label><span>Texto Abajo del QR</span></label>
-                    <input type="text" id="qrCaptionText_instagram" class="plaque-input" maxlength="24" value="SÍGUENOS" placeholder="Ej: ESCANÉAME" />
+                    <input type="text" id="qrCaptionText_instagram" class="plaque-input" value="SÍGUENOS" placeholder="Ej: ESCANÉAME" />
                   </div>
                 </div>
 
@@ -2278,13 +2302,25 @@
                       <input type="color" id="bgColor_instagram" value="#FFFFFF" />
                       <span>Fondo</span>
                     </label>
-                    <label class="color-swatch-chip" title="Color de textos, marco interior e ilustración NFC">
-                      <input type="color" id="textColor_instagram" value="#141414" />
-                      <span>Texto/NFC</span>
-                    </label>
                     <label class="color-swatch-chip" title="Color de ondas laterales y acento">
                       <input type="color" id="accentColor_instagram" value="#E11D74" />
                       <span>Acento</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del título (Instagram)">
+                      <input type="color" id="titleColor_instagram" value="#141414" />
+                      <span>Título</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del subtítulo (¡Acerca tu móvil y síguenos!)">
+                      <input type="color" id="textColor_instagram" value="#141414" />
+                      <span>Subtítulo</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de la ilustración del móvil/NFC">
+                      <input type="color" id="nfcColor_instagram" value="#141414" />
+                      <span>Logo NFC</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del texto NFC">
+                      <input type="color" id="nfcTextColor_instagram" value="#141414" />
+                      <span>Texto NFC</span>
                     </label>
                   </div>
                 </div>
@@ -2361,11 +2397,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Palabra 1 (Blanco)</span></label>
-                  <input type="text" id="t1_bluecode" class="plaque-input" maxlength="32" value="BLUE" />
+                  <input type="text" id="t1_bluecode" class="plaque-input" value="BLUE" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Palabra 2 (Azul)</span></label>
-                  <input type="text" id="t2_bluecode" class="plaque-input" maxlength="45" value="CODE" />
+                  <input type="text" id="t2_bluecode" class="plaque-input" value="CODE" />
                 </div>
               </div>
             </div>
@@ -2412,7 +2448,7 @@
                   </div>
                   <div class="plaque-field-group" id="wrapCaptionText_bluecode">
                     <label><span>Texto del QR</span></label>
-                    <input type="text" id="qrCaptionText_bluecode" class="plaque-input" maxlength="24" value="Scan QR code" placeholder="Ej: Scan QR code" />
+                    <input type="text" id="qrCaptionText_bluecode" class="plaque-input" value="Scan QR code" placeholder="Ej: Scan QR code" />
                   </div>
                 </div>
 
@@ -2432,13 +2468,25 @@
                       <input type="color" id="bgColor_bluecode" value="#FFFFFF" />
                       <span>Fondo</span>
                     </label>
-                    <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                      <input type="color" id="textColor_bluecode" value="#181818" />
-                      <span>Texto/NFC</span>
-                    </label>
                     <label class="color-swatch-chip" title="Color de la cabecera curva superior">
                       <input type="color" id="accentColor_bluecode" value="#060A14" />
                       <span>Cabecera</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del título principal (BLUE)">
+                      <input type="color" id="titleColor_bluecode" value="#FFFFFF" />
+                      <span>Título</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del subtítulo (CODE)">
+                      <input type="color" id="textColor_bluecode" value="#087CF5" />
+                      <span>Subtítulo</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de la ilustración del móvil/NFC">
+                      <input type="color" id="nfcColor_bluecode" value="#181818" />
+                      <span>Logo NFC</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del texto en arco (Tap your phone)">
+                      <input type="color" id="nfcTextColor_bluecode" value="#181818" />
+                      <span>Texto NFC</span>
                     </label>
                   </div>
                 </div>
@@ -2515,11 +2563,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Título Principal</span></label>
-                  <input type="text" id="t1_comida1" class="plaque-input" maxlength="32" value="BURGER & CO." />
+                  <input type="text" id="t1_comida1" class="plaque-input" value="BURGER & CO." />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Subtítulo</span></label>
-                  <input type="text" id="t2_comida1" class="plaque-input" maxlength="45" value="Sabor al instante" />
+                  <input type="text" id="t2_comida1" class="plaque-input" value="Sabor al instante" />
                 </div>
               </div>
             </div>
@@ -2566,7 +2614,7 @@
                   </div>
                   <div class="plaque-field-group" id="wrapCaptionText_comida1">
                     <label><span>Texto del QR</span></label>
-                    <input type="text" id="qrCaptionText_comida1" class="plaque-input" maxlength="24" value="SCAN QR" placeholder="Ej: SCAN QR" />
+                    <input type="text" id="qrCaptionText_comida1" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
                   </div>
                 </div>
 
@@ -2586,13 +2634,25 @@
                       <input type="color" id="bgColor_comida1" value="#FFFFFF" />
                       <span>Fondo</span>
                     </label>
-                    <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                      <input type="color" id="textColor_comida1" value="#1B1A1A" />
-                      <span>Texto/NFC</span>
-                    </label>
                     <label class="color-swatch-chip" title="Color de la cabecera curva superior">
                       <input type="color" id="accentColor_comida1" value="#C8102E" />
                       <span>Cabecera</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del título (BURGER & CO.)">
+                      <input type="color" id="titleColor_comida1" value="#FFFFFF" />
+                      <span>Título</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del subtítulo (Sabor al instante)">
+                      <input type="color" id="textColor_comida1" value="#FFFFFF" />
+                      <span>Subtítulo</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de la ilustración del móvil/NFC">
+                      <input type="color" id="nfcColor_comida1" value="#1B1A1A" />
+                      <span>Logo NFC</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del texto en arco (TAP YOUR PHONE)">
+                      <input type="color" id="nfcTextColor_comida1" value="#1B1A1A" />
+                      <span>Texto NFC</span>
                     </label>
                   </div>
                 </div>
@@ -2669,11 +2729,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Título Principal</span></label>
-                  <input type="text" id="t1_comida2" class="plaque-input" maxlength="32" value="BURGER & CO." />
+                  <input type="text" id="t1_comida2" class="plaque-input" value="BURGER & CO." />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Subtítulo</span></label>
-                  <input type="text" id="t2_comida2" class="plaque-input" maxlength="45" value="Sabor al instante" />
+                  <input type="text" id="t2_comida2" class="plaque-input" value="Sabor al instante" />
                 </div>
               </div>
             </div>
@@ -2720,7 +2780,7 @@
                   </div>
                   <div class="plaque-field-group" id="wrapCaptionText_comida2">
                     <label><span>Texto del QR</span></label>
-                    <input type="text" id="qrCaptionText_comida2" class="plaque-input" maxlength="24" value="SCAN QR" placeholder="Ej: SCAN QR" />
+                    <input type="text" id="qrCaptionText_comida2" class="plaque-input" value="SCAN QR" placeholder="Ej: SCAN QR" />
                   </div>
                 </div>
 
@@ -2740,13 +2800,25 @@
                       <input type="color" id="bgColor_comida2" value="#FFFFFF" />
                       <span>Fondo</span>
                     </label>
-                    <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                      <input type="color" id="textColor_comida2" value="#1B1A1A" />
-                      <span>Texto/NFC</span>
-                    </label>
                     <label class="color-swatch-chip" title="Color de la cabecera curva superior">
                       <input type="color" id="accentColor_comida2" value="#1E1E1E" />
                       <span>Cabecera</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del título (BURGER & CO.)">
+                      <input type="color" id="titleColor_comida2" value="#FFFFFF" />
+                      <span>Título</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del subtítulo (Sabor al instante)">
+                      <input type="color" id="textColor_comida2" value="#FFFFFF" />
+                      <span>Subtítulo</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de la ilustración del móvil/NFC">
+                      <input type="color" id="nfcColor_comida2" value="#1B1A1A" />
+                      <span>Logo NFC</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del texto en arco (TAP YOUR PHONE)">
+                      <input type="color" id="nfcTextColor_comida2" value="#1B1A1A" />
+                      <span>Texto NFC</span>
                     </label>
                   </div>
                 </div>
@@ -2823,11 +2895,11 @@
               <div class="plaque-grid-2">
                 <div class="plaque-field-group">
                   <label><span>Título Principal</span></label>
-                  <input type="text" id="t1_leburre" class="plaque-input" maxlength="32" value="LE BURRÉ" />
+                  <input type="text" id="t1_leburre" class="plaque-input" value="LE BURRÉ" />
                 </div>
                 <div class="plaque-field-group">
                   <label><span>Subtítulo</span></label>
-                  <input type="text" id="t2_leburre" class="plaque-input" maxlength="45" value="Carta Oficial & 7 Salsas" />
+                  <input type="text" id="t2_leburre" class="plaque-input" value="Carta Oficial & 7 Salsas" />
                 </div>
               </div>
             </div>
@@ -2875,7 +2947,7 @@
                   </div>
                   <div class="plaque-field-group" id="wrapCaptionText_leburre">
                     <label><span>Texto del QR</span></label>
-                    <input type="text" id="qrCaptionText_leburre" class="plaque-input" maxlength="24" value="VER CARTA & SALSAS" placeholder="Ej: VER CARTA" />
+                    <input type="text" id="qrCaptionText_leburre" class="plaque-input" value="VER CARTA & SALSAS" placeholder="Ej: VER CARTA" />
                   </div>
                 </div>
 
@@ -2895,13 +2967,25 @@
                       <input type="color" id="bgColor_leburre" value="#7A0C0C" />
                       <span>Fondo</span>
                     </label>
-                    <label class="color-swatch-chip" title="Color de textos e ilustración NFC">
-                      <input type="color" id="textColor_leburre" value="#FAF6EE" />
-                      <span>Texto/NFC</span>
-                    </label>
                     <label class="color-swatch-chip" title="Color de cabecera y acentos dorados">
                       <input type="color" id="accentColor_leburre" value="#F2B705" />
-                      <span>Acento</span>
+                      <span>Cabecera</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del título (LE BURRÉ)">
+                      <input type="color" id="titleColor_leburre" value="#FFFFFF" />
+                      <span>Título</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del subtítulo (Carta Oficial & 7 Salsas)">
+                      <input type="color" id="textColor_leburre" value="#F2B705" />
+                      <span>Subtítulo</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color de la ilustración del móvil/NFC">
+                      <input type="color" id="nfcColor_leburre" value="#FAF6EE" />
+                      <span>Logo NFC</span>
+                    </label>
+                    <label class="color-swatch-chip" title="Color del texto en arco (TOCA CON TU MÓVIL)">
+                      <input type="color" id="nfcTextColor_leburre" value="#F2B705" />
+                      <span>Texto NFC</span>
                     </label>
                   </div>
                 </div>
@@ -4330,13 +4414,13 @@
       };
 
       const DEFAULT_COLORS = {
-        google: { bg: "#FFFFFF", text: "#202124", accent: "#FBC02D", borderStyle: "original" },
-        menu: { bg: "#FFFFFF", text: "#1B1A1A", accent: "#1B1A1A", borderStyle: "original" },
-        instagram: { bg: "#FFFFFF", text: "#141414", accent: "#E11D74", borderStyle: "original" },
-        bluecode: { bg: "#FFFFFF", text: "#181818", accent: "#060A14", borderStyle: "original" },
-        comida1: { bg: "#FFFFFF", text: "#1B1A1A", accent: "#C8102E", borderStyle: "original" },
-        comida2: { bg: "#FFFFFF", text: "#1B1A1A", accent: "#1E1E1E", borderStyle: "original" },
-        leburre: { bg: "#7A0C0C", text: "#FAF6EE", accent: "#F2B705", borderStyle: "original" }
+        google: { bg: "#FFFFFF", text: "#202124", accent: "#FBC02D", title: "#202124", nfc: "#202124", nfcText: "#202124", borderStyle: "original" },
+        menu: { bg: "#FFFFFF", text: "#4B5563", accent: "#1B1A1A", title: "#FFFFFF", nfc: "#1B1A1A", nfcText: "#1B1A1A", borderStyle: "original" },
+        instagram: { bg: "#FFFFFF", text: "#141414", accent: "#E11D74", title: "#141414", nfc: "#141414", nfcText: "#141414", borderStyle: "original" },
+        bluecode: { bg: "#FFFFFF", text: "#087CF5", accent: "#060A14", title: "#FFFFFF", nfc: "#181818", nfcText: "#181818", borderStyle: "original" },
+        comida1: { bg: "#FFFFFF", text: "#FFFFFF", accent: "#C8102E", title: "#FFFFFF", nfc: "#1B1A1A", nfcText: "#1B1A1A", borderStyle: "original" },
+        comida2: { bg: "#FFFFFF", text: "#FFFFFF", accent: "#1E1E1E", title: "#FFFFFF", nfc: "#1B1A1A", nfcText: "#1B1A1A", borderStyle: "original" },
+        leburre: { bg: "#7A0C0C", text: "#F2B705", accent: "#F2B705", title: "#FFFFFF", nfc: "#FAF6EE", nfcText: "#F2B705", borderStyle: "original" }
       };
 
       const borderStyleState = {
@@ -4563,32 +4647,50 @@
         const bgEl = document.getElementById("bgColor_" + motif);
         const txtEl = document.getElementById("textColor_" + motif);
         const accEl = document.getElementById("accentColor_" + motif);
+        const titleEl = document.getElementById("titleColor_" + motif);
+        const nfcEl = document.getElementById("nfcColor_" + motif);
+        const nfcTxtEl = document.getElementById("nfcTextColor_" + motif);
 
         if (motif === "leburre") {
           if (preset === "original") {
             bgEl.value = "#7A0C0C";
-            txtEl.value = "#FAF6EE";
+            txtEl.value = "#F2B705";
             accEl.value = "#F2B705";
+            if (titleEl) titleEl.value = "#FFFFFF";
+            if (nfcEl) nfcEl.value = "#FAF6EE";
+            if (nfcTxtEl) nfcTxtEl.value = "#F2B705";
             borderStyleState[motif] = "original";
           } else if (preset === "parchment") {
             bgEl.value = "#F6F0E4";
-            txtEl.value = "#22120E";
+            txtEl.value = "#7A0C0C";
             accEl.value = "#7A0C0C";
+            if (titleEl) titleEl.value = "#7A0C0C";
+            if (nfcEl) nfcEl.value = "#22120E";
+            if (nfcTxtEl) nfcTxtEl.value = "#7A0C0C";
             borderStyleState[motif] = "accent";
           } else if (preset === "dark-grill") {
             bgEl.value = "#1A0808";
-            txtEl.value = "#FAF6EE";
+            txtEl.value = "#FF5722";
             accEl.value = "#FF5722";
+            if (titleEl) titleEl.value = "#FFFFFF";
+            if (nfcEl) nfcEl.value = "#FAF6EE";
+            if (nfcTxtEl) nfcTxtEl.value = "#FF5722";
             borderStyleState[motif] = "accent";
           } else if (preset === "agave-mex") {
             bgEl.value = "#0F2E1B";
-            txtEl.value = "#FAF6EE";
+            txtEl.value = "#F2B705";
             accEl.value = "#F2B705";
+            if (titleEl) titleEl.value = "#FFFFFF";
+            if (nfcEl) nfcEl.value = "#FAF6EE";
+            if (nfcTxtEl) nfcTxtEl.value = "#F2B705";
             borderStyleState[motif] = "accent";
           } else if (preset === "minimal-bw") {
             bgEl.value = "#FFFFFF";
             txtEl.value = "#111111";
             accEl.value = "#111111";
+            if (titleEl) titleEl.value = "#111111";
+            if (nfcEl) nfcEl.value = "#111111";
+            if (nfcTxtEl) nfcTxtEl.value = "#111111";
             borderStyleState[motif] = "accent";
           }
           renderSinglePlaquePreview(motif);
@@ -4600,26 +4702,41 @@
           bgEl.value = def.bg;
           txtEl.value = def.text;
           accEl.value = def.accent;
+          if (titleEl && def.title) titleEl.value = def.title;
+          if (nfcEl && def.nfc) nfcEl.value = def.nfc;
+          if (nfcTxtEl && def.nfcText) nfcTxtEl.value = def.nfcText;
           borderStyleState[motif] = "original";
         } else if (preset === "dark-gold") {
           bgEl.value = "#111318";
           txtEl.value = "#F8FAFC";
           accEl.value = "#F59E0B";
+          if (titleEl) titleEl.value = "#F59E0B";
+          if (nfcEl) nfcEl.value = "#F8FAFC";
+          if (nfcTxtEl) nfcTxtEl.value = "#F59E0B";
           borderStyleState[motif] = motif === "google" ? "original" : "accent";
         } else if (preset === "bc-tech") {
           bgEl.value = "#0B132B";
           txtEl.value = "#F8FAFC";
           accEl.value = "#0865F5";
+          if (titleEl) titleEl.value = "#FFFFFF";
+          if (nfcEl) nfcEl.value = "#0865F5";
+          if (nfcTxtEl) nfcTxtEl.value = "#087CF5";
           borderStyleState[motif] = "accent";
         } else if (preset === "cream-boutique") {
           bgEl.value = "#FAF6F0";
           txtEl.value = "#29231E";
           accEl.value = "#B48A5A";
+          if (titleEl) titleEl.value = "#29231E";
+          if (nfcEl) nfcEl.value = "#29231E";
+          if (nfcTxtEl) nfcTxtEl.value = "#B48A5A";
           borderStyleState[motif] = motif === "google" ? "original" : "accent";
         } else if (preset === "minimal-bw") {
           bgEl.value = "#FFFFFF";
           txtEl.value = "#111111";
           accEl.value = "#111111";
+          if (titleEl) titleEl.value = "#111111";
+          if (nfcEl) nfcEl.value = "#111111";
+          if (nfcTxtEl) nfcTxtEl.value = "#111111";
           borderStyleState[motif] = "accent";
         }
         renderSinglePlaquePreview(motif);
@@ -4689,9 +4806,16 @@
             const colEl = document.getElementById("qrColor_" + motif);
             const capModeEl = document.getElementById("qrCaptionMode_" + motif);
 
+            const titleEl = document.getElementById("titleColor_" + motif);
+            const nfcEl = document.getElementById("nfcColor_" + motif);
+            const nfcTxtEl = document.getElementById("nfcTextColor_" + motif);
+
             if (bgEl) bgEl.value = colDefs.bg;
             if (txtEl) txtEl.value = colDefs.text;
             if (accEl) accEl.value = colDefs.accent;
+            if (titleEl && colDefs.title) titleEl.value = colDefs.title;
+            if (nfcEl && colDefs.nfc) nfcEl.value = colDefs.nfc;
+            if (nfcTxtEl && colDefs.nfcText) nfcTxtEl.value = colDefs.nfcText;
             if (presetSel) presetSel.value = "original";
             if (logoEl && defs.qrLogo) logoEl.value = defs.qrLogo;
             if (colEl && defs.qrColor) colEl.value = defs.qrColor;
@@ -5004,6 +5128,12 @@
         const bgColor = document.getElementById("bgColor_" + motif).value || DEFAULT_COLORS[motif].bg;
         const textColor = document.getElementById("textColor_" + motif).value || DEFAULT_COLORS[motif].text;
         const accentColor = document.getElementById("accentColor_" + motif).value || DEFAULT_COLORS[motif].accent;
+        const titleColorEl = document.getElementById("titleColor_" + motif);
+        const titleColor = (titleColorEl && titleColorEl.value) || (DEFAULT_COLORS[motif] && DEFAULT_COLORS[motif].title) || textColor;
+        const nfcColorEl = document.getElementById("nfcColor_" + motif);
+        const nfcColor = (nfcColorEl && nfcColorEl.value) || (DEFAULT_COLORS[motif] && DEFAULT_COLORS[motif].nfc) || textColor;
+        const nfcTextColorEl = document.getElementById("nfcTextColor_" + motif);
+        const nfcTextColor = (nfcTextColorEl && nfcTextColorEl.value) || (DEFAULT_COLORS[motif] && DEFAULT_COLORS[motif].nfcText) || nfcColor || textColor;
         const qrCaptionMode = document.getElementById("qrCaptionMode_" + motif).value || "clean";
         const qrCaptionText = document.getElementById("qrCaptionText_" + motif).value || "";
 
@@ -5024,6 +5154,10 @@
           bgColor: bgColor,
           textColor: textColor,
           accentColor: accentColor,
+          titleColor: titleColor,
+          subtitleColor: textColor,
+          nfcColor: nfcColor,
+          nfcTextColor: nfcTextColor,
           borderStyle: borderStyleState[motif] || "original",
           heroIcon: heroIconState[motif] || "original",
           headerBgMode: headerBgState[motif] || "original",
@@ -5294,17 +5428,14 @@
         }
         if (qrCaptionTextIn) {
           qrCaptionTextIn.addEventListener("input", function (ev) {
-            let val = (qrCaptionTextIn.value || "").trim();
+            const val = (qrCaptionTextIn.value || "").trim();
             if (isUrlLikeValue(val)) {
               if (ev && ev.inputType === "insertFromPaste" && urlIn) {
                 urlIn.value = val;
                 if (sel) sel.value = "__custom__";
                 showToast("Enlace asignado al QR automáticamente.");
               }
-              if (/youtube\.com|youtu\.be/i.test(val)) qrCaptionTextIn.value = "VER EN YOUTUBE";
-              else if (/instagram\.com/i.test(val)) qrCaptionTextIn.value = "VER EN INSTAGRAM";
-              else if (/wa\.me|whatsapp\.com/i.test(val)) qrCaptionTextIn.value = "WHATSAPP";
-              else qrCaptionTextIn.value = DEFAULT_MOTIF_FIELDS[m].qrCaptionText;
+              qrCaptionTextIn.value = DEFAULT_MOTIF_FIELDS[m].qrCaptionText;
             }
             renderSinglePlaquePreview(m);
           });
@@ -5323,6 +5454,12 @@
             renderSinglePlaquePreview(m);
           });
         }
+        const titleColIn = document.getElementById("titleColor_" + m);
+        const nfcColIn = document.getElementById("nfcColor_" + m);
+        const nfcTxtColIn = document.getElementById("nfcTextColor_" + m);
+        if (titleColIn) titleColIn.addEventListener("input", function () { renderSinglePlaquePreview(m); });
+        if (nfcColIn) nfcColIn.addEventListener("input", function () { renderSinglePlaquePreview(m); });
+        if (nfcTxtColIn) nfcTxtColIn.addEventListener("input", function () { renderSinglePlaquePreview(m); });
 
         if (elemSel) {
           elemSel.addEventListener("change", function () {
@@ -5357,15 +5494,14 @@
           const el = document.getElementById(fieldKey + "_" + m);
           if (!el) return;
           el.addEventListener("input", function (ev) {
-            let val = (el.value || "").trim();
+            const val = (el.value || "").trim();
             if (isUrlLikeValue(val)) {
               if (ev && ev.inputType === "insertFromPaste" && urlIn) {
                 urlIn.value = val;
                 if (sel) sel.value = "__custom__";
                 showToast("Enlace asignado al QR automáticamente.");
               }
-              const clean = val.replace(/^https?:\/\/+/i, "").replace(/^:\/\/+/i, "").replace(/^www\.+/i, "").replace(/\/+$/, "");
-              el.value = clean || DEFAULT_MOTIF_FIELDS[m][fieldKey] || "";
+              el.value = DEFAULT_MOTIF_FIELDS[m][fieldKey] || "";
             }
             renderSinglePlaquePreview(m);
           });
@@ -5390,7 +5526,7 @@
         });
       });
 
-      // Botón "⚡ Aplicar a las 3" para sincronizar tema/colores en las 3 placas
+      // Botón "⚡ Aplicar a todas" para sincronizar tema/colores en las 7 placas
       document.querySelectorAll("[data-sync-colors-motif]").forEach(function (btn) {
         btn.addEventListener("click", function () {
           const srcMotif = btn.getAttribute("data-sync-colors-motif");
@@ -5398,6 +5534,9 @@
           const srcBg = document.getElementById("bgColor_" + srcMotif).value;
           const srcTxt = document.getElementById("textColor_" + srcMotif).value;
           const srcAcc = document.getElementById("accentColor_" + srcMotif).value;
+          const srcTitle = document.getElementById("titleColor_" + srcMotif) ? document.getElementById("titleColor_" + srcMotif).value : null;
+          const srcNfc = document.getElementById("nfcColor_" + srcMotif) ? document.getElementById("nfcColor_" + srcMotif).value : null;
+          const srcNfcTxt = document.getElementById("nfcTextColor_" + srcMotif) ? document.getElementById("nfcTextColor_" + srcMotif).value : null;
 
           MOTIFS.forEach(function (targetM) {
             if (targetM === srcMotif) return;
@@ -5409,6 +5548,15 @@
               document.getElementById("bgColor_" + targetM).value = srcBg;
               document.getElementById("textColor_" + targetM).value = srcTxt;
               document.getElementById("accentColor_" + targetM).value = srcAcc;
+              if (srcTitle && document.getElementById("titleColor_" + targetM)) {
+                document.getElementById("titleColor_" + targetM).value = srcTitle;
+              }
+              if (srcNfc && document.getElementById("nfcColor_" + targetM)) {
+                document.getElementById("nfcColor_" + targetM).value = srcNfc;
+              }
+              if (srcNfcTxt && document.getElementById("nfcTextColor_" + targetM)) {
+                document.getElementById("nfcTextColor_" + targetM).value = srcNfcTxt;
+              }
               borderStyleState[targetM] = targetM === "google" ? "original" : "accent";
               renderSinglePlaquePreview(targetM);
             }
