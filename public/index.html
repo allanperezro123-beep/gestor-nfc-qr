@@ -14,7 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle.js"></script>
-  <script src="/placas.js?v=12"></script>
+  <script src="/placas.js?v=14"></script>
 
   <style>
     :root {
@@ -469,6 +469,11 @@
       justify-content: center;
     }
     .btn-icon:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    /* Objetivos táctiles cómodos en móvil (antes 15-23 px de alto) */
+    @media (pointer: coarse) {
+      .btn-icon { min-width: 32px; min-height: 32px; }
+      .filter-pill-btn { min-height: 30px; }
+    }
 
     /* Celda Destino Actual Editable */
     .cell-dest {
@@ -527,7 +532,9 @@
       position: fixed;
       bottom: 14px;
       left: 50%;
-      transform: translateX(-50%) translateY(140px);
+      transform: translateX(-50%) translateY(calc(100% + 40px));
+      visibility: hidden;
+      pointer-events: none;
       width: calc(100vw - 20px);
       max-width: 660px;
       background: rgba(17, 20, 30, 0.96);
@@ -541,11 +548,14 @@
       justify-content: center;
       gap: 6px;
       z-index: 50;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.25s;
       flex-wrap: wrap;
     }
     .bulk-bar.visible {
       transform: translateX(-50%) translateY(0);
+      visibility: visible;
+      pointer-events: auto;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s;
     }
     .bulk-count-badge {
       font-size: 0.76rem;
@@ -661,7 +671,7 @@
       font-size: 0.78rem;
       text-align: center;
       margin-top: 4px;
-      max-width: 220px;
+      max-width: 260px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -1598,7 +1608,7 @@
             📋 Enlaces & QR
           </button>
           <button type="button" class="view-tab-btn" id="tabViewPlaques">
-            🪧 Estudio de Placas <span class="btn-hide-xs">(6)</span>
+            🪧 Estudio de Placas <span class="btn-hide-xs">(7)</span>
           </button>
         </div>
 
@@ -2927,8 +2937,8 @@
                   <div class="plaque-field-group">
                     <label><span>Color / Degradado QR</span></label>
                     <select id="qrColor_leburre" class="plaque-select">
-                      <option value="solid:#F2B705" selected>🟡 Oro Maíz Le Burré</option>
-                      <option value="solid:#7A0C0C">🔴 Rojo Carmesí</option>
+                      <option value="solid:#7A0C0C" selected>🔴 Rojo Carmesí Le Burré</option>
+                      <option value="solid:#F2B705">🟡 Oro Maíz (tostado para escaneo)</option>
                       <option value="solid:#1B1A1A">⬛ Negro Carbón</option>
                       <option value="grad-gold">🏆 Degradado Oro</option>
                       <option value="grad-bc">🌊 Degradado BlueCode</option>
@@ -2940,8 +2950,8 @@
                   <div class="plaque-field-group">
                     <label><span>Modo QR (Clean / Texto)</span></label>
                     <select id="qrCaptionMode_leburre" class="plaque-select">
-                      <option value="bottom-text-id" selected>🆔 Completo (Texto + ID)</option>
-                      <option value="bottom-text">🏷️ Solo Texto (Sin ID)</option>
+                      <option value="bottom-text-id">🆔 Completo (Texto + ID)</option>
+                      <option value="bottom-text" selected>🏷️ Solo Texto (Sin ID)</option>
                       <option value="clean">🧼 QR Clean (Solo QR)</option>
                     </select>
                   </div>
@@ -2980,11 +2990,11 @@
                       <span>Subtítulo</span>
                     </label>
                     <label class="color-swatch-chip" title="Color de la ilustración del móvil/NFC">
-                      <input type="color" id="nfcColor_leburre" value="#FAF6EE" />
+                      <input type="color" id="nfcColor_leburre" value="#7A0C0C" />
                       <span>Logo NFC</span>
                     </label>
-                    <label class="color-swatch-chip" title="Color del texto en arco (TOCA CON TU MÓVIL)">
-                      <input type="color" id="nfcTextColor_leburre" value="#F2B705" />
+                    <label class="color-swatch-chip" title="Color del texto NFC (TOCA CON TU MÓVIL)">
+                      <input type="color" id="nfcTextColor_leburre" value="#7A0C0C" />
                       <span>Texto NFC</span>
                     </label>
                   </div>
@@ -3182,7 +3192,7 @@
 
   <!-- Modal: QR Studio & Exportación Personalizable Ultra-HD -->
   <div class="modal-backdrop" id="qrModal">
-    <div class="modal-box" style="text-align: center; max-width: 470px;">
+    <div class="modal-box" style="text-align: center; max-width: 600px;">
       <h3 class="modal-title" id="qrModalTitle">Código QR Único & Personalizado</h3>
       <p class="modal-subtitle">Personaliza trama, ojos, colores y logo. Nivel H de corrección en Ultra-HD 2048 px.</p>
 
@@ -3526,7 +3536,7 @@
           '<button type="button" class="btn-icon btn-view-qr" title="Personalizar / Exportar QR">' +
           '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' +
           '</button>' +
-          '<button type="button" class="btn-icon btn-send-plaque" title="Usar este QR en el Estudio de Placas (Google / Menú / IG)" style="color: var(--bc-cyan); font-size: 0.72rem; width: auto; padding: 0 6px; font-weight: 700;">' +
+          '<button type="button" class="btn-icon btn-send-plaque" title="Usar este QR en el Estudio de Placas" style="color: var(--bc-cyan); font-size: 0.72rem; width: auto; padding: 0 6px; font-weight: 700;">' +
           '🪧 Placa' +
           '</button>' +
           '</div>';
@@ -4200,8 +4210,8 @@
         const previewCanvas = document.createElement("canvas");
         previewCanvas.width = 560;
         previewCanvas.height = 560;
-        previewCanvas.style.width = "156px";
-        previewCanvas.style.height = "156px";
+        previewCanvas.style.width = "210px";
+        previewCanvas.style.height = "210px";
         previewCanvas.style.maxWidth = "100%";
         previewCanvas.style.display = "block";
         const ctx = previewCanvas.getContext("2d");
@@ -4214,11 +4224,19 @@
         box.appendChild(previewCanvas);
       }
 
+      // Etiqueta "Nombre — SLUG" sin repetir cuando el nombre ya es el slug
+      function getQrLabelText(item) {
+        const name = (item.name || "").trim();
+        const slug = item.slug || "";
+        if (!name || cleanSlug(name) === slug) return slug.toUpperCase();
+        return name + " — " + slug.toUpperCase();
+      }
+
       function openQrStudio(item) {
         activeQrItem = item;
         const fixedUrl = getFixedUrl(item.slug);
         document.getElementById("qrModalTitle").textContent = item.name || item.slug;
-        document.getElementById("qrModalLabel").textContent = (item.name || item.slug) + " — " + item.slug;
+        document.getElementById("qrModalLabel").textContent = getQrLabelText(item);
         document.getElementById("qrModalUrl").textContent = fixedUrl;
         renderModalQrPreview();
         qrModal.classList.add("open");
@@ -4258,10 +4276,16 @@
         }
 
         if (withLabel) {
+          const label = getQrLabelText(activeQrItem);
+          let fontPx = 64;
           ctx.fillStyle = "#090b10";
-          ctx.font = "800 64px 'Plus Jakarta Sans', sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText((activeQrItem.name || activeQrItem.slug) + " — " + activeQrItem.slug.toUpperCase(), size / 2, size + 78);
+          ctx.font = "800 " + fontPx + "px 'Plus Jakarta Sans', sans-serif";
+          while (fontPx > 30 && ctx.measureText(label).width > size - margin * 2) {
+            fontPx -= 2;
+            ctx.font = "800 " + fontPx + "px 'Plus Jakarta Sans', sans-serif";
+          }
+          ctx.fillText(label, size / 2, size + 78, size - margin * 2);
         }
 
         return canvas;
@@ -4297,10 +4321,10 @@
 
       document.getElementById("btnExportSvg").addEventListener("click", function () {
         if (!activeQrItem) return;
-        const qr = qrcode(0, "H");
-        qr.addData(getFixedUrl(activeQrItem.slug));
-        qr.make();
-        const svg = qr.createSvgTag({ cellSize: 12, margin: 4 });
+        const studio = window.BlueCodePlaqueStudio;
+        if (!studio || !studio.buildStyledQrSvg) return;
+        // Mismo diseño que el PNG (trama, ojos, colores, marco y logo), a 8 cm y en vectores
+        const svg = studio.buildStyledQrSvg(getFixedUrl(activeQrItem.slug), getModalQrDrawOpts(), { size: 2048, margin: 140, widthMm: 80 });
         const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
         const a = document.createElement("a");
         a.download = "QR_" + activeQrItem.slug + ".svg";
@@ -4420,7 +4444,7 @@
         bluecode: { bg: "#FFFFFF", text: "#087CF5", accent: "#060A14", title: "#FFFFFF", nfc: "#181818", nfcText: "#181818", borderStyle: "original" },
         comida1: { bg: "#FFFFFF", text: "#FFFFFF", accent: "#C8102E", title: "#FFFFFF", nfc: "#1B1A1A", nfcText: "#1B1A1A", borderStyle: "original" },
         comida2: { bg: "#FFFFFF", text: "#FFFFFF", accent: "#1E1E1E", title: "#FFFFFF", nfc: "#1B1A1A", nfcText: "#1B1A1A", borderStyle: "original" },
-        leburre: { bg: "#7A0C0C", text: "#F2B705", accent: "#F2B705", title: "#FFFFFF", nfc: "#FAF6EE", nfcText: "#F2B705", borderStyle: "original" }
+        leburre: { bg: "#7A0C0C", text: "#F2B705", accent: "#F2B705", title: "#FFFFFF", nfc: "#7A0C0C", nfcText: "#7A0C0C", borderStyle: "original" }
       };
 
       const borderStyleState = {
@@ -4657,8 +4681,8 @@
             txtEl.value = "#F2B705";
             accEl.value = "#F2B705";
             if (titleEl) titleEl.value = "#FFFFFF";
-            if (nfcEl) nfcEl.value = "#FAF6EE";
-            if (nfcTxtEl) nfcTxtEl.value = "#F2B705";
+            if (nfcEl) nfcEl.value = "#7A0C0C";
+            if (nfcTxtEl) nfcTxtEl.value = "#7A0C0C";
             borderStyleState[motif] = "original";
           } else if (preset === "parchment") {
             bgEl.value = "#F6F0E4";
@@ -4673,16 +4697,16 @@
             txtEl.value = "#FF5722";
             accEl.value = "#FF5722";
             if (titleEl) titleEl.value = "#FFFFFF";
-            if (nfcEl) nfcEl.value = "#FAF6EE";
-            if (nfcTxtEl) nfcTxtEl.value = "#FF5722";
+            if (nfcEl) nfcEl.value = "#1A0808";
+            if (nfcTxtEl) nfcTxtEl.value = "#B93A12";
             borderStyleState[motif] = "accent";
           } else if (preset === "agave-mex") {
             bgEl.value = "#0F2E1B";
             txtEl.value = "#F2B705";
             accEl.value = "#F2B705";
             if (titleEl) titleEl.value = "#FFFFFF";
-            if (nfcEl) nfcEl.value = "#FAF6EE";
-            if (nfcTxtEl) nfcTxtEl.value = "#F2B705";
+            if (nfcEl) nfcEl.value = "#0F2E1B";
+            if (nfcTxtEl) nfcTxtEl.value = "#0F2E1B";
             borderStyleState[motif] = "accent";
           } else if (preset === "minimal-bw") {
             bgEl.value = "#FFFFFF";
@@ -4749,7 +4773,7 @@
         bluecode: { t1: "BLUE", t2: "CODE", qrLogo: "none", qrColor: "solid:#111111", qrCaptionMode: "bottom-text", qrCaptionText: "Scan QR code" },
         comida1: { t1: "BURGER & CO.", t2: "Sabor al instante", qrLogo: "burger", qrColor: "solid:#843511", qrCaptionMode: "bottom-text-id", qrCaptionText: "SCAN QR" },
         comida2: { t1: "BURGER & CO.", t2: "Sabor al instante", qrLogo: "burger", qrColor: "solid:#843511", qrCaptionMode: "bottom-text-id", qrCaptionText: "SCAN QR" },
-        leburre: { t1: "LE BURRÉ", t2: "Carta Oficial & 7 Salsas", qrLogo: "leburre", qrColor: "solid:#F2B705", qrCaptionMode: "bottom-text-id", qrCaptionText: "VER CARTA & SALSAS" }
+        leburre: { t1: "LE BURRÉ", t2: "Carta Oficial & 7 Salsas", qrLogo: "leburre", qrColor: "solid:#7A0C0C", qrCaptionMode: "bottom-text", qrCaptionText: "VER CARTA & SALSAS" }
       };
 
       function isUrlLikeValue(val) {

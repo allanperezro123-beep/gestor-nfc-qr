@@ -63,11 +63,11 @@
       { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 945 }
     ],
     leburre: [
-      { id: "qr", label: "Código QR", x: 620, y: 515, w: 280, h: 365, cx: 760, cy: 714 },
-      { id: "nfc", label: "Ilustración NFC", x: 145, y: 540, w: 370, h: 330, cx: 338, cy: 720 },
-      { id: "hero", label: "Mascota Le Burré", x: 370, y: 20, w: 260, h: 195, cx: 500, cy: 116 },
-      { id: "title", label: "Título LE BURRÉ", x: 110, y: 200, w: 780, h: 195, cx: 500, cy: 292 },
-      { id: "brand", label: "Sello BlueCode", x: 260, y: 910, w: 480, h: 70, cx: 500, cy: 946 }
+      { id: "qr", label: "Código QR", x: 588, y: 538, w: 264, h: 322, cx: 720, cy: 690 },
+      { id: "nfc", label: "Ilustración NFC", x: 92, y: 538, w: 380, h: 318, cx: 280, cy: 690 },
+      { id: "hero", label: "Mascota Le Burré", x: 398, y: 20, w: 204, h: 204, cx: 500, cy: 122 },
+      { id: "title", label: "Título LE BURRÉ", x: 150, y: 230, w: 700, h: 222, cx: 500, cy: 330 },
+      { id: "brand", label: "Sello BlueCode", x: 290, y: 902, w: 420, h: 62, cx: 500, cy: 934 }
     ]
   };
 
@@ -155,6 +155,41 @@
     const b = parseInt(clean.substring(4, 6), 16) || 0;
     const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     return lum < 0.45;
+  }
+
+  // Luminancia relativa WCAG de un color hex (0 = negro, 1 = blanco)
+  function hexRelativeLuminance(hex) {
+    const clean = String(hex || "").replace("#", "").trim();
+    if (!/^[0-9a-fA-F]{6}$/.test(clean)) return null;
+    const ch = [0, 2, 4].map(function (i) {
+      const v = parseInt(clean.substring(i, i + 2), 16) / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+  }
+
+  /**
+   * Guardián de escaneabilidad: los lectores QR necesitan tinta oscura sobre fondo claro.
+   * Si el color elegido no alcanza `minRatio` de contraste contra blanco, se oscurece
+   * conservando el tono (ej: Oro Maíz #F2B705 → oro tostado legible).
+   */
+  function ensureQrInkContrast(hex, minRatio) {
+    const target = minRatio || 4.5;
+    const lum = hexRelativeLuminance(hex);
+    if (lum === null) return hex;
+    if (1.05 / (lum + 0.05) >= target) return hex;
+    const clean = hex.replace("#", "");
+    let r = parseInt(clean.substring(0, 2), 16);
+    let g = parseInt(clean.substring(2, 4), 16);
+    let b = parseInt(clean.substring(4, 6), 16);
+    for (let i = 0; i < 40; i++) {
+      r = Math.round(r * 0.94);
+      g = Math.round(g * 0.94);
+      b = Math.round(b * 0.94);
+      const out = "#" + [r, g, b].map(function (v) { return v.toString(16).padStart(2, "0"); }).join("");
+      if (1.05 / (hexRelativeLuminance(out) + 0.05) >= target) return out;
+    }
+    return "#111111";
   }
 
   // Obtiene la transformación (dx, dy, scale) de un grupo dentro de data.layout
@@ -1094,13 +1129,18 @@
   }
 
   // Dibuja el Fondo Superior (Cabecera en Onda) Reemplazable en cualquier plantilla
-  function drawReplaceableWaveHeader(ctx, motif, data, defaultAccent, defaultSubWave) {
+  // flatBottomY (opcional): cabecera rectangular hasta esa Y en lugar de onda (la usa Le Burré)
+  function drawReplaceableWaveHeader(ctx, motif, data, defaultAccent, defaultSubWave, flatBottomY) {
     const mode = data.headerBgMode || "original";
     const accentColor = data.accentColor || defaultAccent || "#1B1A1A";
     const subWave = defaultSubWave || "#DCE8F3";
 
     function traceSubWavePath() {
       ctx.beginPath();
+      if (flatBottomY) {
+        ctx.rect(0, 0, 1000, flatBottomY);
+        return;
+      }
       ctx.moveTo(0, 0);
       ctx.lineTo(1000, 0);
       ctx.lineTo(1000, 492);
@@ -1110,6 +1150,10 @@
 
     function traceMainWavePath() {
       ctx.beginPath();
+      if (flatBottomY) {
+        ctx.rect(0, 0, 1000, flatBottomY);
+        return;
+      }
       ctx.moveTo(0, 0);
       ctx.lineTo(1000, 0);
       ctx.lineTo(1000, 472);
@@ -1279,6 +1323,26 @@
   }
 
   // Comprueba si una celda (r, c) pertenece a uno de los 3 ojos buscadores (7x7)
+  // Coordenadas de los patrones de alineación por versión QR (ISO/IEC 18004, Anexo E)
+  const ALIGNMENT_POSITION_TABLE = [
+    [], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50],
+    [6, 30, 54], [6, 32, 58], [6, 34, 62], [6, 26, 46, 66], [6, 26, 48, 70], [6, 26, 50, 74], [6, 30, 54, 78],
+    [6, 30, 56, 82], [6, 30, 58, 86], [6, 34, 62, 90]
+  ];
+
+  function getAlignmentPatternCenters(count) {
+    const version = (count - 17) / 4;
+    const pos = ALIGNMENT_POSITION_TABLE[version - 1] || [];
+    const centers = [];
+    for (let i = 0; i < pos.length; i++) {
+      for (let j = 0; j < pos.length; j++) {
+        if (isFinderPattern(pos[i], pos[j], count)) continue;
+        centers.push([pos[i], pos[j]]);
+      }
+    }
+    return centers;
+  }
+
   function isFinderPattern(r, c, count) {
     if (r < 7 && c < 7) return true;
     if (r < 7 && c >= count - 7) return true;
@@ -1336,15 +1400,9 @@
       roundRectPath(ctx, ringX, ringY, ringDim, ringDim, [cell * 0.4, cell * 2.0, cell * 0.4, cell * 2.0]);
       ctx.stroke();
 
-      const cx = x + outerSize / 2;
-      const cy = y + outerSize / 2;
-      const d = 1.65 * cell;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - d);
-      ctx.lineTo(cx + d, cy);
-      ctx.lineTo(cx, cy + d);
-      ctx.lineTo(cx - d, cy);
-      ctx.closePath();
+      // Núcleo 3x3 completo con puntas de escudo: un rombo rompía la proporción 1:1:3:1:1
+      // que los lectores usan para localizar los ojos (0% de lectura en jsQR).
+      roundRectPath(ctx, x + innerOffset, y + innerOffset, innerSize, innerSize, [cell * 0.25, cell * 1.1, cell * 0.25, cell * 1.1]);
       ctx.fill();
     } else {
       ctx.strokeRect(ringX, ringY, ringDim, ringDim);
@@ -1354,38 +1412,227 @@
     ctx.restore();
   }
 
-  function buildQrFillStyle(ctx, x, y, size, opts) {
+  // Descripción neutra del color del QR (sólido o degradado lineal), compartida por canvas y SVG
+  function getQrPaintSpec(x, y, size, opts) {
     const mode = opts.qrColorMode || "solid";
     const baseColor = opts.color || "#111111";
+    const diagonal = { x1: x, y1: y, x2: x + size, y2: y + size };
 
     if (mode === "grad-bc") {
-      const g = ctx.createLinearGradient(x, y, x + size, y + size);
-      g.addColorStop(0, "#0865F5");
-      g.addColorStop(0.55, "#0696EE");
-      g.addColorStop(1, "#00B4D8");
-      return g;
+      return Object.assign({ stops: [[0, "#0865F5"], [0.55, "#0696EE"], [1, "#00B4D8"]] }, diagonal);
     }
     if (mode === "grad-ig") {
-      const g = ctx.createLinearGradient(x, y + size, x + size, y);
-      g.addColorStop(0, "#F58529");
-      g.addColorStop(0.5, "#DD2A7B");
-      g.addColorStop(1, "#8134AF");
-      return g;
+      return { x1: x, y1: y + size, x2: x + size, y2: y, stops: [[0, "#F58529"], [0.5, "#DD2A7B"], [1, "#8134AF"]] };
     }
     if (mode === "grad-gold") {
-      const g = ctx.createLinearGradient(x, y, x + size, y + size);
-      g.addColorStop(0, "#1E1B18");
-      g.addColorStop(0.55, "#785A28");
-      g.addColorStop(1, "#B48327");
-      return g;
+      return Object.assign({ stops: [[0, "#1E1B18"], [0.55, "#6E5022"], [1, "#8F6A1F"]] }, diagonal);
     }
     if (mode === "grad-custom" && opts.color2) {
-      const g = ctx.createLinearGradient(x, y, x + size, y + size);
-      g.addColorStop(0, baseColor);
-      g.addColorStop(1, opts.color2);
-      return g;
+      return Object.assign({ stops: [[0, ensureQrInkContrast(baseColor)], [1, ensureQrInkContrast(opts.color2)]] }, diagonal);
     }
-    return baseColor;
+    return { solid: ensureQrInkContrast(baseColor) };
+  }
+
+  function buildQrFillStyle(ctx, x, y, size, opts) {
+    const spec = getQrPaintSpec(x, y, size, opts);
+    if (spec.solid) return spec.solid;
+    const g = ctx.createLinearGradient(spec.x1, spec.y1, spec.x2, spec.y2);
+    spec.stops.forEach(function (s) { g.addColorStop(s[0], s[1]); });
+    return g;
+  }
+
+  // Colores de los 3 ojos [arriba-izq, arriba-der, abajo-izq]; null = usar el color principal
+  function resolveQrEyeColors(opts) {
+    const mode = opts.eyeColorMode || "match";
+    if (mode === "bc-blue") return ["#0865F5", "#0865F5", "#0865F5"];
+    if (mode === "google-multi") return ["#4285F4", "#EA4335", "#34A853"];
+    if (mode === "custom" && opts.eyeColor) {
+      const c = ensureQrInkContrast(opts.eyeColor);
+      return [c, c, c];
+    }
+    return [null, null, null];
+  }
+
+  // Zona de silencio mínima (en módulos) entre el QR y cualquier trazo oscuro del marco
+  const QUIET_MODULES = 3.2;
+
+  /**
+   * Geometría del QR dentro de su caja (x, y, size) según el marco elegido.
+   * Única fuente de verdad para el dibujo en canvas y la exportación SVG.
+   */
+  function computeQrLayout(x, y, size, count, frameStyle) {
+    if (frameStyle === "scan-bottom") {
+      const bottomBarH = size * 0.13;
+      const frameLw = size * 0.022;
+      const pillH = bottomBarH * 0.88;
+      const qrSize = (size - pillH - frameLw / 2) / (1 + (2 * QUIET_MODULES) / count);
+      const quiet = (QUIET_MODULES * qrSize) / count;
+      const pillW = size * 0.68;
+      return {
+        qrX: x + (size - qrSize) / 2,
+        qrY: y + frameLw / 2 + quiet,
+        qrSize: qrSize,
+        frame: {
+          type: "scan-bottom",
+          lineWidth: frameLw,
+          rect: [x, y, size, size - bottomBarH * 0.35, size * 0.07],
+          pill: [x + (size - pillW) / 2, y + size - pillH, pillW, pillH],
+          fontPx: Math.round(pillH * 0.54),
+          textX: x + size / 2,
+          textY: y + size - pillH / 2 + 1
+        }
+      };
+    }
+    if (frameStyle === "corners") {
+      const cornerLw = size * 0.024;
+      const qrSize = (size - cornerLw) / (1 + (2 * QUIET_MODULES) / count);
+      const pad = (size - qrSize) / 2;
+      const cLen = size * 0.14;
+      return {
+        qrX: x + pad,
+        qrY: y + pad,
+        qrSize: qrSize,
+        frame: {
+          type: "corners",
+          lineWidth: cornerLw,
+          polylines: [
+            [[x, y + cLen], [x, y], [x + cLen, y]],
+            [[x + size - cLen, y], [x + size, y], [x + size, y + cLen]],
+            [[x, y + size - cLen], [x, y + size], [x + cLen, y + size]],
+            [[x + size - cLen, y + size], [x + size, y + size], [x + size, y + size - cLen]]
+          ]
+        }
+      };
+    }
+    return { qrX: x, qrY: y, qrSize: size, frame: null };
+  }
+
+  /**
+   * Modelo lógico del QR (independiente del tamaño): matriz, módulos reservados para logo,
+   * ojos y patrones de alineación. Compartido por canvas y SVG.
+   */
+  function buildQrModel(url, opts) {
+    const qr = qrcode(0, "H");
+    qr.addData(url || "https://gestor-nfc-qr-2026.web.app");
+    qr.make();
+    const count = qr.getModuleCount();
+    const logoType = opts.centerLogo && opts.centerLogo !== "none" ? opts.centerLogo : null;
+    const clearHalf = logoType ? count * 0.105 : 0;
+    const centerIdx = (count - 1) / 2;
+
+    function isUnderLogo(r, c) {
+      return Boolean(logoType) && Math.abs(r - centerIdx) <= clearHalf && Math.abs(c - centerIdx) <= clearHalf;
+    }
+
+    // Patrones de alineación (5x5): se dibujan siempre sólidos aunque la trama sea decorativa,
+    // porque estrellas/diamantes/puntos impedían que el lector corrigiera la perspectiva.
+    const alignCenters = getAlignmentPatternCenters(count).filter(function (p) {
+      return !isUnderLogo(p[0], p[1]);
+    });
+
+    function isAlignmentModule(r, c) {
+      for (let i = 0; i < alignCenters.length; i++) {
+        if (Math.abs(r - alignCenters[i][0]) <= 2 && Math.abs(c - alignCenters[i][1]) <= 2) return true;
+      }
+      return false;
+    }
+
+    function isSkipped(r, c) {
+      if (r < 0 || c < 0 || r >= count || c >= count) return true;
+      if (isFinderPattern(r, c, count)) return true;
+      if (isUnderLogo(r, c)) return true;
+      return !qr.isDark(r, c);
+    }
+
+    return {
+      count: count,
+      logoType: logoType,
+      alignCenters: alignCenters,
+      isSkipped: isSkipped,
+      isAlignmentModule: isAlignmentModule
+    };
+  }
+
+  // Caja del logo central (21.5% del QR), misma aritmética para canvas y SVG
+  function getQrLogoBox(qrX, qrY, qrSize) {
+    const size = qrSize * 0.215;
+    const bx = qrX + (qrSize - size) / 2;
+    const by = qrY + (qrSize - size) / 2;
+    return { x: bx, y: by, size: size, cx: bx + size / 2, cy: by + size / 2 };
+  }
+
+  // Logo central del QR (placa blanca + icono) dentro de la caja de getQrLogoBox
+  function drawQrCenterLogo(ctx, logoType, logoShape, box, mainFill) {
+    const bx = box.x;
+    const by = box.y;
+    const cx = box.cx;
+    const cy = box.cy;
+    const boxSize = box.size;
+
+    ctx.save();
+    if (logoShape === "circle") {
+      ctx.beginPath();
+      ctx.arc(cx, cy, boxSize * 0.54, 0, Math.PI * 2);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, boxSize * 0.5, 0, Math.PI * 2);
+      ctx.strokeStyle = mainFill;
+      ctx.lineWidth = boxSize * 0.045;
+      ctx.stroke();
+    } else if (logoShape === "rounded") {
+      ctx.shadowColor = "rgba(0,0,0,0.08)";
+      ctx.shadowBlur = boxSize * 0.08;
+      roundRectPath(ctx, bx, by, boxSize, boxSize, boxSize * 0.24);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fill();
+
+      roundRectPath(ctx, bx + boxSize * 0.03, by + boxSize * 0.03, boxSize * 0.94, boxSize * 0.94, boxSize * 0.21);
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = boxSize * 0.03;
+      ctx.stroke();
+    } else {
+      roundRectPath(ctx, bx, by, boxSize, boxSize, boxSize * 0.16);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fill();
+    }
+    ctx.restore();
+
+    if (logoType === "bluecode") {
+      const logoH = boxSize * 0.46;
+      const logoW = (490 / 271) * logoH;
+      drawBlueCodeLogo(ctx, cx - logoW / 2, cy - logoH / 2, logoH);
+    } else if (logoType === "google") {
+      drawGoogleGIcon(ctx, cx, cy, boxSize * 0.34);
+    } else if (logoType === "instagram") {
+      drawInstagramBadgeIcon(ctx, cx, cy, boxSize * 0.86);
+    } else if (logoType === "menu") {
+      drawMenuBadgeIcon(ctx, cx, cy, boxSize * 0.86);
+    } else if (logoType === "whatsapp") {
+      drawWhatsappBadgeIcon(ctx, cx, cy, boxSize * 0.86);
+    } else if (logoType === "wifi") {
+      drawWifiBadgeIcon(ctx, cx, cy, boxSize * 0.86);
+    } else if (logoType === "burger") {
+      drawBurgerBadgeIcon(ctx, cx, cy, boxSize * 0.84, typeof mainFill === "string" ? mainFill : "#843511");
+    } else if (logoType === "star") {
+      drawStar(ctx, cx, cy, boxSize * 0.38, boxSize * 0.18, "#F59E0B");
+    } else if (logoType === "custom" && customQrLogoImage) {
+      ctx.save();
+      const pad = boxSize * 0.12;
+      if (logoShape === "circle") {
+        ctx.beginPath();
+        ctx.arc(cx, cy, (boxSize - pad * 2) / 2, 0, Math.PI * 2);
+        ctx.clip();
+      } else {
+        roundRectPath(ctx, bx + pad, by + pad, boxSize - pad * 2, boxSize - pad * 2, boxSize * 0.14);
+        ctx.clip();
+      }
+      ctx.drawImage(customQrLogoImage, bx + pad, by + pad, boxSize - pad * 2, boxSize - pad * 2);
+      ctx.restore();
+    } else if (logoType && logoType !== "none") {
+      drawExtendedBadgeIcon(ctx, logoType, cx, cy, boxSize * 0.86, mainFill);
+    }
   }
 
   /**
@@ -1395,20 +1642,15 @@
     if (typeof qrcode !== "function") return;
     opts = opts || {};
 
-    const logoType = opts.centerLogo && opts.centerLogo !== "none" ? opts.centerLogo : null;
     const style = opts.qrStyle || "classic";
     const eyeStyle = opts.qrEyeStyle || "square";
     const logoShape = opts.logoShape || "rounded";
     const frameStyle = opts.frameStyle || "none";
 
-    const qr = qrcode(0, "H");
-    qr.addData(url || "https://gestor-nfc-qr-2026.web.app");
-    qr.make();
-    const count = qr.getModuleCount();
-
-    let qrX = x;
-    let qrY = y;
-    let qrSize = size;
+    const model = buildQrModel(url, opts);
+    const count = model.count;
+    const logoType = model.logoType;
+    const isSkipped = model.isSkipped;
 
     ctx.save();
     if (opts.bgWhite) {
@@ -1430,86 +1672,57 @@
     }
 
     const mainFill = buildQrFillStyle(ctx, x, y, size, opts);
+    const layout = computeQrLayout(x, y, size, count, frameStyle);
+    const qrX = layout.qrX;
+    const qrY = layout.qrY;
+    const qrSize = layout.qrSize;
+    const frame = layout.frame;
 
-    if (frameStyle === "scan-bottom") {
-      const pad = size * 0.055;
-      const bottomBarH = size * 0.13;
-      qrSize = size - pad * 2 - bottomBarH;
-      qrX = x + (size - qrSize) / 2;
-      qrY = y + pad;
-
-      roundRectPath(ctx, x, y, size, size - bottomBarH * 0.35, size * 0.07);
+    if (frame && frame.type === "scan-bottom") {
+      roundRectPath(ctx, frame.rect[0], frame.rect[1], frame.rect[2], frame.rect[3], frame.rect[4]);
       ctx.strokeStyle = mainFill;
-      ctx.lineWidth = size * 0.022;
+      ctx.lineWidth = frame.lineWidth;
       ctx.stroke();
 
-      const pillW = size * 0.68;
-      const pillH = bottomBarH * 0.88;
-      const pillX = x + (size - pillW) / 2;
-      const pillY = y + size - pillH;
-      roundRectPath(ctx, pillX, pillY, pillW, pillH, pillH / 2);
+      roundRectPath(ctx, frame.pill[0], frame.pill[1], frame.pill[2], frame.pill[3], frame.pill[3] / 2);
       ctx.fillStyle = mainFill;
       ctx.fill();
 
       ctx.fillStyle = "#FFFFFF";
-      ctx.font = "800 " + Math.round(pillH * 0.54) + "px 'Plus Jakarta Sans', Arial, sans-serif";
+      ctx.font = "800 " + frame.fontPx + "px 'Plus Jakarta Sans', Arial, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(opts.frameText || "ESCANÉAME", x + size / 2, pillY + pillH / 2 + 1);
-    } else if (frameStyle === "corners") {
-      const pad = size * 0.06;
-      qrX = x + pad;
-      qrY = y + pad;
-      qrSize = size - pad * 2;
-      const cLen = size * 0.14;
+      ctx.fillText(opts.frameText || "ESCANÉAME", frame.textX, frame.textY);
+    } else if (frame && frame.type === "corners") {
+      // save/restore: el lineJoin redondo del visor no debe redondear los ojos ni la alineación
+      ctx.save();
       ctx.strokeStyle = mainFill;
-      ctx.lineWidth = size * 0.024;
+      ctx.lineWidth = frame.lineWidth;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.beginPath();
-      ctx.moveTo(x, y + cLen); ctx.lineTo(x, y); ctx.lineTo(x + cLen, y);
-      ctx.moveTo(x + size - cLen, y); ctx.lineTo(x + size, y); ctx.lineTo(x + size, y + cLen);
-      ctx.moveTo(x, y + size - cLen); ctx.lineTo(x, y + size); ctx.lineTo(x + cLen, y + size);
-      ctx.moveTo(x + size - cLen, y + size); ctx.lineTo(x + size, y + size); ctx.lineTo(x + size, y + size - cLen);
+      frame.polylines.forEach(function (pts) {
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        ctx.lineTo(pts[1][0], pts[1][1]);
+        ctx.lineTo(pts[2][0], pts[2][1]);
+      });
       ctx.stroke();
+      ctx.restore();
     }
 
     const cell = qrSize / count;
-    const clearHalf = logoType ? count * 0.105 : 0;
-    const centerIdx = (count - 1) / 2;
-
-    function isSkipped(r, c) {
-      if (r < 0 || c < 0 || r >= count || c >= count) return true;
-      if (isFinderPattern(r, c, count)) return true;
-      if (logoType && Math.abs(r - centerIdx) <= clearHalf && Math.abs(c - centerIdx) <= clearHalf) return true;
-      return !qr.isDark(r, c);
-    }
 
     // 1. Dibujar los 3 Ojos Buscadores
-    const eyeColorMode = opts.eyeColorMode || "match";
-    let eyeTopLeft = mainFill;
-    let eyeTopRight = mainFill;
-    let eyeBottomLeft = mainFill;
-
-    if (eyeColorMode === "bc-blue") {
-      eyeTopLeft = eyeTopRight = eyeBottomLeft = "#0865F5";
-    } else if (eyeColorMode === "google-multi") {
-      eyeTopLeft = "#4285F4";
-      eyeTopRight = "#EA4335";
-      eyeBottomLeft = "#34A853";
-    } else if (eyeColorMode === "custom" && opts.eyeColor) {
-      eyeTopLeft = eyeTopRight = eyeBottomLeft = opts.eyeColor;
-    }
-
-    drawCustomFinderEye(ctx, qrX, qrY, cell, eyeTopLeft, eyeStyle);
-    drawCustomFinderEye(ctx, qrX + (count - 7) * cell, qrY, cell, eyeTopRight, eyeStyle);
-    drawCustomFinderEye(ctx, qrX, qrY + (count - 7) * cell, cell, eyeBottomLeft, eyeStyle);
+    const eyeColors = resolveQrEyeColors(opts);
+    drawCustomFinderEye(ctx, qrX, qrY, cell, eyeColors[0] || mainFill, eyeStyle);
+    drawCustomFinderEye(ctx, qrX + (count - 7) * cell, qrY, cell, eyeColors[1] || mainFill, eyeStyle);
+    drawCustomFinderEye(ctx, qrX, qrY + (count - 7) * cell, cell, eyeColors[2] || mainFill, eyeStyle);
 
     // 2. Dibujar los módulos de datos
     ctx.fillStyle = mainFill;
     for (let r = 0; r < count; r++) {
       for (let c = 0; c < count; c++) {
-        if (isSkipped(r, c)) continue;
+        if (isSkipped(r, c) || model.isAlignmentModule(r, c)) continue;
 
         const mx = qrX + c * cell;
         const my = qrY + r * cell;
@@ -1541,7 +1754,7 @@
         } else if (style === "diamond") {
           const cx = mx + cell / 2;
           const cy = my + cell / 2;
-          const hr = cell * 0.52;
+          const hr = cell * 0.6;
           ctx.beginPath();
           ctx.moveTo(cx, cy - hr);
           ctx.lineTo(cx + hr, cy);
@@ -1552,8 +1765,8 @@
         } else if (style === "star") {
           const cx = mx + cell / 2;
           const cy = my + cell / 2;
-          const or = cell * 0.54;
-          const ir = cell * 0.24;
+          const or = cell * 0.56;
+          const ir = cell * 0.34;
           ctx.beginPath();
           for (let k = 0; k < 8; k++) {
             const ang = (k * Math.PI) / 4;
@@ -1571,81 +1784,259 @@
       }
     }
 
-    // 3. Dibujar el Logo Central
-    if (logoType) {
-      const boxSize = qrSize * 0.215;
-      const bx = qrX + (qrSize - boxSize) / 2;
-      const by = qrY + (qrSize - boxSize) / 2;
-      const cx = bx + boxSize / 2;
-      const cy = by + boxSize / 2;
-
+    // 2b. Patrones de alineación sólidos (anillo 5x5 + núcleo 1x1), redondeados según la forma de ojos
+    const alignRound = eyeStyle === "square" ? 0 : cell * 0.9;
+    for (let i = 0; i < model.alignCenters.length; i++) {
+      const ax = qrX + (model.alignCenters[i][1] - 2) * cell;
+      const ay = qrY + (model.alignCenters[i][0] - 2) * cell;
       ctx.save();
-      if (logoShape === "circle") {
+      ctx.strokeStyle = mainFill;
+      ctx.fillStyle = mainFill;
+      ctx.lineWidth = cell;
+      roundRectPath(ctx, ax + cell * 0.5, ay + cell * 0.5, cell * 4, cell * 4, alignRound);
+      ctx.stroke();
+      if (eyeStyle === "circle") {
         ctx.beginPath();
-        ctx.arc(cx, cy, boxSize * 0.54, 0, Math.PI * 2);
-        ctx.fillStyle = "#FFFFFF";
+        ctx.arc(ax + cell * 2.5, ay + cell * 2.5, cell * 0.55, 0, Math.PI * 2);
         ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, boxSize * 0.5, 0, Math.PI * 2);
-        ctx.strokeStyle = mainFill;
-        ctx.lineWidth = boxSize * 0.045;
-        ctx.stroke();
-      } else if (logoShape === "rounded") {
-        ctx.shadowColor = "rgba(0,0,0,0.08)";
-        ctx.shadowBlur = boxSize * 0.08;
-        roundRectPath(ctx, bx, by, boxSize, boxSize, boxSize * 0.24);
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fill();
-
-        roundRectPath(ctx, bx + boxSize * 0.03, by + boxSize * 0.03, boxSize * 0.94, boxSize * 0.94, boxSize * 0.21);
-        ctx.strokeStyle = "rgba(0,0,0,0.08)";
-        ctx.lineWidth = boxSize * 0.03;
-        ctx.stroke();
       } else {
-        roundRectPath(ctx, bx, by, boxSize, boxSize, boxSize * 0.16);
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fill();
+        ctx.fillRect(ax + cell * 2, ay + cell * 2, cell, cell);
       }
       ctx.restore();
+    }
 
-      if (logoType === "bluecode") {
-        const logoH = boxSize * 0.46;
-        const logoW = (490 / 271) * logoH;
-        drawBlueCodeLogo(ctx, cx - logoW / 2, cy - logoH / 2, logoH);
-      } else if (logoType === "google") {
-        drawGoogleGIcon(ctx, cx, cy, boxSize * 0.34);
-      } else if (logoType === "instagram") {
-        drawInstagramBadgeIcon(ctx, cx, cy, boxSize * 0.86);
-      } else if (logoType === "menu") {
-        drawMenuBadgeIcon(ctx, cx, cy, boxSize * 0.86);
-      } else if (logoType === "whatsapp") {
-        drawWhatsappBadgeIcon(ctx, cx, cy, boxSize * 0.86);
-      } else if (logoType === "wifi") {
-        drawWifiBadgeIcon(ctx, cx, cy, boxSize * 0.86);
-      } else if (logoType === "burger") {
-        drawBurgerBadgeIcon(ctx, cx, cy, boxSize * 0.84, typeof mainFill === "string" ? mainFill : "#843511");
-      } else if (logoType === "star") {
-        drawStar(ctx, cx, cy, boxSize * 0.38, boxSize * 0.18, "#F59E0B");
-      } else if (logoType === "custom" && customQrLogoImage) {
-        ctx.save();
-        const pad = boxSize * 0.12;
-        if (logoShape === "circle") {
-          ctx.beginPath();
-          ctx.arc(cx, cy, (boxSize - pad * 2) / 2, 0, Math.PI * 2);
-          ctx.clip();
-        } else {
-          roundRectPath(ctx, bx + pad, by + pad, boxSize - pad * 2, boxSize - pad * 2, boxSize * 0.14);
-          ctx.clip();
-        }
-        ctx.drawImage(customQrLogoImage, bx + pad, by + pad, boxSize - pad * 2, boxSize - pad * 2);
-        ctx.restore();
-      } else if (logoType && logoType !== "none") {
-        drawExtendedBadgeIcon(ctx, logoType, cx, cy, boxSize * 0.86, mainFill);
-      }
+    // 3. Dibujar el Logo Central
+    if (logoType) {
+      const box = getQrLogoBox(qrX, qrY, qrSize);
+      drawQrCenterLogo(ctx, logoType, logoShape, box, mainFill);
     }
 
     ctx.restore();
+  }
+
+  // ============================================================================
+  // EXPORTACIÓN VECTORIAL SVG (misma geometría que drawQrMatrix)
+  // ============================================================================
+  function svgNum(n) {
+    return String(Math.round(n * 1000) / 1000);
+  }
+
+  function svgEscape(str) {
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  // Equivalente SVG de roundRectPath (mismo recorte de radios a la mitad del lado)
+  function svgRoundRectD(x, y, w, h, r) {
+    let tl, tr, br, bl;
+    if (Array.isArray(r)) {
+      const maxR = Math.min(w / 2, h / 2);
+      tl = Math.min(r[0] || 0, maxR);
+      tr = Math.min(r[1] || 0, maxR);
+      br = Math.min(r[2] || 0, maxR);
+      bl = Math.min(r[3] || 0, maxR);
+    } else {
+      tl = tr = br = bl = Math.min(r || 0, w / 2, h / 2);
+    }
+    const n = svgNum;
+    const arc = function (rad, ex, ey) {
+      return rad > 0 ? "A" + n(rad) + " " + n(rad) + " 0 0 1 " + n(ex) + " " + n(ey) : "L" + n(ex) + " " + n(ey);
+    };
+    return "M" + n(x + tl) + " " + n(y) +
+      "L" + n(x + w - tr) + " " + n(y) + arc(tr, x + w, y + tr) +
+      "L" + n(x + w) + " " + n(y + h - br) + arc(br, x + w - br, y + h) +
+      "L" + n(x + bl) + " " + n(y + h) + arc(bl, x, y + h - bl) +
+      "L" + n(x) + " " + n(y + tl) + arc(tl, x + tl, y) + "Z";
+  }
+
+  function svgCircleD(cx, cy, r) {
+    const n = svgNum;
+    return "M" + n(cx - r) + " " + n(cy) + "a" + n(r) + " " + n(r) + " 0 1 0 " + n(r * 2) + " 0" +
+      "a" + n(r) + " " + n(r) + " 0 1 0 " + n(-r * 2) + " 0Z";
+  }
+
+  // Ojo buscador en SVG: espejo exacto de drawCustomFinderEye
+  function svgFinderEye(x, y, cell, paint, eyeStyle) {
+    const ringX = x + cell * 0.5;
+    const ringY = y + cell * 0.5;
+    const ringDim = 6 * cell;
+    const ix = x + 2 * cell;
+    const iy = y + 2 * cell;
+    const inner = 3 * cell;
+    let ringD;
+    let coreD;
+    if (eyeStyle === "circle") {
+      ringD = svgCircleD(x + 3.5 * cell, y + 3.5 * cell, 3 * cell);
+      coreD = svgCircleD(x + 3.5 * cell, y + 3.5 * cell, 1.5 * cell);
+    } else if (eyeStyle === "rounded") {
+      ringD = svgRoundRectD(ringX, ringY, ringDim, ringDim, cell * 1.65);
+      coreD = svgRoundRectD(ix, iy, inner, inner, cell * 0.85);
+    } else if (eyeStyle === "leaf") {
+      ringD = svgRoundRectD(ringX, ringY, ringDim, ringDim, [cell * 2.3, cell * 0.45, cell * 2.3, cell * 0.45]);
+      coreD = svgRoundRectD(ix, iy, inner, inner, [cell * 1.25, cell * 0.25, cell * 1.25, cell * 0.25]);
+    } else if (eyeStyle === "shield") {
+      ringD = svgRoundRectD(ringX, ringY, ringDim, ringDim, [cell * 0.4, cell * 2.0, cell * 0.4, cell * 2.0]);
+      coreD = svgRoundRectD(ix, iy, inner, inner, [cell * 0.25, cell * 1.1, cell * 0.25, cell * 1.1]);
+    } else {
+      ringD = svgRoundRectD(ringX, ringY, ringDim, ringDim, 0);
+      coreD = svgRoundRectD(ix, iy, inner, inner, 0);
+    }
+    return '<path d="' + ringD + '" fill="none" stroke="' + paint + '" stroke-width="' + svgNum(cell) + '"/>' +
+      '<path d="' + coreD + '" fill="' + paint + '"/>';
+  }
+
+  // Path de un módulo de datos según la trama (espejo del bucle de drawQrMatrix)
+  function svgModuleD(style, mx, my, cell, model, r, c) {
+    const n = svgNum;
+    if (style === "dots") return svgCircleD(mx + cell / 2, my + cell / 2, cell * 0.45);
+    if (style === "rounded") return svgRoundRectD(mx + cell * 0.04, my + cell * 0.04, cell * 0.92, cell * 0.92, cell * 0.34);
+    if (style === "liquid") {
+      const up = !model.isSkipped(r - 1, c);
+      const down = !model.isSkipped(r + 1, c);
+      const rad = cell * 0.44;
+      // En vector se solapa una fracción de módulo (no 0.3 px) para que las barras sean continuas a cualquier escala
+      const ov = cell * 0.02;
+      return svgRoundRectD(mx + cell * 0.07, my - (up ? ov : 0), cell * 0.86, cell + (up ? ov : 0) + (down ? ov : 0),
+        [up ? 0 : rad, up ? 0 : rad, down ? 0 : rad, down ? 0 : rad]);
+    }
+    if (style === "diamond") {
+      const cx = mx + cell / 2;
+      const cy = my + cell / 2;
+      const hr = cell * 0.6;
+      return "M" + n(cx) + " " + n(cy - hr) + "L" + n(cx + hr) + " " + n(cy) + "L" + n(cx) + " " + n(cy + hr) + "L" + n(cx - hr) + " " + n(cy) + "Z";
+    }
+    if (style === "star") {
+      const cx = mx + cell / 2;
+      const cy = my + cell / 2;
+      let d = "";
+      for (let k = 0; k < 8; k++) {
+        const ang = (k * Math.PI) / 4;
+        const rad = k % 2 === 0 ? cell * 0.56 : cell * 0.34;
+        d += (k === 0 ? "M" : "L") + n(cx + Math.cos(ang) * rad) + " " + n(cy + Math.sin(ang) * rad);
+      }
+      return d + "Z";
+    }
+    // Clásico: celdas con un solape mínimo para evitar líneas finas entre módulos vecinos
+    const s = cell * 1.01;
+    return "M" + n(mx) + " " + n(my) + "h" + n(s) + "v" + n(s) + "h" + n(-s) + "Z";
+  }
+
+  /**
+   * Genera un SVG vectorial idéntico al QR del canvas: trama, ojos, patrones de alineación,
+   * colores/degradados y marco son 100% vectoriales; el logo central (iconos dibujados en canvas
+   * o imagen subida) se incrusta como PNG de alta resolución en su placa blanca.
+   * options: { size (unidades del viewBox), margin, widthMm }
+   */
+  function buildStyledQrSvg(url, opts, options) {
+    if (typeof qrcode !== "function") return "";
+    opts = opts || {};
+    options = options || {};
+    const total = options.size || 2048;
+    const margin = options.margin == null ? 140 : options.margin;
+    const widthMm = options.widthMm || 80;
+    const x = margin;
+    const y = margin;
+    const size = total - margin * 2;
+
+    const style = opts.qrStyle || "classic";
+    const eyeStyle = opts.qrEyeStyle || "square";
+    const logoShape = opts.logoShape || "rounded";
+    const model = buildQrModel(url, opts);
+    const count = model.count;
+    const layout = computeQrLayout(x, y, size, count, opts.frameStyle || "none");
+    const qrX = layout.qrX;
+    const qrY = layout.qrY;
+    const qrSize = layout.qrSize;
+    const cell = qrSize / count;
+
+    const spec = getQrPaintSpec(x, y, size, opts);
+    const defs = [];
+    let mainPaint = spec.solid;
+    if (!spec.solid) {
+      defs.push('<linearGradient id="qrInk" gradientUnits="userSpaceOnUse" x1="' + svgNum(spec.x1) + '" y1="' + svgNum(spec.y1) +
+        '" x2="' + svgNum(spec.x2) + '" y2="' + svgNum(spec.y2) + '">' +
+        spec.stops.map(function (s) { return '<stop offset="' + s[0] + '" stop-color="' + s[1] + '"/>'; }).join("") +
+        "</linearGradient>");
+      mainPaint = "url(#qrInk)";
+    }
+
+    const parts = [];
+    parts.push('<rect width="' + total + '" height="' + total + '" fill="#FFFFFF"/>');
+
+    // Marco
+    const frame = layout.frame;
+    if (frame && frame.type === "scan-bottom") {
+      parts.push('<path d="' + svgRoundRectD(frame.rect[0], frame.rect[1], frame.rect[2], frame.rect[3], frame.rect[4]) +
+        '" fill="none" stroke="' + mainPaint + '" stroke-width="' + svgNum(frame.lineWidth) + '"/>');
+      parts.push('<path d="' + svgRoundRectD(frame.pill[0], frame.pill[1], frame.pill[2], frame.pill[3], frame.pill[3] / 2) + '" fill="' + mainPaint + '"/>');
+      parts.push('<text x="' + svgNum(frame.textX) + '" y="' + svgNum(frame.textY) + '" fill="#FFFFFF" font-family="\'Plus Jakarta Sans\', Arial, sans-serif" font-weight="800" font-size="' +
+        frame.fontPx + '" text-anchor="middle" dominant-baseline="central">' + svgEscape(opts.frameText || "ESCANÉAME") + "</text>");
+    } else if (frame && frame.type === "corners") {
+      const d = frame.polylines.map(function (pts) {
+        return "M" + pts.map(function (p) { return svgNum(p[0]) + " " + svgNum(p[1]); }).join("L");
+      }).join("");
+      parts.push('<path d="' + d + '" fill="none" stroke="' + mainPaint + '" stroke-width="' + svgNum(frame.lineWidth) +
+        '" stroke-linecap="round" stroke-linejoin="round"/>');
+    }
+
+    // Ojos
+    const eyeColors = resolveQrEyeColors(opts);
+    parts.push(svgFinderEye(qrX, qrY, cell, eyeColors[0] || mainPaint, eyeStyle));
+    parts.push(svgFinderEye(qrX + (count - 7) * cell, qrY, cell, eyeColors[1] || mainPaint, eyeStyle));
+    parts.push(svgFinderEye(qrX, qrY + (count - 7) * cell, cell, eyeColors[2] || mainPaint, eyeStyle));
+
+    // Módulos de datos: un único path para todo el cuerpo
+    let modulesD = "";
+    for (let r = 0; r < count; r++) {
+      for (let c = 0; c < count; c++) {
+        if (model.isSkipped(r, c) || model.isAlignmentModule(r, c)) continue;
+        modulesD += svgModuleD(style, qrX + c * cell, qrY + r * cell, cell, model, r, c);
+      }
+    }
+    parts.push('<path d="' + modulesD + '" fill="' + mainPaint + '"/>');
+
+    // Patrones de alineación
+    const alignRound = eyeStyle === "square" ? 0 : cell * 0.9;
+    model.alignCenters.forEach(function (p) {
+      const ax = qrX + (p[1] - 2) * cell;
+      const ay = qrY + (p[0] - 2) * cell;
+      parts.push('<path d="' + svgRoundRectD(ax + cell * 0.5, ay + cell * 0.5, cell * 4, cell * 4, alignRound) +
+        '" fill="none" stroke="' + mainPaint + '" stroke-width="' + svgNum(cell) + '"/>');
+      const coreD = eyeStyle === "circle" ? svgCircleD(ax + cell * 2.5, ay + cell * 2.5, cell * 0.55) : svgRoundRectD(ax + cell * 2, ay + cell * 2, cell, cell, 0);
+      parts.push('<path d="' + coreD + '" fill="' + mainPaint + '"/>');
+    });
+
+    // Logo central rasterizado a alta resolución sobre fondo transparente
+    if (model.logoType && typeof document !== "undefined") {
+      const box = getQrLogoBox(qrX, qrY, qrSize);
+      const bleed = box.size * 0.18;
+      const area = box.size + bleed * 2;
+      // ~640 px cubren el logo a más de 800 DPI en una impresión de 8 cm sin inflar el archivo
+      const px = 640;
+      const k = px / area;
+      const lc = document.createElement("canvas");
+      lc.width = px;
+      lc.height = px;
+      const lctx = lc.getContext("2d");
+      lctx.scale(k, k);
+      lctx.translate(-(box.x - bleed), -(box.y - bleed));
+      const logoFill = spec.solid || spec.stops[0][1];
+      drawQrCenterLogo(lctx, model.logoType, logoShape, box, logoFill);
+      const logoUri = lc.toDataURL("image/png");
+      // xlink:href: lo entienden navegadores, Illustrator, Inkscape y visores antiguos (una sola copia del logo)
+      parts.push('<image x="' + svgNum(box.x - bleed) + '" y="' + svgNum(box.y - bleed) + '" width="' + svgNum(area) + '" height="' + svgNum(area) +
+        '" xlink:href="' + logoUri + '"/>');
+    }
+
+    return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + total + " " + total + '" width="' + widthMm + 'mm" height="' + widthMm + 'mm">' +
+      "<title>" + svgEscape(url) + "</title>" +
+      (defs.length ? "<defs>" + defs.join("") + "</defs>" : "") +
+      parts.join("") +
+      "</svg>";
   }
 
   // Texto en arco (para "TAP YOUR PHONE" en la placa Menú)
@@ -2906,6 +3297,51 @@
   // ============================================================================
   // 7. RENDERIZADOR PLACA LE BURRÉ (COCINA ARTESANAL TEX-MEX & 7 SALSAS)
   // ============================================================================
+  // Texto centrado con espaciado entre letras (canvas.letterSpacing cuando existe, manual si no)
+  function drawSpacedText(ctx, text, cx, y, spacingPx) {
+    const str = String(text || "");
+    if ("letterSpacing" in ctx) {
+      const prev = ctx.letterSpacing;
+      ctx.letterSpacing = spacingPx + "px";
+      // El espaciado también se añade tras la última letra: se compensa para centrar ópticamente
+      ctx.fillText(str, cx + spacingPx / 2, y);
+      ctx.letterSpacing = prev;
+      return;
+    }
+    const chars = str.split("");
+    const widths = chars.map(function (ch) { return ctx.measureText(ch).width; });
+    const total = widths.reduce(function (a, b) { return a + b; }, 0) + spacingPx * (chars.length - 1);
+    const prevAlign = ctx.textAlign;
+    ctx.textAlign = "left";
+    let curX = cx - total / 2;
+    for (let i = 0; i < chars.length; i++) {
+      ctx.fillText(chars[i], curX, y);
+      curX += widths[i] + spacingPx;
+    }
+    ctx.textAlign = prevAlign;
+  }
+
+  // Destello de 4 puntas (ornamento de cantina)
+  function drawSparkle(ctx, cx, cy, r, color) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r);
+    ctx.quadraticCurveTo(cx, cy, cx + r, cy);
+    ctx.quadraticCurveTo(cx, cy, cx, cy + r);
+    ctx.quadraticCurveTo(cx, cy, cx - r, cy);
+    ctx.quadraticCurveTo(cx, cy, cx, cy - r);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  /**
+   * PLACA LE BURRÉ v2 — "Cantina Carmesí & Papel"
+   * Mitad superior carmesí con mascota, título y subtítulo en caligrafía;
+   * tarjeta de papel crema con greca mexicana que aloja NFC + QR en tinta oscura
+   * (máximo contraste para que el QR se lea a la primera).
+   */
   function renderLeburrePlaque(ctx, W, H, data, layerFilter) {
     const S = W / 1000;
     ctx.save();
@@ -2918,20 +3354,24 @@
     const showQr = !layerFilter || layerFilter === "all" || layerFilter === "qr";
 
     const bgColor = data.bgColor || "#7A0C0C";
-    const textColor = data.textColor || "#FAF6EE";
     const accentColor = data.accentColor || "#F2B705";
     const darkBg = isHexDark(bgColor);
     const hasRichHeaderBg = Boolean(data.headerBgMode && data.headerBgMode !== "original" && data.headerBgMode !== "solid-custom");
-    const darkHeader = hasRichHeaderBg || isHexDark(accentColor);
-    const headerContentColor = darkHeader ? "#FFFFFF" : "#1B1A1A";
+    const darkHeader = darkBg || hasRichHeaderBg;
     const titleColor = data.titleColor || (darkHeader ? "#FFFFFF" : "#1B1A1A");
     const subtitleColor = data.subtitleColor || accentColor;
-    const nfcColor = data.nfcColor || textColor;
-    const nfcTextColor = data.nfcTextColor || nfcColor || textColor;
+
+    // Tarjeta de papel: crema sobre fondos oscuros, blanca sobre fondos claros
+    const paperColor = darkBg ? "#FBF4E4" : "#FFFFFF";
+    // Tinta dentro del papel: siempre oscura para leerse sobre crema
+    const inkColor = darkBg ? bgColor : ensureQrInkContrast(accentColor, 4.5);
+    const nfcColor = ensureQrInkContrast(data.nfcColor || inkColor, 3.2);
+    const nfcTextColor = ensureQrInkContrast(data.nfcTextColor || nfcColor, 3.2);
+    const captionColor = ensureQrInkContrast(inkColor, 4.5);
 
     const titleMain = cleanVisualText(data.titleMain, "LE BURRÉ");
     const subtitle = cleanVisualText(data.subtitle, "Carta Oficial & 7 Salsas");
-    const arcText = data.arcText || "TOCA CON TU MÓVIL";
+    const arcText = cleanVisualText(data.arcText, "TOCA CON TU MÓVIL");
 
     const logoImg = headerAssets.leburreLogo;
     const hasLogoImg = Boolean(logoImg && logoImg.complete && logoImg.naturalWidth > 0);
@@ -2940,268 +3380,295 @@
     const grecaImg = headerAssets.leburreGreca;
     const hasGrecaImg = Boolean(grecaImg && grecaImg.complete && grecaImg.naturalWidth > 0);
 
+    // Geometría de la tarjeta de papel
+    const PX = 58;
+    const PY = 492;
+    const PW = 884;
+    const PH = 382;
+    const PR = 34;
+    const GRECA_H = 24;
+
     roundRectPath(ctx, 0, 0, 1000, 1000, 82);
     ctx.clip();
 
     if (showBg) {
-      // 1. Fondo base
+      // 1. Fondo carmesí con luz cálida desde arriba y viñeta en bordes
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, 1000, 1000);
 
-      // Si el fondo es oscuro/rojo, dibujar textura de doodles auténtica Le Burré
-      if (hasBgImg && (bgColor === "#7A0C0C" || darkBg)) {
-        ctx.save();
-        ctx.globalAlpha = 0.28;
-        ctx.drawImage(bgImg, 0, 0, 1000, 1000);
-        ctx.restore();
-      }
-
-      // Viñeta cálida radial en el centro para resaltar los elementos
+      // "leburre" ya es la cabecera nativa de esta placa; el resto de cabeceras se dibuja tras el papel
+      // Recorte recto bajo el papel: así el borde ondulado de la cabecera no asoma por encima de la tarjeta
       ctx.save();
-      const radGlow = ctx.createRadialGradient(500, 260, 40, 500, 500, 600);
-      radGlow.addColorStop(0, "rgba(242, 183, 5, 0.12)");
-      radGlow.addColorStop(0.65, "rgba(0, 0, 0, 0.18)");
-      radGlow.addColorStop(1, "rgba(0, 0, 0, 0.48)");
-      ctx.fillStyle = radGlow;
-      ctx.fillRect(0, 0, 1000, 1000);
+      ctx.beginPath();
+      ctx.rect(0, 0, 1000, PY + PR);
+      ctx.clip();
+      const customHeader = data.headerBgMode !== "leburre" && drawReplaceableWaveHeader(ctx, "leburre", data, accentColor, accentColor, PY + PR);
       ctx.restore();
 
-      // 2. Cabecera superior curva
-      if (!drawReplaceableWaveHeader(ctx, "leburre", data, accentColor, "#F2B705")) {
-        // Cabecera Cantina Original Le Burré
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(1000, 0);
-        ctx.lineTo(1000, 440);
-        ctx.bezierCurveTo(760, 460, 520, 395, 0, 452);
-        ctx.closePath();
-
-        const gradH = ctx.createLinearGradient(0, 0, 0, 452);
-        gradH.addColorStop(0, "#360505");
-        gradH.addColorStop(0.6, "#540808");
-        gradH.addColorStop(1, "#360505");
-        ctx.fillStyle = gradH;
-        ctx.fill();
-
-        // Tinte de textura en la cabecera
-        if (hasBgImg) {
+      if (customHeader) {
+        // Velo para que el título blanco se lea sobre fotos o degradados claros
+        const veil = ctx.createLinearGradient(0, 0, 0, 500);
+        veil.addColorStop(0, "rgba(0, 0, 0, 0.28)");
+        veil.addColorStop(1, "rgba(0, 0, 0, 0.42)");
+        ctx.fillStyle = veil;
+        ctx.fillRect(0, 0, 1000, 500);
+      } else {
+        if (hasBgImg && darkBg) {
           ctx.save();
-          ctx.clip();
-          ctx.globalAlpha = 0.35;
-          ctx.drawImage(bgImg, 0, 0, 1000, 480);
+          ctx.globalAlpha = 0.11;
+          ctx.drawImage(bgImg, 0, 0, 1000, 1000);
           ctx.restore();
         }
+        const glow = ctx.createRadialGradient(500, 250, 30, 500, 420, 720);
+        glow.addColorStop(0, darkBg ? "rgba(255, 196, 80, 0.20)" : "rgba(255,255,255,0.35)");
+        glow.addColorStop(0.55, "rgba(0, 0, 0, 0)");
+        glow.addColorStop(1, darkBg ? "rgba(0, 0, 0, 0.42)" : "rgba(0,0,0,0.06)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, 1000, 1000);
+      }
 
-        // Tira Greca Banderillas Mexicanas a lo largo de la división
-        if (hasGrecaImg) {
-          ctx.save();
-          const gw = grecaImg.naturalWidth || grecaImg.width || 366;
-          const gh = grecaImg.naturalHeight || grecaImg.height || 55;
-          const tH = 26;
-          const tW = (gw / gh) * tH;
-          for (let x = 0; x < 1000; x += tW - 1) {
-            ctx.drawImage(grecaImg, x, 428, tW, tH);
-          }
-          ctx.restore();
-        }
+      // 2. Tarjeta de papel con sombra suave
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, 0.38)";
+      ctx.shadowBlur = 28;
+      ctx.shadowOffsetY = 10;
+      roundRectPath(ctx, PX, PY, PW, PH, PR);
+      ctx.fillStyle = paperColor;
+      ctx.fill();
+      ctx.restore();
 
-        // Línea de acento dorado
-        ctx.beginPath();
-        ctx.moveTo(0, 452);
-        ctx.bezierCurveTo(520, 395, 760, 460, 1000, 440);
-        ctx.strokeStyle = accentColor;
-        ctx.lineWidth = 4;
+      if (!darkBg) {
+        roundRectPath(ctx, PX, PY, PW, PH, PR);
+        ctx.strokeStyle = "rgba(0,0,0,0.10)";
+        ctx.lineWidth = 2;
         ctx.stroke();
-
-        ctx.restore();
       }
 
-      // 3. Doble marco táctil de autor con esquinas doradas
+      // 3. Greca mexicana recta coronando el papel (recortada a sus esquinas)
       ctx.save();
-      roundRectPath(ctx, 4, 4, 992, 992, 78);
-      ctx.strokeStyle = accentColor;
-      ctx.lineWidth = 4.5;
-      ctx.stroke();
-
-      roundRectPath(ctx, 16, 16, 968, 968, 68);
-      ctx.strokeStyle = darkBg ? "rgba(242, 183, 5, 0.42)" : "rgba(0,0,0,0.18)";
-      ctx.lineWidth = 1.8;
-      ctx.stroke();
-
-      // 4 remaches dorados en las esquinas
-      const rivets = [[40, 40], [960, 40], [40, 960], [960, 960]];
-      for (let i = 0; i < rivets.length; i++) {
-        const rx = rivets[i][0];
-        const ry = rivets[i][1];
-        ctx.beginPath();
-        ctx.arc(rx, ry, 5.5, 0, Math.PI * 2);
+      roundRectPath(ctx, PX, PY, PW, PH, PR);
+      ctx.clip();
+      if (hasGrecaImg) {
+        const gw = grecaImg.naturalWidth || 366;
+        const gh = grecaImg.naturalHeight || 55;
+        const tW = (gw / gh) * GRECA_H;
+        for (let gx = PX; gx < PX + PW; gx += tW - 0.5) {
+          ctx.drawImage(grecaImg, gx, PY, tW, GRECA_H);
+        }
+      } else {
         ctx.fillStyle = accentColor;
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(rx - 1.2, ry - 1.2, 2, 0, Math.PI * 2);
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fill();
+        ctx.fillRect(PX, PY, PW, GRECA_H);
       }
+      ctx.fillStyle = accentColor;
+      ctx.fillRect(PX, PY + GRECA_H, PW, 4);
       ctx.restore();
+
+      // 4. Separador vertical punteado con "ó" entre NFC y QR
+      ctx.save();
+      ctx.strokeStyle = inkColor;
+      ctx.globalAlpha = 0.22;
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([2, 9]);
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(500, PY + 62);
+      ctx.lineTo(500, 650);
+      ctx.moveTo(500, 714);
+      ctx.lineTo(500, PY + PH - 34);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(500, 682, 22, 0, Math.PI * 2);
+      ctx.fillStyle = inkColor;
+      ctx.fill();
+      ctx.font = "700 23px 'Plus Jakarta Sans', Arial, sans-serif";
+      ctx.fillStyle = paperColor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("o", 500, 679);
+      ctx.restore();
+
+      // 5. Marco dorado fino doble + destellos en esquinas
+      ctx.save();
+      roundRectPath(ctx, 14, 14, 972, 972, 70);
+      ctx.strokeStyle = accentColor;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      roundRectPath(ctx, 26, 26, 948, 948, 60);
+      ctx.strokeStyle = darkBg ? "rgba(242, 183, 5, 0.35)" : "rgba(0,0,0,0.12)";
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+      ctx.restore();
+      drawSparkle(ctx, 58, 58, 11, accentColor);
+      drawSparkle(ctx, 942, 58, 11, accentColor);
+      drawSparkle(ctx, 58, 942, 11, accentColor);
+      drawSparkle(ctx, 942, 942, 11, accentColor);
     }
 
     if (showIcons) {
-      // Icono Hero Superior (Mascota Le Burré o Icono personalizado)
-      withGroupTransform(ctx, data, "hero", 500, 116, function () {
-        if (data.heroIcon && data.heroIcon !== "original" && data.heroIcon !== "leburre") {
-          drawCustomHeroIconOverride(ctx, data.heroIcon, 500, 116, headerContentColor, accentColor);
-        } else if (data.heroIcon !== "none") {
-          ctx.save();
-          const r = 84;
-          ctx.shadowColor = "rgba(0, 0, 0, 0.65)";
-          ctx.shadowBlur = 20;
-          ctx.shadowOffsetY = 6;
+      // Mascota Le Burré en medallón dorado (o icono de la librería)
+      withGroupTransform(ctx, data, "hero", 500, 122, function () {
+        if (data.heroIcon === "none") return;
+        const isMascot = !data.heroIcon || data.heroIcon === "original" || data.heroIcon === "leburre";
+        const r = 86;
 
-          ctx.beginPath();
-          ctx.arc(500, 116, r + 5, 0, Math.PI * 2);
-          ctx.fillStyle = accentColor;
-          ctx.fill();
+        // Medallón dorado común: mascota o cualquier icono de la librería
+        ctx.save();
+        ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+        ctx.shadowBlur = 24;
+        ctx.shadowOffsetY = 8;
+        ctx.beginPath();
+        ctx.arc(500, 122, r + 9, 0, Math.PI * 2);
+        ctx.fillStyle = accentColor;
+        ctx.fill();
+        ctx.restore();
 
-          ctx.beginPath();
-          ctx.arc(500, 116, r, 0, Math.PI * 2);
-          ctx.fillStyle = "#FAF6EE";
-          ctx.fill();
-          ctx.clip();
-
-          if (hasLogoImg) {
-            ctx.drawImage(logoImg, 500 - r, 116 - r, r * 2, r * 2);
-          } else {
-            drawLibraryVectorGlyph(ctx, "burrito", 500, 116, 120, "#7A0C0C", "#F2B705");
-          }
-          ctx.restore();
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(500, 122, r + 3, 0, Math.PI * 2);
+        ctx.fillStyle = "#FBF4E4";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(500, 122, r, 0, Math.PI * 2);
+        ctx.clip();
+        if (isMascot && hasLogoImg) {
+          ctx.drawImage(logoImg, 500 - r, 122 - r, r * 2, r * 2);
+        } else if (isMascot) {
+          drawLibraryVectorGlyph(ctx, "burrito", 500, 122, 120, bgColor, accentColor);
+        } else {
+          // Las imágenes (burger, BlueCode, logo subido) llenan su caja; los glifos vectoriales ocupan ~70%
+          const isImageIcon = data.heroIcon === "burger" || data.heroIcon === "bluecode" || data.heroIcon === "custom";
+          const iconScale = isImageIcon ? 0.62 : 0.98;
+          ctx.translate(500, 122);
+          ctx.scale(iconScale, iconScale);
+          drawCustomHeroIconOverride(ctx, data.heroIcon, 0, 0, darkBg ? bgColor : "#1B1A1A", "#FBF4E4");
         }
+        ctx.restore();
       });
 
-      // Ilustración NFC y llamado a la acción
-      withGroupTransform(ctx, data, "nfc", 338, 715, function () {
-        drawUnifiedMenuNfcIllustration(ctx, 338, 725, 0.96, nfcColor, darkBg ? bgColor : "#FAF6EE");
-        drawArcText(
-          ctx,
-          arcText,
-          4,
-          342,
-          788,
-          228,
-          (-126 * Math.PI) / 180,
-          (-54 * Math.PI) / 180,
-          31,
-          nfcTextColor
-        );
-
-        // Pastilla distintiva Le Burré: 🌶️ 7 Salsas de Autor
+      // Bloque NFC dentro del papel
+      withGroupTransform(ctx, data, "nfc", 280, 690, function () {
         ctx.save();
-        roundRectPath(ctx, 338 - 110, 842, 220, 30, 15);
-        ctx.fillStyle = "rgba(0, 0, 0, 0.42)";
-        ctx.fill();
-        ctx.strokeStyle = nfcTextColor;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        ctx.font = "700 13px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "alphabetic";
         ctx.fillStyle = nfcTextColor;
+        ctx.font = "800 25px 'Plus Jakarta Sans', Arial, sans-serif";
+        let arcSize = 25;
+        while (arcSize > 16 && ctx.measureText(arcText.toUpperCase()).width + arcText.length * 2.5 > 360) {
+          arcSize -= 1;
+          ctx.font = "800 " + arcSize + "px 'Plus Jakarta Sans', Arial, sans-serif";
+        }
+        drawSpacedText(ctx, arcText.toUpperCase(), 280, 568, 2.5);
+        ctx.restore();
+
+        drawUnifiedMenuNfcIllustration(ctx, 296, 694, 0.74, nfcColor, paperColor);
+
+        // Sello "7 SALSAS DE AUTOR"
+        ctx.save();
+        const pillW = 236;
+        const pillH = 36;
+        const pillY = 806;
+        roundRectPath(ctx, 280 - pillW / 2, pillY, pillW, pillH, pillH / 2);
+        ctx.fillStyle = nfcColor;
+        ctx.fill();
+        ctx.font = "800 14.5px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.fillStyle = paperColor;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText("🌶️ 7 Salsas de Autor", 338, 857);
+        drawSpacedText(ctx, "7 SALSAS DE AUTOR", 280, pillY + pillH / 2 + 1, 1.6);
+        drawSparkle(ctx, 280 - pillW / 2 + 22, pillY + pillH / 2, 7, accentColor);
+        drawSparkle(ctx, 280 + pillW / 2 - 22, pillY + pillH / 2, 7, accentColor);
         ctx.restore();
       });
     }
 
     if (showText) {
-      withGroupTransform(ctx, data, "title", 500, 292, function () {
+      withGroupTransform(ctx, data, "title", 500, 330, function () {
         ctx.save();
         ctx.textAlign = "center";
+        ctx.textBaseline = "alphabetic";
 
-        // Pastilla eyebrow "★ COCINA ARTESANAL TEX-MEX ★"
-        roundRectPath(ctx, 500 - 150, 206, 300, 26, 13);
-        ctx.fillStyle = "rgba(0, 0, 0, 0.48)";
-        ctx.fill();
-        ctx.strokeStyle = accentColor;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        ctx.font = "800 12px 'Plus Jakarta Sans', Arial, sans-serif";
+        // Eyebrow espaciado con filetes y destellos
+        const eyebrow = "COCINA ARTESANAL TEX-MEX";
+        ctx.font = "800 15px 'Plus Jakarta Sans', Arial, sans-serif";
         ctx.fillStyle = accentColor;
-        ctx.textBaseline = "middle";
-        ctx.fillText("★ COCINA ARTESANAL TEX-MEX ★", 500, 219);
+        drawSpacedText(ctx, eyebrow, 500, 256, 4.2);
+        const eyebrowHalf = (ctx.measureText(eyebrow).width + 4.2 * eyebrow.length) / 2;
+        ctx.strokeStyle = accentColor;
+        ctx.globalAlpha = 0.75;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(500 - eyebrowHalf - 92, 251); ctx.lineTo(500 - eyebrowHalf - 32, 251);
+        ctx.moveTo(500 + eyebrowHalf + 32, 251); ctx.lineTo(500 + eyebrowHalf + 92, 251);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        drawSparkle(ctx, 500 - eyebrowHalf - 16, 251, 7, accentColor);
+        drawSparkle(ctx, 500 + eyebrowHalf + 16, 251, 7, accentColor);
 
-        // Título Principal "LE BURRÉ"
-        ctx.shadowColor = "rgba(0, 0, 0, 0.88)";
-        ctx.shadowBlur = 18;
+        // Título principal
+        ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+        ctx.shadowBlur = 16;
         ctx.shadowOffsetY = 6;
         ctx.fillStyle = titleColor;
-        drawFittedText(ctx, titleMain, 500, 290, 840, 86, 40, "800", "'Plus Jakarta Sans', 'Outfit', Arial, sans-serif");
+        drawFittedText(ctx, titleMain, 500, 358, 820, 112, 48, "800", "'Plus Jakarta Sans', Arial, sans-serif");
 
-        // Subtítulo "Carta Oficial & 7 Salsas"
-        ctx.shadowColor = "rgba(0, 0, 0, 0.82)";
-        ctx.shadowBlur = 14;
-        ctx.shadowOffsetY = 4;
+        // Subtítulo caligráfico
+        ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 3;
         ctx.fillStyle = subtitleColor;
-        drawFittedText(ctx, subtitle, 500, 356, 820, 34, 18, "600", "'Plus Jakarta Sans', Georgia, serif");
-
+        drawFittedText(ctx, subtitle, 500, 432, 760, 52, 26, "400", "'Grand Hotel', 'Plus Jakarta Sans', cursive");
         ctx.restore();
       });
     }
 
     if (showQr) {
-      withGroupTransform(ctx, data, "qr", 760, 714, function () {
+      withGroupTransform(ctx, data, "qr", 720, 690, function () {
         const targetUrl = data.qrUrl || data.url || "https://gestor-nfc-qr-2026.web.app/r/leburre";
-        const captionMode = data.qrCaptionMode || "bottom-text-id";
+        const captionMode = data.qrCaptionMode || "bottom-text";
         const isClean = captionMode === "clean";
-        const boxSize = isClean ? 248 : 232;
-        const boxX = 760 - boxSize / 2;
-        const boxY = isClean ? 580 : 598;
-        const qrPad = 18;
+        const withId = captionMode === "bottom-text-id";
+        const boxSize = isClean ? 266 : withId ? 226 : 240;
+        const boxX = 720 - boxSize / 2;
+        const boxY = isClean ? 560 : 548;
+        const qrPad = Math.round(boxSize * 0.075);
         const qrSize = boxSize - qrPad * 2;
 
         ctx.save();
-        ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
-        ctx.shadowBlur = 16;
-        ctx.shadowOffsetY = 6;
-
-        // Tarjeta de papel de estraza / pergamino claro
+        ctx.shadowColor = "rgba(60, 10, 10, 0.20)";
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 4;
         roundRectPath(ctx, boxX, boxY, boxSize, boxSize, 22);
-        ctx.fillStyle = "#FAF6EE";
+        ctx.fillStyle = "#FFFFFF";
         ctx.fill();
-
-        ctx.strokeStyle = accentColor;
+        ctx.restore();
+        roundRectPath(ctx, boxX, boxY, boxSize, boxSize, 22);
+        ctx.strokeStyle = captionColor;
         ctx.lineWidth = 3;
         ctx.stroke();
-        ctx.restore();
 
-        // Código QR
-        drawQrMatrix(
-          ctx,
-          targetUrl,
-          boxX + qrPad,
-          boxY + qrPad,
-          qrSize,
-          buildQrOptionsFromData("leburre", data, "#7A0C0C", false)
-        );
+        drawQrMatrix(ctx, targetUrl, boxX + qrPad, boxY + qrPad, qrSize, buildQrOptionsFromData("leburre", data, "#7A0C0C", false));
 
-        // Texto bajo el QR si está activo
         if (!isClean) {
           ctx.save();
           ctx.textAlign = "center";
-          ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
-          ctx.shadowBlur = 6;
-          ctx.shadowOffsetY = 2;
-
-          const caption = cleanVisualText(data.qrCaptionText, "VER CARTA & SALSAS");
-          ctx.font = "800 15px 'Plus Jakarta Sans', Arial, sans-serif";
-          ctx.fillStyle = accentColor;
-          ctx.fillText(caption, 760, 856);
-
-          if (captionMode === "bottom-text-id") {
-            ctx.fillStyle = textColor;
-            ctx.globalAlpha = 0.88;
+          ctx.textBaseline = "alphabetic";
+          ctx.fillStyle = captionColor;
+          const caption = cleanVisualText(data.qrCaptionText, "VER CARTA & SALSAS").toUpperCase();
+          const capY = boxY + boxSize + 34;
+          ctx.font = "800 19px 'Plus Jakarta Sans', Arial, sans-serif";
+          let capSize = 19;
+          while (capSize > 13 && ctx.measureText(caption).width + caption.length * 1.8 > 330) {
+            capSize -= 1;
+            ctx.font = "800 " + capSize + "px 'Plus Jakarta Sans', Arial, sans-serif";
+          }
+          drawSpacedText(ctx, caption, 720, capY, 1.8);
+          if (withId) {
+            ctx.globalAlpha = 0.6;
             const slug = cleanVisualText(data.slug, "LE-BURRE").toUpperCase();
-            drawFittedText(ctx, slug, 760, 874, 280, 21, 13, "600", "'JetBrains Mono', monospace");
+            drawFittedText(ctx, slug, 720, capY + 24, 300, 15, 11, "600", "'JetBrains Mono', monospace");
           }
           ctx.restore();
         }
@@ -3209,14 +3676,14 @@
     }
 
     if (showBrand) {
-      withGroupTransform(ctx, data, "brand", 500, 946, function () {
-        drawPoweredByBlueCodeFooter(ctx, 500, 955, {
+      withGroupTransform(ctx, data, "brand", 500, 934, function () {
+        drawPoweredByBlueCodeFooter(ctx, 500, 944, {
           lowercase: true,
-          fontSize: 27,
-          brandFontSize: 30,
-          logoHeight: 33,
-          prefixColor: darkBg ? "rgba(250, 246, 238, 0.78)" : "#222222",
-          brandColor: accentColor || "#F2B705"
+          fontSize: 25,
+          brandFontSize: 28,
+          logoHeight: 30,
+          prefixColor: darkBg ? "rgba(251, 244, 228, 0.82)" : "#222222",
+          brandColor: darkBg ? "#FBF4E4" : "#1B1A1A"
         });
       });
     }
@@ -3444,16 +3911,20 @@
     }
     const { jsPDF } = window.jspdf;
     const cm = sizeCm || 8;
+    // La página respeta la proporción del lienzo (con etiqueta es más alto que ancho);
+    // antes se forzaba a cuadrado y el QR salía achatado verticalmente.
+    const heightCm = cm * (qrCanvas.height / qrCanvas.width);
     const doc = new jsPDF({
       orientation: "p",
       unit: "cm",
-      format: [cm, cm],
+      format: [cm, heightCm],
       compress: true
     });
     const imgData = qrCanvas.toDataURL("image/png", 1.0);
-    doc.addImage(imgData, "PNG", 0, 0, cm, cm);
-    doc.save("QR_Individual_BlueCode_" + (slug || "TAG") + "_" + cm + "x" + cm + "cm.pdf");
-    if (notifyFn) notifyFn("¡PDF Individual del QR (" + cm + "×" + cm + " cm) descargado!");
+    doc.addImage(imgData, "PNG", 0, 0, cm, heightCm);
+    const sizeLabel = cm + "x" + (Math.round(heightCm * 10) / 10) + "cm";
+    doc.save("QR_Individual_BlueCode_" + (slug || "TAG") + "_" + sizeLabel + ".pdf");
+    if (notifyFn) notifyFn("¡PDF Individual del QR (" + sizeLabel.replace("x", " × ").replace("cm", " cm") + ") descargado!");
   }
 
   window.BlueCodePlaqueStudio = {
@@ -3461,6 +3932,7 @@
     cmToPx300: cmToPx300,
     drawBlueCodeLogo: drawBlueCodeLogo,
     drawQrMatrix: drawQrMatrix,
+    buildStyledQrSvg: buildStyledQrSvg,
     setCustomQrLogoImage: setCustomQrLogoImage,
     setCustomHeaderBgImage: setCustomHeaderBgImage,
     onAssetsLoaded: setOnAssetsLoaded,
